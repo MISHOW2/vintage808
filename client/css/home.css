@@ -1,0 +1,603 @@
+/* ============================================================
+   Vintage808 — Home Page Styles
+   Matches the shop page aesthetic (vintage808-shop.html)
+   Link this after your base/reset styles:
+     <link rel="stylesheet" href="vintage808-home.css" />
+   Google Fonts required in <head>:
+     https://fonts.googleapis.com/css2?family=Archivo+Black&family=Archivo:wght@300;400;500&family=Space+Mono:wght@400;700&display=swap
+   ============================================================ */
+
+/* ── Variables & Reset ── */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+:root {
+  --black:        #111111;
+  --white:        #f5f2ec;
+  --sand:         #e8e2d5;
+  --mid:          #999186;
+  --accent:       #c84b2f;
+  --nav-h:        64px;
+  --font-display: 'Archivo Black', sans-serif;
+  --font-body:    'Archivo', sans-serif;
+  --font-mono:    'Space Mono', monospace;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background: var(--white);
+  color: var(--black);
+  font-family: var(--font-body);
+  font-size: 15px;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+button {
+  cursor: pointer;
+  font-family: inherit;
+}
+
+
+
+
+
+
+
+
+/* ============================================================
+   HERO
+   Expected HTML:
+   <section class="hero">
+     <div class="hero-x hero-x--tl"></div>
+     <div class="hero-x hero-x--tr"></div>
+     <div class="hero-x hero-x--bl"></div>
+     <div class="hero-content">
+       <h1 class="hero-heading">…</h1>
+       <p class="hero-body">…</p>
+       <a href="#" class="btn btn-primary">Explore</a>
+     </div>
+   </section>
+   ============================================================ */
+
+.hero {
+  background: var(--black);
+  color: var(--white);
+  min-height: 520px;
+  display: flex;
+  align-items: flex-end;
+  padding: 80px 40px;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Diagonal stripe texture */
+.hero::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: repeating-linear-gradient(
+    -45deg,
+    transparent,
+    transparent 40px,
+    rgba(255,255,255,0.015) 40px,
+    rgba(255,255,255,0.015) 41px
+  );
+  pointer-events: none;
+}
+
+/* Decorative X marks — matches wireframe top corners */
+.hero-x {
+  position: absolute;
+  width: 120px;
+  height: 120px;
+  opacity: 0.12;
+  pointer-events: none;
+}
+
+.hero-x::before,
+.hero-x::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 100%;
+  height: 1px;
+  background: var(--white);
+  transform-origin: center;
+}
+
+.hero-x::before {
+  transform: translate(-50%, -50%) rotate(45deg);
+}
+
+.hero-x::after {
+  transform: translate(-50%, -50%) rotate(-45deg);
+}
+
+.hero-x--tl {
+  top: -20px;
+  left: -20px;
+}
+
+.hero-x--tr {
+  top: -20px;
+  right: -20px;
+}
+
+.hero-x--bl {
+  bottom: -20px;
+  left: 40px;
+}
+
+.hero-content {
+  position: relative;
+  z-index: 1;
+  max-width: 560px;
+}
+
+.hero-tag {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin-bottom: 16px;
+}
+
+.hero-heading {
+  font-family: var(--font-display);
+  font-size: clamp(32px, 4.5vw, 52px);
+  line-height: 1.05;
+  letter-spacing: -0.02em;
+  margin-bottom: 16px;
+}
+
+.hero-body {
+  font-weight: 500;
+  font-size: 14px;
+  color: rgba(245,242,236,0.75);
+  max-width: 380px;
+  line-height: 1.6;
+  margin-bottom: 32px;
+}
+
+.hero-actions {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+
+/* ============================================================
+   BUTTONS (shared)
+   ============================================================ */
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 24px;
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  border-radius: 2px;
+  transition: all 0.18s;
+  white-space: nowrap;
+  border: 1px solid transparent;
+}
+
+.btn-primary {
+  background: var(--accent);
+  color: #fff;
+  border-color: var(--accent);
+}
+
+.btn-primary:hover {
+  background: #a83a20;
+  border-color: #a83a20;
+}
+
+/* Dark filled — used for "Explore" and "Shop" on home page */
+.btn-dark {
+  background: var(--black);
+  color: var(--white);
+  border-color: var(--black);
+}
+
+.btn-dark:hover {
+  background: #333;
+  border-color: #333;
+}
+
+.btn-ghost {
+  background: transparent;
+  color: var(--black);
+  border-color: var(--black);
+}
+
+.btn-ghost:hover {
+  background: var(--black);
+  color: var(--white);
+}
+
+.btn-ghost-light {
+  background: transparent;
+  color: var(--white);
+  border-color: rgba(245,242,236,0.3);
+}
+
+.btn-ghost-light:hover {
+  border-color: var(--white);
+  background: rgba(255,255,255,0.06);
+}
+
+
+/* ============================================================
+   FEATURED / SHOP SECTION
+   Expected HTML:
+   <section class="featured-section">
+     <p class="section-eyebrow">Featured</p>
+     <h2 class="section-heading section-heading--xl">Shop</h2>
+     <p class="section-sub">Pick what fits your day</p>
+     <div class="product-grid"> … </div>
+   </section>
+   ============================================================ */
+
+.featured-section {
+  padding: 72px 40px 80px;
+  text-align: center;
+}
+
+.section-eyebrow {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--mid);
+  margin-bottom: 10px;
+}
+
+/* Default section heading */
+.section-heading {
+  font-family: var(--font-display);
+  font-size: clamp(28px, 4vw, 42px);
+  letter-spacing: -0.02em;
+  margin-bottom: 8px;
+}
+
+/* XL variant for the centered "Shop" heading on home page */
+.section-heading--xl {
+  font-size: clamp(52px, 8vw, 96px);
+  letter-spacing: -0.04em;
+  line-height: 1;
+  margin-bottom: 12px;
+}
+
+.section-sub {
+  font-size: 14px;
+  color: var(--mid);
+  margin-bottom: 40px;
+}
+
+
+/* ============================================================
+   PRODUCT GRID & CARDS
+   ============================================================ */
+
+.product-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 24px 20px;
+  margin-bottom: 48px;
+  text-align: left;
+ 
+}
+
+.product-card {
+  display: flex;
+  flex-direction: column;
+   width: 332px;
+}
+
+.product-image {
+  aspect-ratio: 1 / 1.15;
+  background: var(--sand);
+  border-radius: 2px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  margin-bottom: 12px;
+  position: relative;
+  transition: transform 0.25s;
+}
+
+.product-card:hover .product-image {
+  transform: translateY(-3px);
+}
+
+.product-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.product-badge {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  background: var(--black);
+  color: var(--white);
+  font-family: var(--font-mono);
+  font-size: 9px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  padding: 3px 8px;
+  border-radius: 2px;
+}
+
+.product-badge.sale {
+  background: var(--accent);
+}
+
+.product-info {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+
+.product-name {
+  font-size: 13px;
+  font-weight: 500;
+  line-height: 1.4;
+  color: var(--black);
+}
+
+.product-price {
+  font-family: var(--font-mono);
+  font-size: 13px;
+  font-weight: 700;
+  white-space: nowrap;
+  color: var(--black);
+}
+
+.btn-cart {
+  width: 100%;
+  background: transparent;
+  border: 1px solid var(--black);
+  padding: 10px 16px;
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--black);
+  border-radius: 2px;
+  transition: all 0.18s;
+}
+
+.btn-cart:hover {
+  background: var(--black);
+  color: var(--white);
+}
+
+
+/* ============================================================
+   DISCOVER MORE / CTA SECTION
+   Expected HTML:
+   <section class="discover-section">
+     <h2 class="discover-heading">Discover more</h2>
+     <p class="discover-sub">Browse the full collection…</p>
+     <div class="discover-actions">
+       <a href="#" class="btn btn-dark">Shop</a>
+       <a href="#" class="btn btn-ghost">Learn more</a>
+     </div>
+   </section>
+   ============================================================ */
+
+.discover-section {
+  padding: 96px 40px;
+  text-align: center;
+  background: var(--white);
+}
+
+.discover-heading {
+  font-family: var(--font-display);
+  font-size: clamp(36px, 5vw, 60px);
+  letter-spacing: -0.03em;
+  margin-bottom: 16px;
+}
+
+.discover-sub {
+  font-size: 14px;
+  color: var(--mid);
+  max-width: 480px;
+  margin: 0 auto 32px;
+  line-height: 1.7;
+}
+
+.discover-actions {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+
+/* ============================================================
+   NEWSLETTER
+   Expected HTML:
+   <section class="newsletter">
+     <div class="newsletter-text">
+       <p class="newsletter-heading">Stay in the loop</p>
+       <p class="newsletter-sub">Get updates on new drops and exclusive offers</p>
+     </div>
+     <div class="newsletter-form">
+       <div class="newsletter-row">
+         <input type="email" class="newsletter-input" placeholder="Your email" />
+         <button class="btn-subscribe">Subscribe</button>
+       </div>
+       <p class="newsletter-note">We respect your privacy. Unsubscribe anytime.</p>
+     </div>
+   </section>
+   ============================================================ */
+
+.newsletter {
+  background: var(--sand);
+  padding: 60px 40px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  align-items: center;
+  gap: 40px;
+}
+
+.newsletter-heading {
+  font-family: var(--font-display);
+  font-size: 20px;
+  letter-spacing: -0.01em;
+  margin-bottom: 6px;
+}
+
+.newsletter-sub {
+  font-size: 13px;
+  color: var(--mid);
+}
+
+.newsletter-form {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.newsletter-row {
+  display: flex;
+  gap: 8px;
+}
+
+.newsletter-input {
+  flex: 1;
+  padding: 11px 16px;
+  font-family: var(--font-body);
+  font-size: 13px;
+  border: 1px solid rgba(17,17,17,0.2);
+  border-radius: 2px;
+  background: var(--white);
+  color: var(--black);
+  outline: none;
+  transition: border-color 0.15s;
+}
+
+.newsletter-input:focus {
+  border-color: var(--black);
+}
+
+.newsletter-input::placeholder {
+  color: var(--mid);
+}
+
+.btn-subscribe {
+  padding: 11px 20px;
+  background: var(--black);
+  color: var(--white);
+  border: 1px solid var(--black);
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  border-radius: 2px;
+  transition: opacity 0.15s;
+  white-space: nowrap;
+  cursor: pointer;
+  font-family: var(--font-body);
+}
+
+.btn-subscribe:hover {
+  opacity: 0.75;
+}
+
+.newsletter-note {
+  font-size: 11px;
+  color: var(--mid);
+}
+
+
+/* ============================================================
+   FOOTER
+   ============================================================ */
+
+
+/* ============================================================
+   RESPONSIVE
+   ============================================================ */
+
+@media (max-width: 900px) {
+  nav {
+    padding: 0 20px;
+    gap: 20px;
+  }
+
+  .nav-links {
+    display: none;
+  }
+
+  .hero {
+    padding: 60px 20px;
+    min-height: 420px;
+  }
+
+  .featured-section {
+    padding: 48px 20px 60px;
+  }
+
+  .product-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 16px;
+  }
+
+  .discover-section {
+    padding: 64px 20px;
+  }
+
+  .newsletter {
+    grid-template-columns: 1fr;
+    padding: 40px 20px;
+  }
+
+  .footer-grid {
+    grid-template-columns: repeat(2, 1fr);
+    padding-bottom: 32px;
+  }
+
+  footer {
+    padding: 40px 20px 24px;
+  }
+}
+
+@media (max-width: 520px) {
+  .product-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .footer-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .section-heading--xl {
+    font-size: clamp(48px, 14vw, 72px);
+  }
+}

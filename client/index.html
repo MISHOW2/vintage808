@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Vintage808 — Home</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Archivo:wght@300;400;500&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="./css/home.css" />
+<link rel="stylesheet" href="./css/components.css">
+</head>
+<body>
+
+<!-- ── Navigation ── -->
+<nav>
+  <a href="./index.html" class="nav-logo">Vintage<strong>808</strong></a>
+  <ul class="nav-links">
+    <li><a href="./shop.html" class="active">Shop</a></li>
+    <li><a href="#">Category</a></li>
+    <li><a href="#">About</a></li>
+    <li><a href="#">Contact</a></li>
+  </ul>
+  <div class="nav-icons">
+    <div class="cart-wrap">
+      <button class="nav-icon-btn" aria-label="Cart">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/>
+          <line x1="3" y1="6" x2="21" y2="6"/>
+          <path d="M16 10a4 4 0 0 1-8 0"/>
+        </svg>
+      </button>
+      <span class="cart-badge">2</span>
+    </div>
+    <button class="nav-icon-btn" aria-label="Account">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+        <circle cx="12" cy="7" r="4"/>
+      </svg>
+    </button>
+  </div>
+
+  <!-- Burger button — hidden on desktop, visible on mobile -->
+  <button class="nav-burger" aria-label="Toggle menu" aria-expanded="false">
+    <span></span>
+    <span></span>
+    <span></span>
+  </button>
+</nav>
+
+<!-- ── Mobile Drawer ── -->
+<div class="nav-drawer" aria-hidden="true">
+  <ul class="nav-drawer-links">
+    <li><a href="./shop.html" class="active">Shop</a></li>
+    <li><a href="#">Category</a></li>
+    <li><a href="#">About</a></li>
+    <li><a href="#">Contact</a></li>
+  </ul>
+  <div class="nav-drawer-bottom">
+    <div class="nav-drawer-icons">
+      <button class="nav-drawer-icon-btn" aria-label="Cart">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/>
+          <line x1="3" y1="6" x2="21" y2="6"/>
+          <path d="M16 10a4 4 0 0 1-8 0"/>
+        </svg>
+        Cart
+        <span class="drawer-badge">2</span>
+      </button>
+      <button class="nav-drawer-icon-btn" aria-label="Account">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+          <circle cx="12" cy="7" r="4"/>
+        </svg>
+        Account
+      </button>
+    </div>
+    <div class="nav-drawer-social">
+      <a href="#" class="drawer-social-link">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/></svg>
+        Facebook
+      </a>
+      <a href="#" class="drawer-social-link">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="2" y="2" width="20" height="20" rx="5"/>
+          <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/>
+          <line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/>
+        </svg>
+        Instagram
+      </a>
+      <a href="#" class="drawer-social-link">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+        X
+      </a>
+    </div>
+  </div>
+</div>
+
+<!-- ── Hero ── -->
+<section class="hero">
+  <div class="hero-x hero-x--tl"></div>
+  <div class="hero-x hero-x--tr"></div>
+  <div class="hero-x hero-x--bl"></div>
+  <div class="hero-content">
+    <h1 class="hero-heading">Custom streetwear for every day</h1>
+    <p class="hero-body">Quality hats, tees, and shorts built for your style. Made simple, made right.</p>
+    <div class="hero-actions">
+      <a href="#featured" class="btn btn-dark">Explore</a>
+    </div>
+  </div>
+</section>
+
+<!-- ── Featured Shop Section ── -->
+<section class="featured-section" id="featured">
+  <p class="section-eyebrow">Featured</p>
+  <h2 class="section-heading section-heading--xl">Shop</h2>
+  <p class="section-sub">Pick what fits your day</p>
+
+  <div class="product-grid">
+
+    <div class="product-card">
+      <div class="product-image">
+        <span class="product-badge sale">New</span>
+        <img src="./assets/images/products/225a9423.jpg" alt="Mirage Surf Revival Board Shorts" />
+      </div>
+      <div class="product-info">
+        <p class="product-name">Mirage Surf Revival Board Shorts</p>
+        <span class="product-price">R350.00</span>
+      </div>
+      <button class="btn-cart">Add to cart</button>
+    </div>
+
+    <div class="product-card">
+      <div class="product-image">
+        <img src="./assets/images/products/35078d3a.jpg" alt="Mirage Surf Revival Board Shorts" />
+      </div>
+      <div class="product-info">
+        <p class="product-name">Mirage Surf Revival Board Shorts</p>
+        <span class="product-price">R350.00</span>
+      </div>
+      <button class="btn-cart">Add to cart</button>
+    </div>
+
+    <div class="product-card">
+      <div class="product-image">
+        <span class="product-badge sale">New</span>
+        <img src="./assets/images/products/51b9d3e4.jpg" alt="Mirage Surf Revival Board Shorts" />
+      </div>
+      <div class="product-info">
+        <p class="product-name">Mirage Surf Revival Board Shorts</p>
+        <span class="product-price">R350.00</span>
+      </div>
+      <button class="btn-cart">Add to cart</button>
+    </div>
+
+    <div class="product-card">
+      <div class="product-image">
+        <span class="product-badge sale">New</span>
+        <img src="./assets/images/products/5e9e8614.jpg" alt="Mirage Surf Revival Board Shorts" />
+      </div>
+      <div class="product-info">
+        <p class="product-name">Mirage Surf Revival Board Shorts</p>
+        <span class="product-price">R350.00</span>
+      </div>
+      <button class="btn-cart">Add to cart</button>
+    </div>
+
+    <div class="product-card">
+      <div class="product-image">
+        <span class="product-badge sale">New</span>
+        <img src="./assets/images/products/5ede0498.jpg" alt="Mirage Surf Revival Board Shorts" />
+      </div>
+      <div class="product-info">
+        <p class="product-name">Mirage Surf Revival Board Shorts</p>
+        <span class="product-price">R350.00</span>
+      </div>
+      <button class="btn-cart">Add to cart</button>
+    </div>
+
+    <div class="product-card">
+      <div class="product-image">
+        <span class="product-badge sale">New</span>
+        <img src="./assets/images/products/767d7e5b.jpg" alt="Mirage Surf Revival Board Shorts" />
+      </div>
+      <div class="product-info">
+        <p class="product-name">Mirage Surf Revival Board Shorts</p>
+        <span class="product-price">R350.00</span>
+      </div>
+      <button class="btn-cart">Add to cart</button>
+    </div>
+
+    <div class="product-card">
+      <div class="product-image">
+        <img src="./assets/images/products/845274b2.jpg" alt="Mirage Surf Revival Board Shorts" />
+      </div>
+      <div class="product-info">
+        <p class="product-name">Mirage Surf Revival Board Shorts</p>
+        <span class="product-price">R350.00</span>
+      </div>
+      <button class="btn-cart">Add to cart</button>
+    </div>
+
+    <div class="product-card">
+      <div class="product-image">
+        <span class="product-badge sale">New</span>
+        <img src="./assets/images/products/91082737.jpg" alt="Mirage Surf Revival Board Shorts" />
+      </div>
+      <div class="product-info">
+        <p class="product-name">Mirage Surf Revival Board Shorts</p>
+        <span class="product-price">R350.00</span>
+      </div>
+      <button class="btn-cart">Add to cart</button>
+    </div>
+
+  </div>
+</section>
+
+<!-- ── Discover More ── -->
+<section class="discover-section">
+  <h2 class="discover-heading">Discover more</h2>
+  <p class="discover-sub">Browse the full collection of hats, shirts, and shorts in all available colors and sizes.</p>
+  <div class="discover-actions">
+    <a href="#" class="btn btn-dark">Shop</a>
+    <a href="#" class="btn btn-ghost">Learn more</a>
+  </div>
+</section>
+
+<!-- ── Newsletter ── -->
+<section class="newsletter">
+  <div class="newsletter-text">
+    <p class="newsletter-heading">Stay in the loop</p>
+    <p class="newsletter-sub">Get updates on new drops and exclusive offers</p>
+  </div>
+  <div class="newsletter-form">
+    <div class="newsletter-row">
+      <input type="email" class="newsletter-input" placeholder="Your email" />
+      <button class="btn-subscribe">Subscribe</button>
+    </div>
+    <p class="newsletter-note">We respect your privacy. Unsubscribe anytime.</p>
+  </div>
+</section>
+
+<!-- ── Footer ── -->
+<footer>
+  <div class="footer-grid">
+
+    <div>
+      <p class="footer-col-title">Shop</p>
+      <ul class="footer-links">
+        <li><a href="#">All items</a></li>
+        <li><a href="#">Hats</a></li>
+        <li><a href="#">T-shirt</a></li>
+        <li><a href="#">Shorts</a></li>
+      </ul>
+    </div>
+
+    <div>
+      <p class="footer-col-title">Company</p>
+      <ul class="footer-links">
+        <li><a href="#">About us</a></li>
+        <li><a href="#">Contact</a></li>
+        <li><a href="#">Support</a></li>
+      </ul>
+    </div>
+
+    <div>
+      <p class="footer-col-title">Help</p>
+      <ul class="footer-links">
+        <li><a href="#">FAQ</a></li>
+        <li><a href="#">Shipping info</a></li>
+        <li><a href="#">Returns</a></li>
+        <li><a href="#">Size guide</a></li>
+      </ul>
+    </div>
+
+    <div>
+      <p class="footer-col-title">Legal</p>
+      <ul class="footer-links">
+        <li><a href="#">Privacy policy</a></li>
+        <li><a href="#">Terms policy</a></li>
+        <li><a href="#">Cookie policy</a></li>
+        <li><a href="#">Accessibility</a></li>
+      </ul>
+    </div>
+
+    <div>
+      <p class="footer-col-title">Follow Us</p>
+      <ul class="social-links">
+        <li>
+          <a href="#" class="social-link">
+            <span class="social-icon">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/></svg>
+            </span>
+            Facebook
+          </a>
+        </li>
+        <li>
+          <a href="#" class="social-link">
+            <span class="social-icon">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="2" y="2" width="20" height="20" rx="5"/>
+                <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/>
+                <line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/>
+              </svg>
+            </span>
+            Instagram
+          </a>
+        </li>
+        <li>
+          <a href="#" class="social-link">
+            <span class="social-icon">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+            </span>
+            X
+          </a>
+        </li>
+      </ul>
+    </div>
+
+  </div>
+
+  <div class="footer-bottom">
+    <span>© 2025 Vintage808. All rights reserved.</span>
+    <span>Made in South Africa</span>
+  </div>
+</footer>
+
+<script type="module" src="./js/components/nav.js" defer></script>
+</body>
+</html>
