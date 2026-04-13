@@ -301,9 +301,9 @@ button {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
   gap: 24px 20px;
-  margin-bottom: 48px;
-  text-align: left;
  
+  text-align: left;
+ padding: 60px;
 }
 
 .product-card {
@@ -536,15 +536,6 @@ button {
 }
 
 
-/* ============================================================
-   FOOTER
-   ============================================================ */
-
-
-/* ============================================================
-   RESPONSIVE
-   ============================================================ */
-
 @media (max-width: 900px) {
   nav {
     padding: 0 20px;
@@ -583,20 +574,22 @@ button {
     padding-bottom: 32px;
   }
 
-  footer {
-    padding: 40px 20px 24px;
-  }
+ 
 }
 
 @media (max-width: 520px) {
   .product-grid {
-    grid-template-columns: 1fr;
+     grid-template-columns: repeat(2, 1fr);
+      padding: 0;
+   margin: 0;
   }
+  .product-card {
+  display: flex;
+  flex-direction: column;
+   width: 160px;
 
-  .footer-grid {
-    grid-template-columns: 1fr;
-  }
-
+}
+  
   .section-heading--xl {
     font-size: clamp(48px, 14vw, 72px);
   }
