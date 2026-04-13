@@ -402,11 +402,10 @@ footer {
     padding: 50px 20px 30px;
   }
 
-  .footer-newsletter {
+   .newsletter-row{
+    display: flex;
     flex-direction: column;
-    align-items: flex-start;
   }
-
   .newsletter-form {
     width: 100%;
     flex-direction: column;

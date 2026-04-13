@@ -558,6 +558,7 @@ button {
   .product-grid {
     grid-template-columns: repeat(2, 1fr);
     gap: 16px;
+    padding: 0;
   }
 
   .discover-section {
