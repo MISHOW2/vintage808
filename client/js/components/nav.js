@@ -1,11 +1,4 @@
-/* ============================================================
-   Vintage808 — nav.js
-   Save as ./js/nav.js
-   Already linked in index.html as:
-     <script src="./js/nav.js" defer></script>
-   ============================================================ */
-
-(function () {
+export function nav() {
   const burger = document.querySelector('.nav-burger');
   const drawer = document.querySelector('.nav-drawer');
 
@@ -27,22 +20,19 @@
     drawer.setAttribute('aria-hidden', 'true');
   }
 
-  burger.addEventListener('click', function () {
+  burger.addEventListener('click', () => {
     burger.classList.contains('open') ? closeMenu() : openMenu();
   });
 
-  // Close when a drawer link is tapped
-  drawer.querySelectorAll('a').forEach(function (link) {
+  drawer.querySelectorAll('a').forEach(link => {
     link.addEventListener('click', closeMenu);
   });
 
-  // Close on Escape key
-  document.addEventListener('keydown', function (e) {
+  document.addEventListener('keydown', e => {
     if (e.key === 'Escape') closeMenu();
   });
 
-  // Close if screen is resized back to desktop width
-  window.addEventListener('resize', function () {
+  window.addEventListener('resize', () => {
     if (window.innerWidth > 900) closeMenu();
   });
-})();
+}

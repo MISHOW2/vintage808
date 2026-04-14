@@ -256,10 +256,7 @@ button {
    </section>
    ============================================================ */
 
-.featured-section {
-  padding: 72px 40px 80px;
-  text-align: center;
-}
+
 
 .section-eyebrow {
   font-family: var(--font-mono);
@@ -536,62 +533,365 @@ button {
 }
 
 
+
+
+
 @media (max-width: 900px) {
-  nav {
-    padding: 0 20px;
-    gap: 20px;
-  }
 
-  .nav-links {
-    display: none;
-  }
-
+  /* ── Hero ── */
   .hero {
-    padding: 60px 20px;
+    padding: 60px 24px 48px;
     min-height: 420px;
+    align-items: flex-end;
   }
 
+  .hero-heading {
+    font-size: clamp(28px, 6vw, 42px);
+  }
+
+  .hero-body {
+    font-size: 13px;
+    max-width: 100%;
+    margin-bottom: 24px;
+  }
+
+  .hero-actions {
+    gap: 10px;
+  }
+
+  /* ── Featured / Shop section ── */
   .featured-section {
-    padding: 48px 20px 60px;
+    padding: 48px 24px 56px;
   }
 
+  .section-heading--xl {
+    font-size: clamp(48px, 10vw, 80px);
+  }
+
+  /* ── Product grid — 2 columns ── */
   .product-grid {
     grid-template-columns: repeat(2, 1fr);
     gap: 16px;
-    padding: 0;
+    padding: 0 24px;
   }
 
+  .product-card {
+    width: 100%;
+  }
+
+  /* ── Discover section ── */
   .discover-section {
-    padding: 64px 20px;
+    padding: 64px 24px;
   }
 
+  .discover-heading {
+    font-size: clamp(30px, 6vw, 50px);
+  }
+
+  /* ── Newsletter ── */
   .newsletter {
     grid-template-columns: 1fr;
-    padding: 40px 20px;
+    padding: 44px 24px;
+    gap: 28px;
   }
 
-  .footer-grid {
-    grid-template-columns: repeat(2, 1fr);
-    padding-bottom: 32px;
+  .newsletter-heading {
+    font-size: 18px;
   }
 
- 
+  .newsletter-row {
+    flex-direction: row;
+  }
 }
 
-@media (max-width: 520px) {
-  .product-grid {
-     grid-template-columns: repeat(2, 1fr);
-      padding: 0;
-   margin: 0;
-  }
-  .product-card {
-  display: flex;
-  flex-direction: column;
-   width: 160px;
+/* ============================================================
+   768px — STANDARD MOBILE
+   ============================================================ */
+@media (max-width: 768px) {
 
-}
-  
+  /* ── Hero ── */
+  .hero {
+    padding: 48px 16px 40px;
+    min-height: 380px;
+  }
+
+  .hero-tag {
+    font-size: 9px;
+    margin-bottom: 12px;
+  }
+
+  .hero-heading {
+    font-size: clamp(26px, 7vw, 38px);
+    margin-bottom: 12px;
+  }
+
+  .hero-body {
+    margin-bottom: 20px;
+  }
+
+  .hero-actions {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+
+  .hero-actions .btn {
+    width: 100%;
+    justify-content: center;
+  }
+
+  /* ── Featured / Shop section ── */
+  .featured-section {
+    padding: 40px 16px 48px;
+  }
+
+  .section-eyebrow {
+    font-size: 9px;
+    margin-bottom: 8px;
+  }
+
   .section-heading--xl {
-    font-size: clamp(48px, 14vw, 72px);
+    font-size: clamp(44px, 12vw, 72px);
+    margin-bottom: 8px;
+  }
+
+  .section-sub {
+    font-size: 13px;
+    margin-bottom: 28px;
+  }
+
+  /* ── Product grid ── */
+  .product-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+    padding: 0 16px;
+    margin: 0;
+  }
+
+  .product-card {
+    width: 100%;
+  }
+
+  .product-name {
+    font-size: 12px;
+  }
+
+  .product-price {
+    font-size: 12px;
+  }
+
+  .btn-cart {
+    padding: 9px 12px;
+    font-size: 10px;
+  }
+
+  /* ── Discover section ── */
+  .discover-section {
+    padding: 56px 16px;
+  }
+
+  .discover-heading {
+    font-size: clamp(28px, 8vw, 44px);
+    margin-bottom: 12px;
+  }
+
+  .discover-sub {
+    font-size: 13px;
+    margin-bottom: 24px;
+  }
+
+  .discover-actions {
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .discover-actions .btn {
+    width: 100%;
+    justify-content: center;
+  }
+
+  /* ── Newsletter ── */
+  .newsletter {
+    padding: 40px 16px;
+    gap: 24px;
+  }
+
+  .newsletter-row {
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .newsletter-input,
+  .btn-subscribe {
+    width: 100%;
+  }
+
+  .newsletter-note {
+    font-size: 10px;
+  }
+
+  /* ── Buttons (global home page) ── */
+  .btn {
+    padding: 11px 20px;
+    font-size: 11px;
+  }
+}
+
+/* ============================================================
+   520px — COMPACT PHONES
+   ============================================================ */
+@media (max-width: 520px) {
+
+  /* ── Hero ── */
+  .hero {
+    padding: 40px 12px 36px;
+    min-height: 340px;
+  }
+
+  .hero-heading {
+    font-size: clamp(24px, 8vw, 34px);
+  }
+
+  .hero-body {
+    font-size: 12px;
+  }
+
+  /* ── Section heading XL (the big "Shop" title) ── */
+  .section-heading--xl {
+    font-size: clamp(40px, 14vw, 64px);
+    letter-spacing: -0.03em;
+  }
+
+  /* ── Product grid — stays 2-col but tighter ── */
+  .product-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 8px;
+    padding: 0 12px;
+  }
+
+  .product-card {
+    width: 100%;
+  }
+
+  .product-image {
+    margin-bottom: 8px;
+  }
+
+  .product-info {
+    flex-direction: column;
+    gap: 2px;
+    margin-bottom: 6px;
+  }
+
+  .product-name,
+  .product-price {
+    font-size: 11px;
+  }
+
+  .btn-cart {
+    padding: 8px 10px;
+    font-size: 10px;
+    letter-spacing: 0.08em;
+  }
+
+  /* ── Featured section ── */
+  .featured-section {
+    padding: 32px 12px 40px;
+  }
+
+  /* ── Discover section ── */
+  .discover-section {
+    padding: 48px 12px;
+  }
+
+  .discover-heading {
+    font-size: clamp(26px, 10vw, 38px);
+  }
+
+  /* ── Newsletter ── */
+  .newsletter {
+    padding: 32px 12px;
+  }
+
+  .newsletter-heading {
+    font-size: 17px;
+  }
+
+  .newsletter-input {
+    padding: 10px 12px;
+    font-size: 12px;
+  }
+
+  .btn-subscribe {
+    padding: 10px 16px;
+    font-size: 11px;
+  }
+}
+
+/* ============================================================
+   380px — VERY SMALL PHONES (iPhone SE, Galaxy A)
+   ============================================================ */
+@media (max-width: 380px) {
+
+  /* ── Hero ── */
+  .hero {
+    padding: 36px 10px 32px;
+    min-height: 300px;
+  }
+
+  .hero-heading {
+    font-size: clamp(22px, 9vw, 30px);
+    margin-bottom: 10px;
+  }
+
+  /* ── Section heading XL ── */
+  .section-heading--xl {
+    font-size: clamp(36px, 15vw, 54px);
+  }
+
+  /* ── Product grid — single column on truly tiny screens ── */
+  .product-grid {
+    grid-template-columns: 1fr;
+    gap: 16px;
+    padding: 0 10px;
+  }
+
+  .product-card {
+    flex-direction: row;
+    align-items: flex-start;
+    gap: 12px;
+    width: 100%;
+  }
+
+  .product-image {
+    width: 100px;
+    height: 100px;
+    flex-shrink: 0;
+    aspect-ratio: 1 / 1;
+    margin-bottom: 0;
+  }
+
+  .product-info {
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .btn-cart {
+    margin-top: 8px;
+  }
+
+  /* ── Discover section ── */
+  .discover-section {
+    padding: 40px 10px;
+  }
+
+  .discover-heading {
+    font-size: clamp(24px, 11vw, 34px);
+  }
+
+  /* ── Newsletter ── */
+  .newsletter {
+    padding: 28px 10px;
   }
 }
