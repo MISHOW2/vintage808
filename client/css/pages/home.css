@@ -265,6 +265,7 @@ button {
   text-transform: uppercase;
   color: var(--mid);
   margin-bottom: 10px;
+  text-align: center;
 }
 
 /* Default section heading */
@@ -273,6 +274,8 @@ button {
   font-size: clamp(28px, 4vw, 42px);
   letter-spacing: -0.02em;
   margin-bottom: 8px;
+   text-align: center;
+
 }
 
 /* XL variant for the centered "Shop" heading on home page */
@@ -281,116 +284,22 @@ button {
   letter-spacing: -0.04em;
   line-height: 1;
   margin-bottom: 12px;
+   text-align: center;
+
 }
 
 .section-sub {
   font-size: 14px;
   color: var(--mid);
   margin-bottom: 40px;
+   text-align: center;
+
 }
 
 
-/* ============================================================
-   PRODUCT GRID & CARDS
-   ============================================================ */
 
-.product-grid {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 24px 20px;
- 
-  text-align: left;
- padding: 60px;
-}
 
-.product-card {
-  display: flex;
-  flex-direction: column;
-   width: 332px;
-}
 
-.product-image {
-  aspect-ratio: 1 / 1.15;
-  background: var(--sand);
-  border-radius: 2px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  overflow: hidden;
-  margin-bottom: 12px;
-  position: relative;
-  transition: transform 0.25s;
-}
-
-.product-card:hover .product-image {
-  transform: translateY(-3px);
-}
-
-.product-image img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-
-.product-badge {
-  position: absolute;
-  top: 12px;
-  left: 12px;
-  background: var(--black);
-  color: var(--white);
-  font-family: var(--font-mono);
-  font-size: 9px;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  padding: 3px 8px;
-  border-radius: 2px;
-}
-
-.product-badge.sale {
-  background: var(--accent);
-}
-
-.product-info {
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: 8px;
-  margin-bottom: 10px;
-}
-
-.product-name {
-  font-size: 13px;
-  font-weight: 500;
-  line-height: 1.4;
-  color: var(--black);
-}
-
-.product-price {
-  font-family: var(--font-mono);
-  font-size: 13px;
-  font-weight: 700;
-  white-space: nowrap;
-  color: var(--black);
-}
-
-.btn-cart {
-  width: 100%;
-  background: transparent;
-  border: 1px solid var(--black);
-  padding: 10px 16px;
-  font-size: 11px;
-  font-weight: 500;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  color: var(--black);
-  border-radius: 2px;
-  transition: all 0.18s;
-}
-
-.btn-cart:hover {
-  background: var(--black);
-  color: var(--white);
-}
 
 
 /* ============================================================

@@ -1,3 +1,89 @@
+  /* ── Nav ── */
+  nav {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background: var(--white);
+    border-bottom: 1px solid var(--sand);
+    height: var(--nav-h);
+    display: flex;
+    align-items: center;
+    padding: 0 40px;
+    gap: 40px;
+  }
+
+  .nav-logo {
+    font-family: var(--font-body);
+    font-weight: 300;
+    font-size: 15px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    display: flex;
+    align-items: baseline;
+    gap: 2px;
+  }
+
+  .nav-logo strong {
+    font-family: var(--font-display);
+    font-size: 22px;
+    letter-spacing: -0.02em;
+  }
+
+  .nav-links {
+    display: flex;
+    align-items: center;
+    gap: 32px;
+    list-style: none;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  .nav-links a {
+    font-size: 13px;
+    font-weight: 500;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--mid);
+    transition: color 0.15s;
+  }
+
+  .nav-links a:hover,
+  .nav-links a.active { color: var(--black); }
+
+  .nav-icons {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    margin-left: auto;
+  }
+
+  .nav-icon-btn {
+    background: none;
+    border: none;
+    padding: 4px;
+    color: var(--black);
+    transition: opacity 0.15s;
+  }
+
+  .nav-icon-btn:hover { opacity: 0.5; }
+
+  .cart-wrap { position: relative; }
+
+  .cart-badge {
+    position: absolute;
+    top: -4px;
+    right: -6px;
+    width: 16px;
+    height: 16px;
+    background: var(--accent);
+    color: #fff;
+    font-size: 9px;
+    font-family: var(--font-mono);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
 nav {
   position: sticky;
   top: 0;
@@ -269,12 +355,10 @@ body.nav-open {
 
 .product-grid {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 24px 20px;
- justify-content: center;
- align-items: center;
-  text-align: left;
-
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 89px 65px;
+  max-width: 1500px;
+  margin: 0 auto;
 }
 
 .product-card {
