@@ -497,20 +497,7 @@ button {
     font-size: clamp(30px, 6vw, 50px);
   }
 
-  /* ── Newsletter ── */
-  .newsletter {
-    grid-template-columns: 1fr;
-    padding: 44px 24px;
-    gap: 28px;
-  }
 
-  .newsletter-heading {
-    font-size: 18px;
-  }
-
-  .newsletter-row {
-    flex-direction: row;
-  }
 }
 
 /* ============================================================
