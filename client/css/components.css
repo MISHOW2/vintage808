@@ -652,7 +652,85 @@ body.nav-open {
       transition: background 0.15s;
     }
     .btn-checkout:hover { background: #333; }
+/* ── Size picker ─────────────────────────────────────── */
+.size-picker {
+  display: grid;
+  grid-template-rows: 0fr;
+  transition: grid-template-rows 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  overflow: hidden;
+}
 
+.size-picker.open {
+  grid-template-rows: 1fr;
+}
+
+/* inner wrapper needed for grid-template-rows collapse trick */
+.size-picker > * {
+  min-height: 0;
+  overflow: hidden;
+}
+
+.size-picker-label {
+  font-size: 0.7rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: #888;
+  margin: 0 0 8px;
+  padding-top: 12px;
+}
+
+.size-options {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 8px;
+}
+
+.size-option {
+  background: transparent;
+  border: 1px solid #ddd;
+  border-radius: 2px;
+  padding: 5px 10px;
+  font-size: 0.7rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #111;
+  cursor: pointer;
+  transition: border-color 0.15s, background 0.15s, color 0.15s;
+  line-height: 1;
+}
+
+.size-option:hover {
+  border-color: #111;
+}
+
+.size-option.selected {
+  background: #111;
+  border-color: #111;
+  color: #fff;
+}
+
+.size-error {
+  font-size: 0.7rem;
+  color: #c0392b;
+  margin: 0 0 8px;
+  min-height: 1em;
+}
+
+/* ── Btn-cart confirm state ──────────────────────────── */
+.btn-cart {
+  transition: all 0.18s, background 0.18s;
+}
+
+/* when picker is open, make the confirm button filled */
+.product-card:has(.size-picker.open) .btn-cart {
+  background: #111;
+  color: #fff;
+}
+
+.product-card:has(.size-picker.open) .btn-cart:hover {
+  background: #333;
+}
 
 /* ── Responsive: show burger, hide desktop nav ── */
 @media (max-width: 900px) {

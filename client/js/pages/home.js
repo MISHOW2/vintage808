@@ -18,6 +18,12 @@ export async function renderFeaturedProducts() {
       const price = typeof product.price === "number" ? product.price : parseFloat(product.price);
       const displayPrice = `R${price.toFixed(2)}`;
 
+      // Build size buttons from API data
+      const sizes = Array.isArray(product.sizes) ? product.sizes : [];
+      const sizeBtns = sizes.map(size => `
+        <button class="size-option" data-size="${size}">${size}</button>
+      `).join("");
+
       grid.innerHTML += `
         <div class="product-card">
           <div class="product-image">
@@ -28,6 +34,14 @@ export async function renderFeaturedProducts() {
             <p class="product-name">${product.name}</p>
             <span class="product-price">${displayPrice}</span>
           </div>
+
+          <!-- Size picker — hidden until user clicks Add to Cart -->
+          <div class="size-picker" aria-hidden="true">
+            <p class="size-picker-label">Select a size</p>
+            <div class="size-options">${sizeBtns}</div>
+            <p class="size-error" aria-live="polite"></p>
+          </div>
+
           <button
             class="btn-cart"
             data-product-id="${product.id}"
@@ -41,17 +55,56 @@ export async function renderFeaturedProducts() {
       `;
     });
 
-    // ── Single delegated listener on the grid ──
-    grid.addEventListener('click', e => {
-      const btn = e.target.closest('.btn-cart');
-      if (!btn) return;
+    // ── Event delegation on grid ──────────────────────────────────
+    grid.addEventListener("click", e => {
 
+      // 1. Size option selected
+      const sizeBtn = e.target.closest(".size-option");
+      if (sizeBtn) {
+        const picker = sizeBtn.closest(".size-picker");
+        picker.querySelectorAll(".size-option").forEach(b => b.classList.remove("selected"));
+        sizeBtn.classList.add("selected");
+        picker.querySelector(".size-error").textContent = "";
+        return;
+      }
+
+      // 2. Add to Cart clicked
+      const cartBtn = e.target.closest(".btn-cart");
+      if (!cartBtn) return;
+
+      const card = cartBtn.closest(".product-card");
+      const picker = card.querySelector(".size-picker");
+      const selectedSize = picker.querySelector(".size-option.selected");
+
+      // If picker not open yet — open it
+      if (!picker.classList.contains("open")) {
+        picker.classList.add("open");
+        picker.setAttribute("aria-hidden", "false");
+        cartBtn.textContent = "Confirm";
+        return;
+      }
+
+      // Picker open but no size chosen
+      if (!selectedSize) {
+        picker.querySelector(".size-error").textContent = "Please select a size";
+        return;
+      }
+
+      // All good — add to cart
       addToCart({
-        id:    btn.dataset.productId,
-        name:  btn.dataset.productName,
-        price: parseFloat(btn.dataset.productPrice),
-        image: btn.dataset.productImage,
+        id:    `${cartBtn.dataset.productId}-${selectedSize.dataset.size}`,
+        name:  `${cartBtn.dataset.productName} — ${selectedSize.dataset.size}`,
+        price: parseFloat(cartBtn.dataset.productPrice),
+        image: cartBtn.dataset.productImage,
+        size:  selectedSize.dataset.size,
       });
+
+      // Reset card state
+      picker.classList.remove("open");
+      picker.setAttribute("aria-hidden", "true");
+      picker.querySelectorAll(".size-option").forEach(b => b.classList.remove("selected"));
+      picker.querySelector(".size-error").textContent = "";
+      cartBtn.textContent = "Add to cart";
     });
 
   } catch (err) {
