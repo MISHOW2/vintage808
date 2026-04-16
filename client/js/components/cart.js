@@ -96,10 +96,10 @@ function renderCartDrawer() {
         <p class="cart-item-name">${item.name}</p>
         <p class="cart-item-price">R${(item.price * item.qty).toFixed(2)}</p>
         <div class="cart-item-qty">
-          <button class="qty-btn" data-id="${item.id}" data-delta="-1">−</button>
-          <span>${item.qty}</span>
-          <button class="qty-btn" data-id="${item.id}" data-delta="1">+</button>
-        </div>
+  <button class="qty-btn" data-id="${item.id}" data-delta="-1">−</button>
+  <span class="qty-count">${item.qty}</span>
+  <button class="qty-btn" data-id="${item.id}" data-delta="1">+</button>
+</div>
       </div>
       <button class="cart-item-remove" data-id="${item.id}" aria-label="Remove">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
