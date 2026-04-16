@@ -1,6 +1,6 @@
 // api/products.js
 export const API_BASE_URL =
-  "https://vintage808-api.vercel.app";
+  "https://vintage808-api.vercel.app/api";
 
 export async function getAllProducts() {
   const res = await fetch(`${API_BASE_URL}/products`);

@@ -1,7 +1,7 @@
 import { getAllProducts } from "../api/products.js";
 
 // ✅ Asset base (NO /api here)
-const ASSET_BASE_URL = "https://vintage808-api.vercel.app";
+const ASSET_BASE_URL = "https://vintage808-api.vercel.app/";
 
 export async function renderFeaturedProducts() {
   const grid = document.querySelector(".product-grid");
