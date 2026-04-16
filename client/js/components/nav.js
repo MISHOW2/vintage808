@@ -20,6 +20,9 @@ export function nav() {
     drawer.setAttribute('aria-hidden', 'true');
   }
 
+  // ✅ MAKE IT GLOBAL (this is the key)
+  window.closeNavDrawer = closeMenu;
+
   burger.addEventListener('click', () => {
     burger.classList.contains('open') ? closeMenu() : openMenu();
   });
