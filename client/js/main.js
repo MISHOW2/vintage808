@@ -1,6 +1,8 @@
 import Cart from "./components/cart.js";
 import { nav } from "./components/nav.js";
+import { renderFeaturedProducts } from "./pages/home.js";
 
+renderFeaturedProducts();
 nav()
 Cart.init();
 
