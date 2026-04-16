@@ -1,4 +1,145 @@
-// ─── Open / Close ─────────────────────────────────────────────
+// ─── Constants ───────────────────────────────────────────────
+const STORAGE_KEY = 'v808_cart';
+
+// ─── State ───────────────────────────────────────────────────
+function getCart() {
+  try {
+    return JSON.parse(localStorage.getItem(STORAGE_KEY)) ?? [];
+  } catch {
+    return [];
+  }
+}
+
+function saveCart(cart) {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(cart));
+}
+
+
+// ─── Cart Actions ────────────────────────────────────────────
+
+export function addToCart(product) {
+  // product: { id, name, price (number), image (full URL) }
+  const cart = getCart();
+  const existing = cart.find(item => item.id === product.id);
+
+  if (existing) {
+    existing.qty += 1;
+  } else {
+    cart.push({ ...product, qty: 1 });
+  }
+
+  saveCart(cart);
+  renderCartDrawer();
+  updateBadges();
+  openDrawer();
+}
+
+export function removeFromCart(productId) {
+  const cart = getCart().filter(item => item.id !== productId);
+  saveCart(cart);
+  renderCartDrawer();
+  updateBadges();
+}
+
+export function changeQty(productId, delta) {
+  const cart = getCart();
+  const item = cart.find(i => i.id === productId);
+  if (!item) return;
+
+  item.qty += delta;
+  if (item.qty <= 0) {
+    // Remove if qty drops to 0
+    saveCart(cart.filter(i => i.id !== productId));
+  } else {
+    saveCart(cart);
+  }
+
+  renderCartDrawer();
+  updateBadges();
+}
+
+export function clearCart() {
+  saveCart([]);
+  renderCartDrawer();
+  updateBadges();
+}
+
+export function getCartCount() {
+  return getCart().reduce((sum, item) => sum + item.qty, 0);
+}
+
+export function getCartTotal() {
+  return getCart().reduce((sum, item) => sum + item.price * item.qty, 0);
+}
+
+
+// ─── Render Drawer ───────────────────────────────────────────
+
+function renderCartDrawer() {
+  const body = document.getElementById('cart-drawer-body');
+  const footer = document.getElementById('cart-drawer-footer');
+  const totalEl = document.getElementById('cart-drawer-total');
+  if (!body) return;
+
+  const cart = getCart();
+
+  if (cart.length === 0) {
+    body.innerHTML = `<div class="cart-empty"><p>Your cart is empty</p></div>`;
+    if (footer) footer.style.display = 'none';
+    return;
+  }
+
+  body.innerHTML = cart.map(item => `
+    <div class="cart-item" data-id="${item.id}">
+      <img class="cart-item-img" src="${item.image}" alt="${item.name}" />
+      <div class="cart-item-info">
+        <p class="cart-item-name">${item.name}</p>
+        <p class="cart-item-price">R${(item.price * item.qty).toFixed(2)}</p>
+        <div class="cart-item-qty">
+          <button class="qty-btn" data-id="${item.id}" data-delta="-1">−</button>
+          <span>${item.qty}</span>
+          <button class="qty-btn" data-id="${item.id}" data-delta="1">+</button>
+        </div>
+      </div>
+      <button class="cart-item-remove" data-id="${item.id}" aria-label="Remove">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+        </svg>
+      </button>
+    </div>
+  `).join('');
+
+  // Footer
+  if (footer) footer.style.display = 'flex';
+  if (totalEl) totalEl.textContent = `R${getCartTotal().toFixed(2)}`;
+
+  // Bind qty + remove buttons
+  body.querySelectorAll('.qty-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      changeQty(btn.dataset.id, Number(btn.dataset.delta));
+    });
+  });
+
+  body.querySelectorAll('.cart-item-remove').forEach(btn => {
+    btn.addEventListener('click', () => {
+      removeFromCart(btn.dataset.id);
+    });
+  });
+}
+
+
+// ─── Badges ──────────────────────────────────────────────────
+
+function updateBadges() {
+  const count = getCartCount();
+  document.querySelectorAll('.drawer-badge, .cart-badge').forEach(badge => {
+    badge.textContent = count;
+    badge.style.display = count > 0 ? 'inline-flex' : 'none';
+  });
+}
+
+
+// ─── Open / Close ────────────────────────────────────────────
 
 export function openDrawer() {
   document.getElementById('cart-drawer')?.classList.add('open');
@@ -16,24 +157,16 @@ export function closeDrawer() {
 // ─── Bind Controls ───────────────────────────────────────────
 
 function bindDrawerControls() {
-  // Click overlay → close
   document.getElementById('cart-overlay')?.addEventListener('click', closeDrawer);
-
-  // Click close button → close
   document.getElementById('cart-drawer-close')?.addEventListener('click', closeDrawer);
-
-  // Press ESC → close
-  document.addEventListener('keydown', (e) => {
+  document.addEventListener('keydown', e => {
     if (e.key === 'Escape') closeDrawer();
   });
 }
 
-
-// ─── Bind Cart Icon ──────────────────────────────────────────
-
 function bindCartIcons() {
   document.querySelectorAll('[aria-label="Cart"]').forEach(btn => {
-    btn.addEventListener('click', (e) => {
+    btn.addEventListener('click', e => {
       e.preventDefault();
       openDrawer();
     });
@@ -41,11 +174,13 @@ function bindCartIcons() {
 }
 
 
-// ─── Init ───────────────────────────────────────────────────
+// ─── Init ────────────────────────────────────────────────────
 
 export function init() {
   bindDrawerControls();
   bindCartIcons();
+  renderCartDrawer();  // render persisted cart on load
+  updateBadges();      // restore badge count on load
 }
 
-export default { init, openDrawer, closeDrawer };
+export default { init, openDrawer, closeDrawer, addToCart, removeFromCart, changeQty, clearCart, getCartCount, getCartTotal };

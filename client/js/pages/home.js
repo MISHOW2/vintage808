@@ -1,35 +1,22 @@
-import { getAllProducts } from "../api/products.js";
-
-// ✅ Asset base (NO /api here)
-const ASSET_BASE_URL = "https://vintage808-api.vercel.app/";
+import { getAllProducts, IMAGE_BASE_URL } from "../api/products.js";
+import { addToCart } from "../components/cart.js";
 
 export async function renderFeaturedProducts() {
   const grid = document.querySelector(".product-grid");
   if (!grid) return;
 
   try {
-    const products = await getAllProducts();
-    const featured = products.slice(0, 8);
+    const response = await getAllProducts();
+    const featured = response.data.slice(0, 8);
 
     grid.innerHTML = "";
 
     featured.forEach(product => {
       const isNew = product.isNew ?? false;
-
-      // ✅ Get raw path from API data
-      const rawImage = Array.isArray(product.images)
-        ? product.images[0]
-        : product.image ?? "";
-
-      // ✅ Build FULL image URL
-      const imageSrc = rawImage
-        ? `${ASSET_BASE_URL}${rawImage}`
-        : "";
-
-      const price =
-        typeof product.price === "number"
-          ? `R${product.price.toFixed(2)}`
-          : product.price;
+      const rawImage = Array.isArray(product.images) ? product.images[0] : product.image ?? "";
+      const imageSrc = rawImage ? `${IMAGE_BASE_URL}${rawImage}` : "";
+      const price = typeof product.price === "number" ? product.price : parseFloat(product.price);
+      const displayPrice = `R${price.toFixed(2)}`;
 
       grid.innerHTML += `
         <div class="product-card">
@@ -39,14 +26,34 @@ export async function renderFeaturedProducts() {
           </div>
           <div class="product-info">
             <p class="product-name">${product.name}</p>
-            <span class="product-price">${price}</span>
+            <span class="product-price">${displayPrice}</span>
           </div>
-          <button class="btn-cart" data-product-id="${product.id}">
+          <button
+            class="btn-cart"
+            data-product-id="${product.id}"
+            data-product-name="${product.name}"
+            data-product-price="${price}"
+            data-product-image="${imageSrc}"
+          >
             Add to cart
           </button>
         </div>
       `;
     });
+
+    // ── Single delegated listener on the grid ──
+    grid.addEventListener('click', e => {
+      const btn = e.target.closest('.btn-cart');
+      if (!btn) return;
+
+      addToCart({
+        id:    btn.dataset.productId,
+        name:  btn.dataset.productName,
+        price: parseFloat(btn.dataset.productPrice),
+        image: btn.dataset.productImage,
+      });
+    });
+
   } catch (err) {
     console.error("[Home] Failed to load products:", err);
   }

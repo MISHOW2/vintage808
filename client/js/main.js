@@ -1,6 +1,10 @@
 import Cart from "./components/cart.js";
 import { nav } from "./components/nav.js";
 import { renderFeaturedProducts } from "./pages/home.js";
+import { init } from './components/cart.js';
+
+
+document.addEventListener('DOMContentLoaded', init);
 
 renderFeaturedProducts();
 nav()
