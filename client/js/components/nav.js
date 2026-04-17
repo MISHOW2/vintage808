@@ -39,3 +39,4 @@ export function nav() {
     if (window.innerWidth > 900) closeMenu();
   });
 }
+

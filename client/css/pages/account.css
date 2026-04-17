@@ -1,0 +1,540 @@
+/* ============================================================
+   Vintage808 — account.css
+   ============================================================ */
+
+.account-page {
+  min-height: calc(100vh - var(--nav-h));
+  background: var(--white);
+  padding: 56px 40px 80px;
+}
+
+.account-container {
+  max-width: 1100px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: 260px 1fr;
+  gap: 64px;
+  align-items: start;
+}
+
+/* ── Sidebar ─────────────────────────────────────────────────── */
+
+.account-sidebar {
+  position: sticky;
+  top: calc(var(--nav-h) + 24px);
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+}
+
+/* Avatar */
+.account-avatar {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding-bottom: 24px;
+  border-bottom: 1px solid var(--sand);
+}
+
+.avatar-circle {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: var(--black);
+  color: var(--white);
+  font-family: var(--font-display);
+  font-size: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  letter-spacing: 0.02em;
+}
+
+.avatar-name {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--black);
+  line-height: 1.3;
+}
+
+.avatar-email {
+  font-size: 12px;
+  color: var(--mid);
+  margin-top: 2px;
+}
+
+/* Sidebar nav */
+.account-nav {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.account-nav-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  font-family: var(--font-body);
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--mid);
+  background: none;
+  border: none;
+  border-radius: 2px;
+  cursor: pointer;
+  text-align: left;
+  transition: background 0.15s, color 0.15s;
+  width: 100%;
+}
+
+.account-nav-item:hover {
+  background: var(--sand);
+  color: var(--black);
+}
+
+.account-nav-item.active {
+  background: var(--sand);
+  color: var(--black);
+}
+
+/* Logout */
+.account-logout {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 12px;
+  font-family: var(--font-body);
+  font-size: 13px;
+  font-weight: 500;
+  color: #b91c1c;
+  background: none;
+  border: none;
+  border-radius: 2px;
+  cursor: pointer;
+  text-align: left;
+  transition: background 0.15s;
+  width: 100%;
+  margin-top: auto;
+}
+
+.account-logout:hover {
+  background: #fef2f2;
+}
+
+/* ── Content ─────────────────────────────────────────────────── */
+
+.account-tab {
+  display: none;
+}
+
+.account-tab.active {
+  display: block;
+}
+
+.account-eyebrow {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--mid);
+  margin-bottom: 10px;
+}
+
+.account-heading {
+  font-family: var(--font-display);
+  font-size: clamp(26px, 3.5vw, 38px);
+  letter-spacing: -0.02em;
+  color: var(--black);
+  margin-bottom: 32px;
+}
+
+/* ── Card ── */
+.account-card {
+  border: 1px solid var(--sand);
+  border-radius: 2px;
+  overflow: hidden;
+  margin-bottom: 24px;
+}
+
+/* ── Profile rows ── */
+.profile-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--sand);
+  gap: 16px;
+}
+
+.profile-row:last-child {
+  border-bottom: none;
+}
+
+.profile-key {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--mid);
+  white-space: nowrap;
+}
+
+.profile-val {
+  font-size: 14px;
+  color: var(--black);
+  text-align: right;
+}
+
+/* ── Orders ── */
+.order-card {
+  border: 1px solid var(--sand);
+  border-radius: 2px;
+  margin-bottom: 16px;
+  overflow: hidden;
+}
+
+.order-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 20px;
+  background: var(--sand);
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.order-id {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--black);
+  font-weight: 700;
+}
+
+.order-date {
+  font-size: 12px;
+  color: var(--mid);
+}
+
+.order-status {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  padding: 3px 10px;
+  border-radius: 20px;
+}
+
+.order-status--pending {
+  background: #fef9c3;
+  color: #854d0e;
+}
+
+.order-status--paid {
+  background: #dcfce7;
+  color: #166534;
+}
+
+.order-status--failed {
+  background: #fee2e2;
+  color: #991b1b;
+}
+
+.order-card-body {
+  padding: 16px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.order-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.order-item-img {
+  width: 48px;
+  height: 56px;
+  object-fit: cover;
+  border-radius: 2px;
+  background: var(--sand);
+  flex-shrink: 0;
+}
+
+.order-item-info {
+  flex: 1;
+}
+
+.order-item-name {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--black);
+}
+
+.order-item-meta {
+  font-size: 11px;
+  color: var(--mid);
+  margin-top: 2px;
+}
+
+.order-item-price {
+  font-family: var(--font-mono);
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--black);
+}
+
+.order-card-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 20px;
+  border-top: 1px solid var(--sand);
+  font-size: 13px;
+}
+
+.order-total-label {
+  color: var(--mid);
+}
+
+.order-total-amount {
+  font-family: var(--font-mono);
+  font-weight: 700;
+  font-size: 14px;
+  color: var(--black);
+}
+
+/* ── Addresses ── */
+.address-card {
+  border: 1px solid var(--sand);
+  border-radius: 2px;
+  padding: 20px;
+  margin-bottom: 16px;
+}
+
+.address-label {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--mid);
+  margin-bottom: 10px;
+}
+
+.address-text {
+  font-size: 14px;
+  color: var(--black);
+  line-height: 1.7;
+}
+
+/* ── Edit form ── */
+.edit-section-label {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--black);
+  padding: 16px 20px 12px;
+  border-bottom: 1px solid var(--sand);
+}
+
+.edit-fields {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+  padding: 16px 20px;
+}
+
+.edit-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.edit-field--full {
+  grid-column: 1 / -1;
+}
+
+.edit-label {
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--black);
+}
+
+.edit-input {
+  width: 100%;
+  padding: 12px 14px;
+  font-family: var(--font-body);
+  font-size: 14px;
+  border: 1px solid var(--sand);
+  border-radius: 2px;
+  background: var(--white);
+  color: var(--black);
+  outline: none;
+  transition: border-color 0.15s;
+  box-sizing: border-box;
+}
+
+.edit-input:focus {
+  border-color: var(--black);
+}
+
+.edit-input::placeholder {
+  color: var(--mid);
+}
+
+.edit-divider {
+  height: 1px;
+  background: var(--sand);
+  margin: 4px 0;
+}
+
+/* ── Buttons ── */
+.account-btn-primary {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 13px 28px;
+  background: var(--black);
+  color: var(--white);
+  border: 1px solid var(--black);
+  border-radius: 2px;
+  font-family: var(--font-display);
+  font-size: 13px;
+  letter-spacing: 0.04em;
+  cursor: pointer;
+  text-decoration: none;
+  transition: background 0.18s;
+}
+
+.account-btn-primary:hover {
+  background: #333;
+  border-color: #333;
+}
+
+.account-btn-secondary {
+  display: inline-flex;
+  align-items: center;
+  padding: 11px 24px;
+  background: transparent;
+  color: var(--black);
+  border: 1px solid var(--black);
+  border-radius: 2px;
+  font-family: var(--font-body);
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: background 0.18s, color 0.18s;
+}
+
+.account-btn-secondary:hover {
+  background: var(--black);
+  color: var(--white);
+}
+
+/* ── Success / Error ── */
+.account-success {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: #dcfce7;
+  border: 1px solid #bbf7d0;
+  border-radius: 2px;
+  padding: 10px 14px;
+  font-size: 12px;
+  color: #166534;
+  margin-bottom: 20px;
+}
+
+.account-error {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: #fef2f2;
+  border: 1px solid #fecaca;
+  border-radius: 2px;
+  padding: 10px 14px;
+  font-size: 12px;
+  color: #b91c1c;
+  margin-bottom: 20px;
+}
+
+/* ── Empty states ── */
+.account-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 16px;
+  padding: 40px 0;
+}
+
+.account-empty p {
+  font-size: 14px;
+  color: var(--mid);
+}
+
+/* ── Spinner ── */
+.account-spinner {
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* ── Responsive ─────────────────────────────────────────────── */
+
+@media (max-width: 860px) {
+  .account-container {
+    grid-template-columns: 1fr;
+    gap: 32px;
+  }
+
+  .account-sidebar {
+    position: static;
+    flex-direction: column;
+    gap: 20px;
+  }
+
+  .account-nav {
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+
+  .account-nav-item {
+    flex: 1 1 auto;
+    justify-content: center;
+    min-width: 120px;
+  }
+
+  .account-page {
+    padding: 32px 24px 60px;
+  }
+}
+
+@media (max-width: 520px) {
+  .edit-fields {
+    grid-template-columns: 1fr;
+  }
+
+  .edit-field--full {
+    grid-column: 1;
+  }
+
+  .account-page {
+    padding: 24px 16px 48px;
+  }
+
+  .order-card-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 6px;
+  }
+}

@@ -1,0 +1,131 @@
+// js/pages/checkout.js
+
+import { getCart, getCartTotal, clearCart } from '../api/cart.js';
+
+const SHIPPING = 80;
+
+// ── Auth guard ────────────────────────────────────────────────
+const token = localStorage.getItem('v808_token');
+if (!token) {
+  sessionStorage.setItem('v808_return', './checkout.html');
+  window.location.href = './login.html';
+}
+
+// ── Nav account icon ──────────────────────────────────────────
+document.getElementById('nav-account-btn')?.addEventListener('click', () => {
+  window.location.href = token ? './account.html' : './login.html';
+});
+
+// ── Elements ──────────────────────────────────────────────────
+const summaryItems   = document.getElementById('summary-items');
+const summaryEmpty   = document.getElementById('summary-empty');
+const summarySubtotal = document.getElementById('summary-subtotal');
+const summaryTotal   = document.getElementById('summary-total');
+const errorBox       = document.getElementById('checkout-error');
+const errorMsg       = document.getElementById('checkout-error-msg');
+const payBtn         = document.getElementById('pay-btn');
+const payBtnText     = document.getElementById('pay-btn-text');
+const payBtnLoader   = document.getElementById('pay-btn-loader');
+
+// ── Render summary ────────────────────────────────────────────
+function renderSummary() {
+  const cart     = getCart();
+  const subtotal = getCartTotal();
+  const total    = subtotal + SHIPPING;
+
+  if (cart.length === 0) {
+    summaryItems.style.display = 'none';
+    summaryEmpty.style.display = 'block';
+  } else {
+    summaryItems.innerHTML = cart.map(item => `
+      <div class="summary-item">
+        <img class="summary-item-img" src="${item.image}" alt="${item.name}" />
+        <div class="summary-item-info">
+          <p class="summary-item-name">${item.name}</p>
+          <p class="summary-item-meta">Size: ${item.size ?? '—'} &nbsp;·&nbsp; Qty: ${item.qty}</p>
+        </div>
+        <span class="summary-item-price">R${(item.price * item.qty).toFixed(2)}</span>
+      </div>
+    `).join('');
+  }
+
+  summarySubtotal.textContent = `R${subtotal.toFixed(2)}`;
+  summaryTotal.textContent    = `R${total.toFixed(2)}`;
+}
+
+renderSummary();
+
+// ── Helpers ───────────────────────────────────────────────────
+function showError(msg) {
+  errorMsg.textContent = msg;
+  errorBox.style.display = 'flex';
+  errorBox.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+}
+
+function hideError() {
+  errorBox.style.display = 'none';
+}
+
+function setLoading(loading) {
+  payBtn.disabled           = loading;
+  payBtnText.style.display  = loading ? 'none' : 'inline';
+  payBtnLoader.style.display = loading ? 'inline-flex' : 'none';
+}
+
+// ── Place order ───────────────────────────────────────────────
+payBtn.addEventListener('click', async () => {
+  hideError();
+
+  const name     = document.getElementById('full-name').value.trim();
+  const email    = document.getElementById('email').value.trim();
+  const phone    = document.getElementById('phone').value.trim();
+  const street   = document.getElementById('street').value.trim();
+  const city     = document.getElementById('city').value.trim();
+  const province = document.getElementById('province').value;
+  const postal   = document.getElementById('postal').value.trim();
+
+  if (!name || !email || !phone || !street || !city || !province || !postal) {
+    showError('Please fill in all fields before continuing.');
+    return;
+  }
+
+  const cart = getCart();
+  if (cart.length === 0) {
+    showError('Your cart is empty.');
+    return;
+  }
+
+  setLoading(true);
+
+  try {
+    const res  = await fetch('http://localhost:5000/api/orders', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`,
+      },
+      body: JSON.stringify({
+        customer: { name, email, phone },
+        address:  { street, city, province, postal },
+        cart,
+      }),
+    });
+
+    const data = await res.json();
+
+    if (!res.ok) {
+      showError(data.message || 'Something went wrong. Please try again.');
+      return;
+    }
+
+    // Clear cart and go to confirmation
+    clearCart();
+    sessionStorage.setItem('v808_last_order', JSON.stringify(data.data));
+    window.location.href = './order-confirmation.html';
+
+  } catch (err) {
+    showError('Could not connect to server. Please try again.');
+  } finally {
+    setLoading(false);
+  }
+});

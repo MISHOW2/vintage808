@@ -15,3 +15,9 @@ Cart.init();
 if (document.querySelector('.filter-btn')) {
   import('./pages/shop.js').then(m => m.default.init());
 }
+
+const navAccountBtn = document.getElementById('nav-account-btn');
+
+  navAccountBtn.addEventListener('click', () => {
+    window.location.href ='./login.html';
+  });
