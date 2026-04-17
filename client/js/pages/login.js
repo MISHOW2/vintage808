@@ -1,86 +1,153 @@
 // js/pages/login.js
+// Handles both the Sign In and Create Account panels on the same page.
 
-const emailInput   = document.getElementById('email');
-const passwordInput = document.getElementById('password');
-const loginBtn     = document.getElementById('login-btn');
-const btnText      = document.getElementById('login-btn-text');
-const btnLoader    = document.getElementById('login-btn-loader');
-const errorBox     = document.getElementById('auth-error');
-const errorMsg     = document.getElementById('auth-error-msg');
-const togglePw     = document.getElementById('toggle-pw');
-
-// ── Show / hide password ─────────────────────────────────────
-togglePw.addEventListener('click', () => {
-  const isPassword = passwordInput.type === 'password';
-  passwordInput.type = isPassword ? 'text' : 'password';
-});
-
-// ── Show error ───────────────────────────────────────────────
-function showError(msg) {
-  errorMsg.textContent = msg;
-  errorBox.style.display = 'flex';
+// ── If already logged in, skip this page ─────────────────────
+if (localStorage.getItem('v808_token')) {
+  window.location.replace('./account.html');
 }
 
-function hideError() {
-  errorBox.style.display = 'none';
+// ── Panel toggle ─────────────────────────────────────────────
+const panelLogin    = document.getElementById('panel-login');
+const panelRegister = document.getElementById('panel-register');
+
+function showLogin() {
+  panelLogin.classList.remove('auth-form-wrap--hidden');
+  panelRegister.classList.add('auth-form-wrap--hidden');
 }
 
-// ── Loading state ────────────────────────────────────────────
-function setLoading(loading) {
-  loginBtn.disabled  = loading;
-  btnText.style.display   = loading ? 'none' : 'inline';
-  btnLoader.style.display = loading ? 'inline-flex' : 'none';
+function showRegister() {
+  panelRegister.classList.remove('auth-form-wrap--hidden');
+  panelLogin.classList.add('auth-form-wrap--hidden');
 }
 
-// ── Login ────────────────────────────────────────────────────
-loginBtn.addEventListener('click', async () => {
-  hideError();
+document.getElementById('go-to-register').addEventListener('click', showRegister);
+document.getElementById('go-to-login').addEventListener('click', showLogin);
 
-  const email    = emailInput.value.trim();
-  const password = passwordInput.value.trim();
+// ── Helpers ───────────────────────────────────────────────────
+function showError(boxId, msgId, msg) {
+  const box = document.getElementById(boxId);
+  const span = document.getElementById(msgId);
+  span.textContent = msg;
+  box.style.display = 'flex';
+}
+
+function hideError(boxId) {
+  document.getElementById(boxId).style.display = 'none';
+}
+
+function setLoading(btnId, textId, loaderId, loading) {
+  const btn = document.getElementById(btnId);
+  btn.disabled = loading;
+  document.getElementById(textId).style.display  = loading ? 'none' : 'inline';
+  document.getElementById(loaderId).style.display = loading ? 'inline-flex' : 'none';
+}
+
+function bindPasswordToggle(btnId, inputId) {
+  document.getElementById(btnId)?.addEventListener('click', () => {
+    const input = document.getElementById(inputId);
+    input.type = input.type === 'password' ? 'text' : 'password';
+  });
+}
+
+// ── Password toggles ─────────────────────────────────────────
+bindPasswordToggle('login-toggle-pw',   'login-password');
+bindPasswordToggle('reg-toggle-pw',     'reg-password');
+bindPasswordToggle('reg-toggle-confirm','reg-confirm');
+
+// ── Where to redirect after login/register ────────────────────
+function getReturnUrl() {
+  const returnTo = sessionStorage.getItem('v808_return') || './index.html';
+  sessionStorage.removeItem('v808_return');
+  return returnTo;
+}
+
+// ── LOGIN ─────────────────────────────────────────────────────
+document.getElementById('login-btn').addEventListener('click', async () => {
+  hideError('login-error');
+
+  const email    = document.getElementById('login-email').value.trim();
+  const password = document.getElementById('login-password').value.trim();
 
   if (!email || !password) {
-    showError('Please fill in all fields.');
+    showError('login-error', 'login-error-msg', 'Please fill in all fields.');
     return;
   }
 
-  setLoading(true);
+  setLoading('login-btn', 'login-btn-text', 'login-btn-loader', true);
 
   try {
     const res  = await fetch('http://localhost:5000/api/auth/login', {
-      method: 'POST',
+      method:  'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email, password }),
+      body:    JSON.stringify({ email, password }),
     });
 
     const data = await res.json();
 
     if (!res.ok) {
-      showError(data.message || 'Invalid email or password.');
+      showError('login-error', 'login-error-msg', data.message || 'Invalid email or password.');
       return;
     }
 
-    // Save token and user to localStorage
     localStorage.setItem('v808_token', data.token);
-    localStorage.setItem('v808_user', JSON.stringify(data.user));
+    localStorage.setItem('v808_user',  JSON.stringify(data.user));
+    window.location.href = getReturnUrl();
 
-    // Redirect — back to checkout if they came from there, else home
-    const returnTo = sessionStorage.getItem('v808_return') || './index.html';
-    sessionStorage.removeItem('v808_return');
-    window.location.href = returnTo;
-
-  } catch (err) {
-    showError('Something went wrong. Please try again.');
+  } catch {
+    showError('login-error', 'login-error-msg', 'Something went wrong. Please try again.');
   } finally {
-    setLoading(false);
+    setLoading('login-btn', 'login-btn-text', 'login-btn-loader', false);
   }
 });
 
-// ── Nav account icon: go to account if logged in ─────────────
-const token = localStorage.getItem('v808_token');
-const navAccountBtn = document.getElementById('nav-account-btn');
-if (navAccountBtn) {
-  navAccountBtn.addEventListener('click', () => {
-    window.location.href = token ? './account.html' : './login.html';
-  });
-}
+// ── REGISTER ──────────────────────────────────────────────────
+document.getElementById('register-btn').addEventListener('click', async () => {
+  hideError('register-error');
+
+  const first   = document.getElementById('reg-first').value.trim();
+  const last    = document.getElementById('reg-last').value.trim();
+  const email   = document.getElementById('reg-email').value.trim();
+  const password = document.getElementById('reg-password').value;
+  const confirm  = document.getElementById('reg-confirm').value;
+
+  if (!first || !last || !email || !password) {
+    showError('register-error', 'register-error-msg', 'Please fill in all fields.');
+    return;
+  }
+
+  if (password.length < 8) {
+    showError('register-error', 'register-error-msg', 'Password must be at least 8 characters.');
+    return;
+  }
+
+  if (password !== confirm) {
+    showError('register-error', 'register-error-msg', 'Passwords do not match.');
+    return;
+  }
+
+  setLoading('register-btn', 'register-btn-text', 'register-btn-loader', true);
+
+  try {
+    const res  = await fetch('http://localhost:5000/api/auth/register', {
+      method:  'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body:    JSON.stringify({ firstName: first, lastName: last, email, password }),
+    });
+
+    const data = await res.json();
+
+    if (!res.ok) {
+      showError('register-error', 'register-error-msg', data.message || 'Could not create account.');
+      return;
+    }
+
+    localStorage.setItem('v808_token', data.token);
+    localStorage.setItem('v808_user',  JSON.stringify(data.user));
+    window.location.href = getReturnUrl();
+
+  } catch {
+    showError('register-error', 'register-error-msg', 'Something went wrong. Please try again.');
+  } finally {
+    setLoading('register-btn', 'register-btn-text', 'register-btn-loader', false);
+  }
+});

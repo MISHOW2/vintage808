@@ -5,15 +5,45 @@
 (function () {
   'use strict';
 
+  // ── Auth guard ───────────────────────────────────────────────
+  const token   = localStorage.getItem('v808_token');
+  const userRaw = localStorage.getItem('v808_user');
+
+  if (!token || !userRaw) {
+    sessionStorage.setItem('v808_return', './account.html');
+    window.location.replace('./login.html');
+    return;
+  }
+
+  let user;
+  try {
+    user = JSON.parse(userRaw);
+  } catch {
+    localStorage.removeItem('v808_token');
+    localStorage.removeItem('v808_user');
+    window.location.replace('./login.html');
+    return;
+  }
+
+  // Normalise field names — handle {firstName,lastName} or {name}
+  if (!user.firstName && user.name) {
+    const parts   = user.name.split(' ');
+    user.firstName = parts[0] ?? '';
+    user.lastName  = parts.slice(1).join(' ') ?? '';
+  }
+
+  if (user.createdAt) {
+    user.memberSince = new Date(user.createdAt)
+      .toLocaleDateString('en-ZA', { month: 'long', year: 'numeric' });
+  }
+
   /* ── DOM refs ──────────────────────────────────────────────── */
   const avatarInitials    = document.getElementById('avatar-initials');
   const avatarName        = document.getElementById('avatar-name');
   const avatarEmail       = document.getElementById('avatar-email');
-
   const profileNameDisp   = document.getElementById('profile-name-display');
   const profileEmailDisp  = document.getElementById('profile-email-display');
   const profileSinceDisp  = document.getElementById('profile-since-display');
-
   const profileView       = document.getElementById('profile-view');
   const profileEdit       = document.getElementById('profile-edit');
   const editProfileBtn    = document.getElementById('edit-profile-btn');
@@ -23,87 +53,44 @@
   const saveError         = document.getElementById('save-error');
   const saveErrorMsg      = document.getElementById('save-error-msg');
   const saveSpinner       = document.getElementById('save-spinner');
-
   const editFirstName     = document.getElementById('edit-first-name');
   const editLastName      = document.getElementById('edit-last-name');
   const editEmail         = document.getElementById('edit-email');
   const editCurrentPw     = document.getElementById('edit-current-pw');
   const editNewPw         = document.getElementById('edit-new-pw');
   const editConfirmPw     = document.getElementById('edit-confirm-pw');
-
   const ordersList        = document.getElementById('orders-list');
   const addressesList     = document.getElementById('addresses-list');
   const addAddressBtn     = document.getElementById('add-address-btn');
-
   const logoutBtn         = document.getElementById('logout-btn');
   const navItems          = document.querySelectorAll('.account-nav-item');
 
-  /* ── Mock user data (replace with real API calls) ──────────── */
-  const user = {
-    firstName:   'John',
-    lastName:    'Doe',
-    email:       'john@example.com',
-    memberSince: 'March 2024',
-  };
-
-  const mockOrders = [
-    {
-      id: '#V808-00142',
-      date: '12 March 2025',
-      status: 'paid',
-      items: [
-        { name: "Levi's 501 Original — Stonewash", meta: 'Size W32 L30 · Qty 1', price: 'R 1,250', bg: '#d4c8bc' },
-        { name: 'Vintage Polo Shirt — Cream',       meta: 'Size M · Qty 1',       price: 'R 480',   bg: '#c9bfb3' },
-      ],
-      total: 'R 1,730',
-    },
-    {
-      id: '#V808-00098',
-      date: '5 January 2025',
-      status: 'paid',
-      items: [
-        { name: '90s Windbreaker — Forest Green', meta: 'Size L · Qty 1', price: 'R 920', bg: '#bfb5a8' },
-      ],
-      total: 'R 920',
-    },
-  ];
-
-  const mockAddresses = [
-    {
-      label: 'Default Shipping Address',
-      lines: ['John Doe', '14 Long Street', 'Cape Town, Western Cape', '8001, South Africa'],
-    },
-  ];
-
   /* ── Helpers ───────────────────────────────────────────────── */
   function getInitials(first, last) {
-    return ((first?.[0] ?? '') + (last?.[0] ?? '')).toUpperCase();
+    return ((first?.[0] ?? '') + (last?.[0] ?? '')).toUpperCase() || '??';
   }
 
-  function formatStatus(status) {
-    const map = { paid: 'Paid', pending: 'Pending', failed: 'Failed' };
-    return map[status] ?? status;
+  function formatStatus(s) {
+    return { paid: 'Paid', pending: 'Pending', failed: 'Failed' }[s] ?? s;
   }
 
-  function show(el) { el.classList.remove('hidden'); }
-  function hide(el) { el.classList.add('hidden'); }
+  function show(el) { el?.classList.remove('hidden'); }
+  function hide(el) { el?.classList.add('hidden'); }
 
-  /* ── Populate sidebar & profile view ──────────────────────── */
+  /* ── Render ────────────────────────────────────────────────── */
   function renderUserInfo() {
-    const fullName = `${user.firstName} ${user.lastName}`.trim();
-    avatarInitials.textContent   = getInitials(user.firstName, user.lastName);
-    avatarName.textContent        = fullName;
-    avatarEmail.textContent       = user.email;
-    profileNameDisp.textContent   = fullName;
-    profileEmailDisp.textContent  = user.email;
-    profileSinceDisp.textContent  = user.memberSince;
+    const fullName = `${user.firstName ?? ''} ${user.lastName ?? ''}`.trim();
+    if (avatarInitials)   avatarInitials.textContent  = getInitials(user.firstName, user.lastName);
+    if (avatarName)       avatarName.textContent       = fullName || user.email;
+    if (avatarEmail)      avatarEmail.textContent      = user.email;
+    if (profileNameDisp)  profileNameDisp.textContent  = fullName || '—';
+    if (profileEmailDisp) profileEmailDisp.textContent = user.email || '—';
+    if (profileSinceDisp) profileSinceDisp.textContent = user.memberSince || '—';
   }
 
-  /* ── Populate orders ───────────────────────────────────────── */
-  function renderOrders() {
-    if (!mockOrders.length) return; // keep empty-state markup
-
-    ordersList.innerHTML = mockOrders.map(order => `
+  function renderOrders(orders = []) {
+    if (!ordersList || !orders.length) return;
+    ordersList.innerHTML = orders.map(order => `
       <div class="order-card">
         <div class="order-card-header">
           <span class="order-id">${order.id}</span>
@@ -113,7 +100,9 @@
         <div class="order-card-body">
           ${order.items.map(item => `
             <div class="order-item">
-              <div class="order-item-img" style="background:${item.bg};"></div>
+              <div class="order-item-img" style="background:var(--sand);">
+                ${item.image ? `<img src="${item.image}" alt="${item.name}" style="width:100%;height:100%;object-fit:cover;border-radius:2px;">` : ''}
+              </div>
               <div class="order-item-info">
                 <div class="order-item-name">${item.name}</div>
                 <div class="order-item-meta">${item.meta}</div>
@@ -130,14 +119,13 @@
     `).join('');
   }
 
-  /* ── Populate addresses ────────────────────────────────────── */
-  function renderAddresses() {
-    if (!mockAddresses.length) {
-      addressesList.innerHTML = '<p style="font-size:14px;color:var(--mid);padding:24px 0;">No saved addresses.</p>';
+  function renderAddresses(addresses = []) {
+    if (!addressesList) return;
+    if (!addresses.length) {
+      addressesList.innerHTML = '<p style="font-size:14px;color:var(--mid);padding:24px 0 12px;">No saved addresses.</p>';
       return;
     }
-
-    addressesList.innerHTML = mockAddresses.map(addr => `
+    addressesList.innerHTML = addresses.map(addr => `
       <div class="address-card">
         <div class="address-label">${addr.label}</div>
         <div class="address-text">${addr.lines.join('<br>')}</div>
@@ -145,37 +133,50 @@
     `).join('');
   }
 
+  /* ── API calls ─────────────────────────────────────────────── */
+  async function fetchOrders() {
+    try {
+      const res = await fetch('http://localhost:5000/api/orders', {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      if (!res.ok) return [];
+      const data = await res.json();
+      return data.orders ?? data ?? [];
+    } catch { return []; }
+  }
+
+  async function fetchAddresses() {
+    try {
+      const res = await fetch('http://localhost:5000/api/addresses', {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      if (!res.ok) return [];
+      const data = await res.json();
+      return data.addresses ?? data ?? [];
+    } catch { return []; }
+  }
+
   /* ── Tab switching ─────────────────────────────────────────── */
   function switchTab(tabName) {
     document.querySelectorAll('.account-tab').forEach(t => t.classList.remove('active'));
     navItems.forEach(b => b.classList.remove('active'));
-
-    const tab = document.getElementById(`tab-${tabName}`);
-    if (tab) tab.classList.add('active');
-
-    const activeBtn = document.querySelector(`.account-nav-item[data-tab="${tabName}"]`);
-    if (activeBtn) activeBtn.classList.add('active');
-
-    // Persist active tab in session
+    document.getElementById(`tab-${tabName}`)?.classList.add('active');
+    document.querySelector(`.account-nav-item[data-tab="${tabName}"]`)?.classList.add('active');
     sessionStorage.setItem('account_tab', tabName);
   }
 
-  navItems.forEach(btn => {
-    btn.addEventListener('click', () => switchTab(btn.dataset.tab));
-  });
-
-  // Restore last active tab on page load
+  navItems.forEach(btn => btn.addEventListener('click', () => switchTab(btn.dataset.tab)));
   const savedTab = sessionStorage.getItem('account_tab');
   if (savedTab) switchTab(savedTab);
 
-  /* ── Edit profile toggle ───────────────────────────────────── */
+  /* ── Edit profile ──────────────────────────────────────────── */
   function openEdit() {
-    editFirstName.value = user.firstName;
-    editLastName.value  = user.lastName;
-    editEmail.value     = user.email;
-    editCurrentPw.value = '';
-    editNewPw.value     = '';
-    editConfirmPw.value = '';
+    if (editFirstName) editFirstName.value = user.firstName ?? '';
+    if (editLastName)  editLastName.value  = user.lastName  ?? '';
+    if (editEmail)     editEmail.value     = user.email     ?? '';
+    if (editCurrentPw) editCurrentPw.value = '';
+    if (editNewPw)     editNewPw.value     = '';
+    if (editConfirmPw) editConfirmPw.value = '';
     hide(saveSuccess);
     hide(saveError);
     hide(profileView);
@@ -187,69 +188,88 @@
     show(profileView);
   }
 
-  editProfileBtn.addEventListener('click', openEdit);
-  cancelEditBtn.addEventListener('click', closeEdit);
+  editProfileBtn?.addEventListener('click', openEdit);
+  cancelEditBtn?.addEventListener('click', closeEdit);
 
-  /* ── Save profile ──────────────────────────────────────────── */
-  saveProfileBtn.addEventListener('click', async () => {
+  saveProfileBtn?.addEventListener('click', async () => {
     hide(saveSuccess);
     hide(saveError);
 
-    const newFirst   = editFirstName.value.trim();
-    const newLast    = editLastName.value.trim();
-    const newEmail   = editEmail.value.trim();
-    const newPw      = editNewPw.value;
-    const confirmPw  = editConfirmPw.value;
+    const newFirst  = editFirstName?.value.trim();
+    const newLast   = editLastName?.value.trim();
+    const newEmail  = editEmail?.value.trim();
+    const newPw     = editNewPw?.value;
+    const confirmPw = editConfirmPw?.value;
 
-    // Basic validation
     if (!newFirst || !newEmail) {
-      saveErrorMsg.textContent = 'First name and email are required.';
+      if (saveErrorMsg) saveErrorMsg.textContent = 'First name and email are required.';
       show(saveError);
       return;
     }
 
     if (newPw && newPw !== confirmPw) {
-      saveErrorMsg.textContent = 'New passwords do not match.';
+      if (saveErrorMsg) saveErrorMsg.textContent = 'New passwords do not match.';
       show(saveError);
       return;
     }
 
-    // Simulate async save
-    saveProfileBtn.disabled = true;
+    if (saveProfileBtn) saveProfileBtn.disabled = true;
     show(saveSpinner);
 
-    await new Promise(resolve => setTimeout(resolve, 800));
+    try {
+      const body = { firstName: newFirst, lastName: newLast, email: newEmail };
+      if (newPw) body.password = newPw;
 
-    // Commit changes to local user object (replace with real API call)
-    user.firstName = newFirst;
-    user.lastName  = newLast;
-    user.email     = newEmail;
+      const res = await fetch('http://localhost:5000/api/auth/profile', {
+        method:  'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization:  `Bearer ${token}`,
+        },
+        body: JSON.stringify(body),
+      });
 
-    renderUserInfo();
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}));
+        if (saveErrorMsg) saveErrorMsg.textContent = data.message || 'Could not save changes.';
+        show(saveError);
+        return;
+      }
 
-    saveProfileBtn.disabled = false;
-    hide(saveSpinner);
-    show(saveSuccess);
+      user.firstName = newFirst;
+      user.lastName  = newLast;
+      user.email     = newEmail;
+      localStorage.setItem('v808_user', JSON.stringify(user));
 
-    setTimeout(closeEdit, 1400);
+      renderUserInfo();
+      show(saveSuccess);
+      setTimeout(closeEdit, 1400);
+
+    } catch {
+      if (saveErrorMsg) saveErrorMsg.textContent = 'Something went wrong. Please try again.';
+      show(saveError);
+    } finally {
+      if (saveProfileBtn) saveProfileBtn.disabled = false;
+      hide(saveSpinner);
+    }
   });
 
-  /* ── Add address (placeholder) ─────────────────────────────── */
-  addAddressBtn.addEventListener('click', () => {
-    alert('Add address form — connect to your backend here.');
+  /* ── Add address ───────────────────────────────────────────── */
+  addAddressBtn?.addEventListener('click', () => {
+    alert('Add address — connect to your backend here.');
   });
 
   /* ── Logout ─────────────────────────────────────────────────── */
-  logoutBtn.addEventListener('click', () => {
-    // Clear any auth tokens / session
+  logoutBtn?.addEventListener('click', () => {
     localStorage.removeItem('v808_token');
+    localStorage.removeItem('v808_user');
     sessionStorage.clear();
-    window.location.href = 'login.html';
+    window.location.href = './index.html';
   });
 
-  /* ── Init ───────────────────────────────────────────────────── */
+  /* ── Boot ───────────────────────────────────────────────────── */
   renderUserInfo();
-  renderOrders();
-  renderAddresses();
+  fetchOrders().then(renderOrders);
+  fetchAddresses().then(renderAddresses);
 
 })();

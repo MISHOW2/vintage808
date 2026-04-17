@@ -1,3 +1,5 @@
+// js/components/nav.js
+
 export function nav() {
   const burger = document.querySelector('.nav-burger');
   const drawer = document.querySelector('.nav-drawer');
@@ -20,7 +22,6 @@ export function nav() {
     drawer.setAttribute('aria-hidden', 'true');
   }
 
-  // ✅ MAKE IT GLOBAL (this is the key)
   window.closeNavDrawer = closeMenu;
 
   burger.addEventListener('click', () => {
@@ -38,5 +39,15 @@ export function nav() {
   window.addEventListener('resize', () => {
     if (window.innerWidth > 900) closeMenu();
   });
-}
 
+  // ── Highlight active nav link ─────────────────────────────
+  const currentPage = window.location.pathname.split('/').pop() || 'index.html';
+  document.querySelectorAll('.nav-links a, .nav-drawer-links a').forEach(link => {
+    const linkPage = link.getAttribute('href')?.split('/').pop();
+    if (linkPage === currentPage) {
+      link.classList.add('active');
+    } else {
+      link.classList.remove('active');
+    }
+  });
+}
