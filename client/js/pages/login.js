@@ -1,6 +1,8 @@
 // js/pages/login.js
 // Handles both the Sign In and Create Account panels on the same page.
 
+import { login, register } from '../api/auth.js';
+
 // ── If already logged in, skip this page ─────────────────────
 if (localStorage.getItem('v808_token')) {
   window.location.replace('./account.html');
@@ -25,7 +27,7 @@ document.getElementById('go-to-login').addEventListener('click', showLogin);
 
 // ── Helpers ───────────────────────────────────────────────────
 function showError(boxId, msgId, msg) {
-  const box = document.getElementById(boxId);
+  const box  = document.getElementById(boxId);
   const span = document.getElementById(msgId);
   span.textContent = msg;
   box.style.display = 'flex';
@@ -38,27 +40,32 @@ function hideError(boxId) {
 function setLoading(btnId, textId, loaderId, loading) {
   const btn = document.getElementById(btnId);
   btn.disabled = loading;
-  document.getElementById(textId).style.display  = loading ? 'none' : 'inline';
+  document.getElementById(textId).style.display   = loading ? 'none'        : 'inline';
   document.getElementById(loaderId).style.display = loading ? 'inline-flex' : 'none';
 }
 
 function bindPasswordToggle(btnId, inputId) {
   document.getElementById(btnId)?.addEventListener('click', () => {
     const input = document.getElementById(inputId);
-    input.type = input.type === 'password' ? 'text' : 'password';
+    input.type  = input.type === 'password' ? 'text' : 'password';
   });
 }
 
 // ── Password toggles ─────────────────────────────────────────
-bindPasswordToggle('login-toggle-pw',   'login-password');
-bindPasswordToggle('reg-toggle-pw',     'reg-password');
-bindPasswordToggle('reg-toggle-confirm','reg-confirm');
+bindPasswordToggle('login-toggle-pw',    'login-password');
+bindPasswordToggle('reg-toggle-pw',      'reg-password');
+bindPasswordToggle('reg-toggle-confirm', 'reg-confirm');
 
 // ── Where to redirect after login/register ────────────────────
 function getReturnUrl() {
   const returnTo = sessionStorage.getItem('v808_return') || './index.html';
   sessionStorage.removeItem('v808_return');
   return returnTo;
+}
+
+function saveSession(token, user) {
+  localStorage.setItem('v808_token', token);
+  localStorage.setItem('v808_user',  JSON.stringify(user));
 }
 
 // ── LOGIN ─────────────────────────────────────────────────────
@@ -76,25 +83,13 @@ document.getElementById('login-btn').addEventListener('click', async () => {
   setLoading('login-btn', 'login-btn-text', 'login-btn-loader', true);
 
   try {
-    const res  = await fetch('http://localhost:5000/api/auth/login', {
-      method:  'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body:    JSON.stringify({ email, password }),
-    });
-
-    const data = await res.json();
-
-    if (!res.ok) {
-      showError('login-error', 'login-error-msg', data.message || 'Invalid email or password.');
-      return;
-    }
-
-    localStorage.setItem('v808_token', data.token);
-    localStorage.setItem('v808_user',  JSON.stringify(data.user));
+    const data = await login(email, password);
+    saveSession(data.token, data.user);
     window.location.href = getReturnUrl();
 
-  } catch {
-    showError('login-error', 'login-error-msg', 'Something went wrong. Please try again.');
+  } catch (err) {
+    showError('login-error', 'login-error-msg', err.message || 'Something went wrong. Please try again.');
+
   } finally {
     setLoading('login-btn', 'login-btn-text', 'login-btn-loader', false);
   }
@@ -104,9 +99,9 @@ document.getElementById('login-btn').addEventListener('click', async () => {
 document.getElementById('register-btn').addEventListener('click', async () => {
   hideError('register-error');
 
-  const first   = document.getElementById('reg-first').value.trim();
-  const last    = document.getElementById('reg-last').value.trim();
-  const email   = document.getElementById('reg-email').value.trim();
+  const first    = document.getElementById('reg-first').value.trim();
+  const last     = document.getElementById('reg-last').value.trim();
+  const email    = document.getElementById('reg-email').value.trim();
   const password = document.getElementById('reg-password').value;
   const confirm  = document.getElementById('reg-confirm').value;
 
@@ -128,25 +123,15 @@ document.getElementById('register-btn').addEventListener('click', async () => {
   setLoading('register-btn', 'register-btn-text', 'register-btn-loader', true);
 
   try {
-    const res  = await fetch('http://localhost:5000/api/auth/register', {
-      method:  'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body:    JSON.stringify({ firstName: first, lastName: last, email, password }),
-    });
-
-    const data = await res.json();
-
-    if (!res.ok) {
-      showError('register-error', 'register-error-msg', data.message || 'Could not create account.');
-      return;
-    }
-
-    localStorage.setItem('v808_token', data.token);
-    localStorage.setItem('v808_user',  JSON.stringify(data.user));
+    // Combine first + last into a single `name` field to match the backend
+    const name = `${first} ${last}`.trim();
+    const data = await register(name, email, password);
+    saveSession(data.token, data.user);
     window.location.href = getReturnUrl();
 
-  } catch {
-    showError('register-error', 'register-error-msg', 'Something went wrong. Please try again.');
+  } catch (err) {
+    showError('register-error', 'register-error-msg', err.message || 'Something went wrong. Please try again.');
+
   } finally {
     setLoading('register-btn', 'register-btn-text', 'register-btn-loader', false);
   }
