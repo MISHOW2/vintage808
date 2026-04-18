@@ -3,7 +3,6 @@
    ============================================================ */
 
 /* ── CSS Variables & base reset ─────────────────────────────── */
-/* Defined here so the page works even if main.css isn't loaded  */
 :root {
   --nav-h: 64px;
   --black: #111111;
@@ -121,6 +120,7 @@ button { font-family: var(--font-body); }
   top: calc(var(--nav-h) + 24px);
   display: flex;
   flex-direction: column;
+  gap: 0;
 }
 
 .account-avatar {
@@ -160,14 +160,14 @@ button { font-family: var(--font-body); }
   margin-top: 2px;
 }
 
-/* Nav items — always a stacked column on desktop */
+/* Nav items */
 .account-nav {
   display: flex;
   flex-direction: column;
   gap: 2px;
-  padding: 8px 0;
+  padding: 8px 0 8px;
   border-bottom: 1px solid var(--sand);
-  margin-bottom: 8px;
+  margin-bottom: 4px;
 }
 
 .account-nav-item {
@@ -198,7 +198,7 @@ button { font-family: var(--font-body); }
   color: var(--black);
 }
 
-/* Logout — isolated below nav, never overlaps it */
+/* ── Logout — sits cleanly below the nav border ─────────────── */
 .account-logout {
   display: flex;
   align-items: center;
@@ -214,6 +214,9 @@ button { font-family: var(--font-body); }
   text-align: left;
   transition: background 0.15s;
   width: 100%;
+  /* prevent any overlap — force it below everything above it */
+  clear: both;
+  position: static;
 }
 
 .account-logout:hover { background: #fef2f2; }
@@ -541,12 +544,8 @@ button { font-family: var(--font-body); }
     gap: 24px;
   }
 
-  .account-sidebar {
-    position: static;
-    /* Avatar, nav, logout all stay as separate full-width rows */
-  }
+  .account-sidebar { position: static; }
 
-  /* Nav pills scroll horizontally — no wrapping, no overlap */
   .account-nav {
     flex-direction: row;
     flex-wrap: nowrap;
@@ -559,15 +558,13 @@ button { font-family: var(--font-body); }
   .account-nav::-webkit-scrollbar { display: none; }
 
   .account-nav-item {
-    flex: 0 0 auto;   /* don't grow or shrink — just fit content */
+    flex: 0 0 auto;
     width: auto;
     justify-content: center;
     padding: 9px 16px;
   }
 
-  /* Logout stays on its own row, full width, below the nav */
   .account-logout {
-    width: 100%;
     border-top: 1px solid var(--sand);
     padding-top: 12px;
   }
@@ -587,9 +584,7 @@ button { font-family: var(--font-body); }
     gap: 6px;
   }
 
-  .edit-actions {
-    flex-direction: column;
-  }
+  .edit-actions { flex-direction: column; }
 
   .account-btn-primary,
   .account-btn-secondary {

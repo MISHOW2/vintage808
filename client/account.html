@@ -9,7 +9,6 @@
   <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=DM+Sans:wght@400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="./css/main.css" />
   <link rel="stylesheet" href="./css/components.css" />
-
   <link rel="stylesheet" href="./css/pages/account.css" />
 </head>
 <body>
@@ -39,8 +38,6 @@
       </svg>
     </button>
   </div>
-
-  <!-- Burger button — hidden on desktop, visible on mobile -->
   <button class="nav-burger" aria-label="Toggle menu" aria-expanded="false">
     <span></span>
     <span></span>
@@ -108,13 +105,11 @@
       </svg>
     </button>
   </div>
-
   <div class="cart-drawer-body" id="cart-drawer-body">
     <div class="cart-empty">
       <p>Your cart is empty</p>
     </div>
   </div>
-
   <div class="cart-drawer-footer" id="cart-drawer-footer" style="display:none;">
     <div class="cart-drawer-subtotal">
       <span>Subtotal</span>
@@ -125,175 +120,178 @@
   </div>
 </aside>
 
-  <!-- ── Account Page ─────────────────────────────────────────── -->
-  <main class="account-page">
-    <div class="account-container">
+<!-- ── Account Page ─────────────────────────────────────────── -->
+<main class="account-page">
+  <div class="account-container">
 
-      <!-- ── Sidebar ──────────────────────────────────────────── -->
-      <aside class="account-sidebar">
+    <!-- ── Sidebar ──────────────────────────────────────────── -->
+    <aside class="account-sidebar">
 
-        <div class="account-avatar">
-          <div class="avatar-circle" id="avatar-initials">--</div>
-          <div>
-            <div class="avatar-name" id="avatar-name">Loading…</div>
-            <div class="avatar-email" id="avatar-email"></div>
+      <!-- Avatar -->
+      <div class="account-avatar">
+        <div class="avatar-circle" id="avatar-initials">--</div>
+        <div>
+          <div class="avatar-name" id="avatar-name">Loading…</div>
+          <div class="avatar-email" id="avatar-email"></div>
+        </div>
+      </div>
+
+      <!-- Nav items ONLY — logout is NOT inside here -->
+      <nav class="account-nav">
+        <button class="account-nav-item active" data-tab="profile">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/>
+            <circle cx="12" cy="7" r="4"/>
+          </svg>
+          Profile
+        </button>
+        <button class="account-nav-item" data-tab="orders">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <rect x="2" y="3" width="20" height="14" rx="2"/>
+            <path d="M8 21h8M12 17v4"/>
+          </svg>
+          Orders
+        </button>
+        <button class="account-nav-item" data-tab="addresses">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/>
+            <circle cx="12" cy="10" r="3"/>
+          </svg>
+          Addresses
+        </button>
+      </nav>
+
+    
+    </aside>
+
+
+
+    <!-- ── Content ──────────────────────────────────────────── -->
+    <div class="account-content">
+
+      <!-- ── Profile Tab ── -->
+      <div id="tab-profile" class="account-tab active">
+        <div class="account-eyebrow">My Account</div>
+        <h1 class="account-heading">Profile</h1>
+
+        <!-- View mode -->
+        <div id="profile-view">
+          <div class="account-card">
+            <div class="profile-row">
+              <span class="profile-key">Name</span>
+              <span class="profile-val" id="profile-name-display">—</span>
+            </div>
+            <div class="profile-row">
+              <span class="profile-key">Email</span>
+              <span class="profile-val" id="profile-email-display">—</span>
+            </div>
+            <div class="profile-row">
+              <span class="profile-key">Member Since</span>
+              <span class="profile-val" id="profile-since-display">—</span>
+            </div>
           </div>
+          <button class="account-btn-secondary" id="edit-profile-btn">Edit Profile</button>
         </div>
 
-        <nav class="account-nav">
-          <button class="account-nav-item active" data-tab="profile">
-            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/>
-              <circle cx="12" cy="7" r="4"/>
+        <!-- Edit mode -->
+        <div id="profile-edit" class="hidden">
+          <div class="account-success hidden" id="save-success">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+              <polyline points="20 6 9 17 4 12"/>
             </svg>
-            Profile
-          </button>
-          <button class="account-nav-item" data-tab="orders">
-            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            Profile updated successfully.
+          </div>
+          <div class="account-error hidden" id="save-error">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+              <circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/>
+            </svg>
+            <span id="save-error-msg">Something went wrong.</span>
+          </div>
+          <div class="account-card">
+            <div class="edit-section-label">Personal Info</div>
+            <div class="edit-fields">
+              <div class="edit-field">
+                <label class="edit-label" for="edit-first-name">First Name</label>
+                <input class="edit-input" id="edit-first-name" type="text" placeholder="First name" />
+              </div>
+              <div class="edit-field">
+                <label class="edit-label" for="edit-last-name">Last Name</label>
+                <input class="edit-input" id="edit-last-name" type="text" placeholder="Last name" />
+              </div>
+              <div class="edit-field edit-field--full">
+                <label class="edit-label" for="edit-email">Email</label>
+                <input class="edit-input" id="edit-email" type="email" placeholder="your@email.com" />
+              </div>
+            </div>
+            <div class="edit-section-label">Change Password</div>
+            <div class="edit-fields">
+              <div class="edit-field edit-field--full">
+                <label class="edit-label" for="edit-current-pw">Current Password</label>
+                <input class="edit-input" id="edit-current-pw" type="password" placeholder="••••••••" />
+              </div>
+              <div class="edit-field">
+                <label class="edit-label" for="edit-new-pw">New Password</label>
+                <input class="edit-input" id="edit-new-pw" type="password" placeholder="••••••••" />
+              </div>
+              <div class="edit-field">
+                <label class="edit-label" for="edit-confirm-pw">Confirm Password</label>
+                <input class="edit-input" id="edit-confirm-pw" type="password" placeholder="••••••••" />
+              </div>
+            </div>
+          </div>
+          <div class="edit-actions">
+            <button class="account-btn-primary" id="save-profile-btn">
+              <svg class="account-spinner hidden" id="save-spinner" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                <path d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" opacity="0.25"/>
+                <path d="M21 12a9 9 0 00-9-9"/>
+              </svg>
+              Save Changes
+            </button>
+            <button class="account-btn-secondary" id="cancel-edit-btn">Cancel</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── Orders Tab ── -->
+      <div id="tab-orders" class="account-tab">
+        <div class="account-eyebrow">My Account</div>
+        <h1 class="account-heading">Orders</h1>
+        <div id="orders-list">
+          <div class="account-empty">
+            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" color="var(--mid)">
               <rect x="2" y="3" width="20" height="14" rx="2"/>
               <path d="M8 21h8M12 17v4"/>
             </svg>
-            Orders
-          </button>
-          <button class="account-nav-item" data-tab="addresses">
-            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/>
-              <circle cx="12" cy="10" r="3"/>
-            </svg>
-            Addresses
-          </button>
-        </nav>
-
-        <button class="account-logout" id="logout-btn">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/>
-            <polyline points="16 17 21 12 16 7"/>
-            <line x1="21" y1="12" x2="9" y2="12"/>
-          </svg>
-          Log out
-        </button>
-
-      </aside>
-
-      <!-- ── Content ──────────────────────────────────────────── -->
-      <div class="account-content">
-
-        <!-- ── Profile Tab ── -->
-        <div id="tab-profile" class="account-tab active">
-          <div class="account-eyebrow">My Account</div>
-          <h1 class="account-heading">Profile</h1>
-
-          <!-- View mode -->
-          <div id="profile-view">
-            <div class="account-card">
-              <div class="profile-row">
-                <span class="profile-key">Name</span>
-                <span class="profile-val" id="profile-name-display">—</span>
-              </div>
-              <div class="profile-row">
-                <span class="profile-key">Email</span>
-                <span class="profile-val" id="profile-email-display">—</span>
-              </div>
-              <div class="profile-row">
-                <span class="profile-key">Member Since</span>
-                <span class="profile-val" id="profile-since-display">—</span>
-              </div>
-            </div>
-            <button class="account-btn-secondary" id="edit-profile-btn">Edit Profile</button>
-          </div>
-
-          <!-- Edit mode -->
-          <div id="profile-edit" class="hidden">
-            <div class="account-success hidden" id="save-success">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-                <polyline points="20 6 9 17 4 12"/>
-              </svg>
-              Profile updated successfully.
-            </div>
-            <div class="account-error hidden" id="save-error">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-                <circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/>
-              </svg>
-              <span id="save-error-msg">Something went wrong.</span>
-            </div>
-            <div class="account-card">
-              <div class="edit-section-label">Personal Info</div>
-              <div class="edit-fields">
-                <div class="edit-field">
-                  <label class="edit-label" for="edit-first-name">First Name</label>
-                  <input class="edit-input" id="edit-first-name" type="text" placeholder="First name" />
-                </div>
-                <div class="edit-field">
-                  <label class="edit-label" for="edit-last-name">Last Name</label>
-                  <input class="edit-input" id="edit-last-name" type="text" placeholder="Last name" />
-                </div>
-                <div class="edit-field edit-field--full">
-                  <label class="edit-label" for="edit-email">Email</label>
-                  <input class="edit-input" id="edit-email" type="email" placeholder="your@email.com" />
-                </div>
-              </div>
-              <div class="edit-section-label">Change Password</div>
-              <div class="edit-fields">
-                <div class="edit-field edit-field--full">
-                  <label class="edit-label" for="edit-current-pw">Current Password</label>
-                  <input class="edit-input" id="edit-current-pw" type="password" placeholder="••••••••" />
-                </div>
-                <div class="edit-field">
-                  <label class="edit-label" for="edit-new-pw">New Password</label>
-                  <input class="edit-input" id="edit-new-pw" type="password" placeholder="••••••••" />
-                </div>
-                <div class="edit-field">
-                  <label class="edit-label" for="edit-confirm-pw">Confirm Password</label>
-                  <input class="edit-input" id="edit-confirm-pw" type="password" placeholder="••••••••" />
-                </div>
-              </div>
-            </div>
-            <div class="edit-actions">
-              <button class="account-btn-primary" id="save-profile-btn">
-                <svg class="account-spinner hidden" id="save-spinner" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-                  <path d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" opacity="0.25"/>
-                  <path d="M21 12a9 9 0 00-9-9"/>
-                </svg>
-                Save Changes
-              </button>
-              <button class="account-btn-secondary" id="cancel-edit-btn">Cancel</button>
-            </div>
+            <p>No orders yet.</p>
+            <a class="account-btn-secondary" href="shop.html">Browse the Shop</a>
           </div>
         </div>
+      </div>
 
-        <!-- ── Orders Tab ── -->
-        <div id="tab-orders" class="account-tab">
-          <div class="account-eyebrow">My Account</div>
-          <h1 class="account-heading">Orders</h1>
-          <div id="orders-list">
-            <!-- Populated by account.js -->
-            <div class="account-empty">
-              <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" color="var(--mid)">
-                <rect x="2" y="3" width="20" height="14" rx="2"/>
-                <path d="M8 21h8M12 17v4"/>
-              </svg>
-              <p>No orders yet.</p>
-              <a class="account-btn-secondary" href="shop.html">Browse the Shop</a>
-            </div>
-          </div>
-        </div>
+      <!-- ── Addresses Tab ── -->
+      <div id="tab-addresses" class="account-tab">
+        <div class="account-eyebrow">My Account</div>
+        <h1 class="account-heading">Addresses</h1>
+        <div id="addresses-list"></div>
+        <button class="account-btn-secondary" id="add-address-btn">Add New Address</button>
+      </div>
+      <!-- Logout — AFTER </nav>, never inside it -->
+      <button class="account-logout" id="logout-btn">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/>
+          <polyline points="16 17 21 12 16 7"/>
+          <line x1="21" y1="12" x2="9" y2="12"/>
+        </svg>
+        Log out
+      </button>
+    </div><!-- /.account-content -->
+  </div><!-- /.account-container -->
 
-        <!-- ── Addresses Tab ── -->
-        <div id="tab-addresses" class="account-tab">
-          <div class="account-eyebrow">My Account</div>
-          <h1 class="account-heading">Addresses</h1>
-          <div id="addresses-list">
-            <!-- Populated by account.js -->
-          </div>
-          <button class="account-btn-secondary" id="add-address-btn">Add New Address</button>
-        </div>
+  
+</main>
 
-      </div><!-- /.account-content -->
-    </div><!-- /.account-container -->
-  </main>
-
-   <script type="module" src="./js/pages/account.js"></script>
-    <script type="module" src="./js/main.js"></script>
+<script type="module" src="./js/pages/account.js"></script>
+<script type="module" src="./js/main.js"></script>
 
 </body>
 </html>
