@@ -102,18 +102,18 @@ payBtn.addEventListener('click', async () => {
         'Authorization': `Bearer ${token}`,
       },
       body: JSON.stringify({
-        items: cart,
-        total,
-        shippingAddress: {
-          street,
-          city,
-          province,
-          postal,
-          phone
-        },
-        customerName: name,
-        customerEmail: email,
-      }),
+  customerName:    name,
+  customerEmail:   email,
+  items:           cart,
+  total:           getCartTotal() + SHIPPING,
+  shippingAddress: {
+    street,
+    city,
+    province,
+    postal,
+    phone,
+  },
+}),
     });
 
     const data = await res.json();

@@ -148,40 +148,24 @@ async function fetchOrders() {
     });
     if (!res.ok) return [];
     const data = await res.json();
-
-    // Filter by logged in user's email
     const allOrders = data.data ?? data.orders ?? data ?? [];
-    return allOrders.filter(o => o.customer?.email === user.email);
 
+    // filter by customerEmail not customer.email
+    return allOrders.filter(o => o.customerEmail === user.email);
   } catch { return []; }
 }
 
-async function fetchAddresses() {
+async function fetchOrders() {
   try {
     const res = await fetch('https://vintage808-api.vercel.app/api/orders', {
       headers: { Authorization: `Bearer ${token}` },
     });
     if (!res.ok) return [];
     const data = await res.json();
+    const allOrders = data.data ?? data.orders ?? data ?? [];
 
-    // Pull unique addresses from order history
-    const allOrders = (data.data ?? data.orders ?? data ?? [])
-      .filter(o => o.customer?.email === user.email);
-
-    const seen = new Set();
-    return allOrders
-      .map(o => o.address)
-      .filter(a => {
-        const key = JSON.stringify(a);
-        if (seen.has(key)) return false;
-        seen.add(key);
-        return true;
-      })
-      .map((a, i) => ({
-        label: `Address ${i + 1}`,
-        lines: [a.street, `${a.city}, ${a.province}`, a.postal]
-      }));
-
+    // filter by customerEmail not customer.email
+    return allOrders.filter(o => o.customerEmail === user.email);
   } catch { return []; }
 }
   /* ── Tab switching ─────────────────────────────────────────── */
@@ -244,11 +228,11 @@ async function fetchAddresses() {
     if (saveProfileBtn) saveProfileBtn.disabled = true;
     show(saveSpinner);
 
-    try {
+try {
       const body = { firstName: newFirst, lastName: newLast, email: newEmail };
       if (newPw) body.password = newPw;
 
-      const res = await fetch('http://localhost:5000/api/auth/profile', {
+      const res = await fetch('http://localhost:5000/api/auth/profile', {  // ← change this line
         method:  'PUT',
         headers: {
           'Content-Type': 'application/json',
