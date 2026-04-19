@@ -1,11 +1,11 @@
 // js/pages/shop.js
 import { getAllProducts, IMAGE_BASE_URL } from '../api/products.js';
-// at the top of shop.js add this import
 import { addToCart } from '../components/cart.js';
+
 // ─── State ────────────────────────────────────────────────────
 const state = {
-  all:        [],   // all products from API
-  filtered:   [],   // after filters applied
+  all:        [],
+  filtered:   [],
   open:       false,
   priceMax:   0,
   maxPrice:   0,
@@ -26,7 +26,7 @@ export async function init() {
 
 export default { init };
 
-// ─── Load Products from API ───────────────────────────────────
+// ─── Load Products ────────────────────────────────────────────
 async function loadProducts() {
   const grid = document.querySelector('.product-grid');
   if (!grid) return;
@@ -38,7 +38,6 @@ async function loadProducts() {
     state.all      = res.data || res;
     state.filtered = [...state.all];
 
-    // Set max price from products
     const prices   = state.all.map(p => p.price || 0);
     state.maxPrice = prices.length ? Math.ceil(Math.max(...prices) / 50) * 50 : 1000;
     state.priceMax = state.maxPrice;
@@ -55,7 +54,7 @@ function renderPage() {
   const grid = document.querySelector('.product-grid');
   if (!grid) return;
 
-  const start    = (currentPage - 1) * ITEMS_PER_PAGE;
+  const start     = (currentPage - 1) * ITEMS_PER_PAGE;
   const pageItems = state.filtered.slice(start, start + ITEMS_PER_PAGE);
 
   if (pageItems.length === 0) {
@@ -66,8 +65,71 @@ function renderPage() {
 
   grid.innerHTML = pageItems.map(product => buildCard(product)).join('');
 
-  // Init sliders on all cards
+  // Bind slider arrows/dots per card
   grid.querySelectorAll('.product-card').forEach(card => initSlider(card));
+
+  // ── Event delegation for size picker + cart ──────────────────
+  grid.addEventListener('click', e => {
+
+    // Size option selected
+    const sizeBtn = e.target.closest('.size-option');
+    if (sizeBtn) {
+      const picker = sizeBtn.closest('.size-picker');
+      picker.querySelectorAll('.size-option').forEach(b => b.classList.remove('selected'));
+      sizeBtn.classList.add('selected');
+      picker.querySelector('.size-error').textContent = '';
+      return;
+    }
+
+    // Add to Cart / Confirm clicked
+    const cartBtn = e.target.closest('.btn-cart');
+    if (!cartBtn) return;
+
+    const card   = cartBtn.closest('.product-card');
+    const picker = card.querySelector('.size-picker');
+
+    // No sizes for this product — add directly
+    if (!picker) {
+      addToCart({
+        id:    card.dataset.id,
+        name:  card.dataset.name,
+        price: parseFloat(card.dataset.price),
+        image: card.querySelector('img')?.src || '',
+      });
+      return;
+    }
+
+    // Picker not open yet — open it
+    if (!picker.classList.contains('open')) {
+      picker.classList.add('open');
+      picker.setAttribute('aria-hidden', 'false');
+      cartBtn.textContent = 'Confirm';
+      return;
+    }
+
+    // Picker open but no size chosen
+    const selectedSize = picker.querySelector('.size-option.selected');
+    if (!selectedSize) {
+      picker.querySelector('.size-error').textContent = 'Please select a size';
+      return;
+    }
+
+    // All good — add to cart
+    addToCart({
+      id:    `${card.dataset.id}-${selectedSize.dataset.size}`,
+      name:  `${card.dataset.name} — ${selectedSize.dataset.size}`,
+      price: parseFloat(card.dataset.price),
+      size:  selectedSize.dataset.size,
+      image: card.querySelector('img')?.src || '',
+    });
+
+    // Reset card state
+    picker.classList.remove('open');
+    picker.setAttribute('aria-hidden', 'true');
+    picker.querySelectorAll('.size-option').forEach(b => b.classList.remove('selected'));
+    picker.querySelector('.size-error').textContent = '';
+    cartBtn.textContent = 'Add to cart';
+  });
 
   renderPagination();
 }
@@ -105,23 +167,25 @@ function buildCard(product) {
     : '';
 
   const badge = product.isFeatured
-    ? `<span class="product-badge">New</span>`
+    ? `<span class="product-badge sale">New</span>`
     : '';
 
+  // ── Size picker — same markup as home page ────────────────────
   const sizes = Array.isArray(product.sizes) && product.sizes.length > 0
-    ? `<div class="size-picker">
-        <div>
-          <p class="size-picker-label">Select size</p>
-          <div class="size-options">
-            ${product.sizes.map(s => `<button class="size-option" data-size="${s}">${s}</button>`).join('')}
-          </div>
-          <p class="size-error"></p>
+    ? `<div class="size-picker" aria-hidden="true">
+        <p class="size-picker-label">Select a size</p>
+        <div class="size-options">
+          ${product.sizes.map(s => `<button class="size-option" data-size="${s}">${s}</button>`).join('')}
         </div>
+        <p class="size-error" aria-live="polite"></p>
        </div>`
     : '';
 
   return `
-    <div class="product-card" data-id="${product.id ?? product._id}" data-name="${product.name}" data-price="${product.price}">
+    <div class="product-card"
+      data-id="${product.id ?? product._id}"
+      data-name="${product.name}"
+      data-price="${product.price}">
       <div class="product-image">
         ${badge}
         <div class="product-image-track">${imagesHTML}</div>
@@ -138,72 +202,29 @@ function buildCard(product) {
   `;
 }
 
+// ─── Image slider (arrows + dots) ────────────────────────────
 function initSlider(card) {
-  const track  = card.querySelector('.product-image-track');
-  const prev   = card.querySelector('.product-image-prev');
-  const next   = card.querySelector('.product-image-next');
-  const dots   = card.querySelectorAll('.product-image-dot');
+  const track = card.querySelector('.product-image-track');
+  const prev  = card.querySelector('.product-image-prev');
+  const next  = card.querySelector('.product-image-next');
+  const dots  = card.querySelectorAll('.product-image-dot');
 
-  // ── Slider (only if multiple images) ──────────────────────
-  if (track && (prev || next)) {
-    const total = track.children.length;
-    let current = 0;
+  if (!track || (!prev && !next)) return;
 
-    function goTo(index) {
-      current = (index + total) % total;
-      track.style.transform = `translateX(-${current * 100}%)`;
-      dots.forEach((d, i) => d.classList.toggle('active', i === current));
-    }
+  const total = track.children.length;
+  let current = 0;
 
-    prev?.addEventListener('click', (e) => { e.stopPropagation(); goTo(current - 1); });
-    next?.addEventListener('click', (e) => { e.stopPropagation(); goTo(current + 1); });
-    dots.forEach((dot, i) => {
-      dot.addEventListener('click', (e) => { e.stopPropagation(); goTo(i); });
-    });
+  function goTo(index) {
+    current = (index + total) % total;
+    track.style.transform = `translateX(-${current * 100}%)`;
+    dots.forEach((d, i) => d.classList.toggle('active', i === current));
   }
 
-  // ── Size picker + cart (always runs) ──────────────────────
-  const sizePicker  = card.querySelector('.size-picker');
-  const sizeOptions = card.querySelectorAll('.size-option');
-  const sizeError   = card.querySelector('.size-error');
-  const cartBtn     = card.querySelector('.btn-cart');
-  let selectedSize  = null;
-
-  sizeOptions.forEach(opt => {
-    opt.addEventListener('click', () => {
-      sizeOptions.forEach(o => o.classList.remove('selected'));
-      opt.classList.add('selected');
-      selectedSize = opt.dataset.size;
-      if (sizeError) sizeError.textContent = '';
-    });
-  });
-
-  cartBtn?.addEventListener('click', () => {
-    if (sizePicker && !sizePicker.classList.contains('open')) {
-      sizePicker.classList.add('open');
-      cartBtn.textContent = 'Confirm';
-      return;
-    }
-
-    if (sizePicker && !selectedSize) {
-      if (sizeError) sizeError.textContent = 'Please select a size';
-      return;
-    }
-
-    addToCart({
-      id:    `${card.dataset.id}-${selectedSize}`,
-      name:  `${card.dataset.name} — ${selectedSize}`,
-      price: parseFloat(card.dataset.price),
-      size:  selectedSize,
-      image: track?.querySelector('img')?.src || '',
-    });
-
-    if (sizePicker) sizePicker.classList.remove('open');
-    cartBtn.textContent = 'Add to cart';
-    selectedSize = null;
-    sizeOptions.forEach(o => o.classList.remove('selected'));
-  });
+  prev?.addEventListener('click', e => { e.stopPropagation(); goTo(current - 1); });
+  next?.addEventListener('click', e => { e.stopPropagation(); goTo(current + 1); });
+  dots.forEach((dot, i) => dot.addEventListener('click', e => { e.stopPropagation(); goTo(i); }));
 }
+
 // ─── Pagination ───────────────────────────────────────────────
 function renderPagination() {
   const container = document.querySelector('.pagination');
@@ -228,11 +249,9 @@ function renderPagination() {
   container.querySelector('#pg-prev')?.addEventListener('click', () => {
     if (currentPage > 1) { currentPage--; renderPage(); scrollToProducts(); }
   });
-
   container.querySelector('#pg-next')?.addEventListener('click', () => {
     if (currentPage < totalPages) { currentPage++; renderPage(); scrollToProducts(); }
   });
-
   container.querySelectorAll('[data-page]').forEach(btn => {
     btn.addEventListener('click', () => {
       currentPage = parseInt(btn.dataset.page);
@@ -254,11 +273,9 @@ function applyFilters() {
     const name     = (product.name || '').toLowerCase();
 
     const passPrice = price <= state.priceMax;
-
     const passBadge = state.badges.length === 0 ||
       (state.badges.includes('new') && product.isFeatured);
-
-    const passCat = state.categories.length === 0 ||
+    const passCat   = state.categories.length === 0 ||
       state.categories.some(c => category.includes(c) || name.includes(c));
 
     return passPrice && passBadge && passCat;
@@ -292,11 +309,11 @@ function updateActiveCount() {
 }
 
 function resetFilters() {
-  state.priceMax    = state.maxPrice;
-  state.categories  = [];
-  state.badges      = [];
+  state.priceMax   = state.maxPrice;
+  state.categories = [];
+  state.badges     = [];
 
-  const slider  = document.getElementById('price-range');
+  const slider   = document.getElementById('price-range');
   const priceVal = document.getElementById('price-value');
   if (slider)   slider.value = state.maxPrice;
   if (priceVal) priceVal.textContent = `R${state.maxPrice}`;
@@ -328,7 +345,6 @@ function buildFilterPanel() {
         </button>
       </div>
     </div>
-
     <div class="fp-body">
       <div class="fp-section">
         <p class="fp-section-label">Price range</p>
@@ -338,14 +354,12 @@ function buildFilterPanel() {
         </div>
         <input type="range" id="price-range" class="fp-range" min="0" max="${state.maxPrice}" step="50" value="${state.maxPrice}" />
       </div>
-
       <div class="fp-section">
         <p class="fp-section-label">Tag</p>
         <div class="fp-chips">
           <button class="filter-chip" data-type="badge" data-value="new">New</button>
         </div>
       </div>
-
       <div class="fp-section">
         <p class="fp-section-label">Category</p>
         <div class="fp-chips">
@@ -355,7 +369,6 @@ function buildFilterPanel() {
         </div>
       </div>
     </div>
-
     <div class="fp-footer">
       <button class="fp-apply" id="fp-apply">Show results</button>
     </div>
@@ -375,8 +388,7 @@ function buildFilterPanel() {
   panel.querySelectorAll('.filter-chip').forEach(chip => {
     chip.addEventListener('click', () => {
       chip.classList.toggle('active');
-      const type  = chip.dataset.type;
-      const value = chip.dataset.value;
+      const { type, value } = chip.dataset;
 
       if (type === 'badge') {
         state.badges = state.badges.includes(value)
@@ -391,12 +403,10 @@ function buildFilterPanel() {
     });
   });
 
-  document.addEventListener('keydown', e => {
-    if (e.key === 'Escape') closePanel();
-  });
+  document.addEventListener('keydown', e => { if (e.key === 'Escape') closePanel(); });
 }
 
-function openPanel()  {
+function openPanel() {
   state.open = true;
   document.getElementById('filter-panel')?.classList.add('open');
   document.getElementById('filter-overlay')?.classList.add('open');
