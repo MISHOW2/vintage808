@@ -91,13 +91,13 @@ export async function renderFeaturedProducts() {
       }
 
       // All good — add to cart
-      addToCart({
-        id:    `${cartBtn.dataset.productId}-${selectedSize.dataset.size}`,
-        name:  `${cartBtn.dataset.productName} — ${selectedSize.dataset.size}`,
-        price: parseFloat(cartBtn.dataset.productPrice),
-        image: cartBtn.dataset.productImage,
-        size:  selectedSize.dataset.size,
-      });
+addToCart({
+  id:    `${cartBtn.dataset.productId}-${selectedSize.dataset.size}`,
+  name:  `${cartBtn.dataset.productName} — ${selectedSize.dataset.size}`,
+  price: parseFloat(cartBtn.dataset.productPrice),
+  size:  selectedSize.dataset.size,
+  image: cartBtn.dataset.productImage,
+});
 
       // Reset card state
       picker.classList.remove("open");

@@ -1,12 +1,6 @@
 // ─── Constants ───────────────────────────────────────────────
 const STORAGE_KEY = 'v808_cart';
 
-// ─── Helpers ─────────────────────────────────────────────────
-// Normalise id — MongoDB uses _id, our cart uses id
-function normaliseId(product) {
-  return String(product._id || product.id || '');
-}
-
 // ─── State ───────────────────────────────────────────────────
 export function getCart() {
   try {
@@ -22,14 +16,29 @@ function saveCart(cart) {
 
 // ─── Cart Actions ────────────────────────────────────────────
 export function addToCart(product) {
-  const cart    = getCart();
-  const id      = normaliseId(product);
+  // product.id must always be a non-empty unique string before calling addToCart
+  // e.g. `${mongoId}-${size}` — this is set by shop.js / home.js before calling us
+  const id = String(product.id || product._id || '');
+
+  if (!id) {
+    console.error('[cart] addToCart called with no id:', product);
+    return;
+  }
+
+  const cart     = getCart();
   const existing = cart.find(item => item.id === id);
 
   if (existing) {
     existing.qty += 1;
   } else {
-    cart.push({ ...product, id, qty: 1 });
+    cart.push({
+      id,
+      name:  product.name,
+      price: product.price,
+      image: product.image || '',
+      size:  product.size  || '',
+      qty:   1,
+    });
   }
 
   saveCart(cart);
@@ -39,8 +48,7 @@ export function addToCart(product) {
 }
 
 export function removeFromCart(productId) {
-  const cart = getCart().filter(item => item.id !== productId);
-  saveCart(cart);
+  saveCart(getCart().filter(item => item.id !== productId));
   renderCartDrawer();
   updateBadges();
 }
@@ -51,12 +59,7 @@ export function changeQty(productId, delta) {
   if (!item) return;
 
   item.qty += delta;
-  if (item.qty <= 0) {
-    saveCart(cart.filter(i => i.id !== productId));
-  } else {
-    saveCart(cart);
-  }
-
+  saveCart(item.qty <= 0 ? cart.filter(i => i.id !== productId) : cart);
   renderCartDrawer();
   updateBadges();
 }
@@ -92,7 +95,7 @@ function renderCartDrawer() {
 
   body.innerHTML = cart.map(item => `
     <div class="cart-item" data-id="${item.id}">
-      <img class="cart-item-img" src="${item.image || ''}" alt="${item.name}" />
+      <img class="cart-item-img" src="${item.image}" alt="${item.name}" />
       <div class="cart-item-info">
         <p class="cart-item-name">${item.name}</p>
         <p class="cart-item-price">R${(item.price * item.qty).toFixed(2)}</p>
@@ -104,7 +107,8 @@ function renderCartDrawer() {
       </div>
       <button class="cart-item-remove" data-id="${item.id}" aria-label="Remove">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+          <line x1="18" y1="6" x2="6" y2="18"/>
+          <line x1="6" y1="6" x2="18" y2="18"/>
         </svg>
       </button>
     </div>
@@ -114,15 +118,11 @@ function renderCartDrawer() {
   if (totalEl) totalEl.textContent = `R${getCartTotal().toFixed(2)}`;
 
   body.querySelectorAll('.qty-btn').forEach(btn => {
-    btn.addEventListener('click', () => {
-      changeQty(btn.dataset.id, Number(btn.dataset.delta));
-    });
+    btn.addEventListener('click', () => changeQty(btn.dataset.id, Number(btn.dataset.delta)));
   });
 
   body.querySelectorAll('.cart-item-remove').forEach(btn => {
-    btn.addEventListener('click', () => {
-      removeFromCart(btn.dataset.id);
-    });
+    btn.addEventListener('click', () => removeFromCart(btn.dataset.id));
   });
 }
 
@@ -157,10 +157,7 @@ function bindDrawerControls() {
 
 function bindCartIcons() {
   document.querySelectorAll('[aria-label="Cart"]').forEach(btn => {
-    btn.addEventListener('click', e => {
-      e.preventDefault();
-      openDrawer();
-    });
+    btn.addEventListener('click', e => { e.preventDefault(); openDrawer(); });
   });
 }
 

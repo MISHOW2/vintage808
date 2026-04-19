@@ -115,13 +115,13 @@ function renderPage() {
     }
 
     // All good — add to cart
-    addToCart({
-      id:    `${card.dataset.id}-${selectedSize.dataset.size}`,
-      name:  `${card.dataset.name} — ${selectedSize.dataset.size}`,
-      price: parseFloat(card.dataset.price),
-      size:  selectedSize.dataset.size,
-      image: card.querySelector('img')?.src || '',
-    });
+addToCart({
+  id:    `${card.dataset.id}-${selectedSize.dataset.size}`,  // e.g. "507f1f-M"
+  name:  `${card.dataset.name} — ${selectedSize.dataset.size}`,
+  price: parseFloat(card.dataset.price),
+  size:  selectedSize.dataset.size,
+  image: card.querySelector('img')?.src || '',
+});
 
     // Reset card state
     picker.classList.remove('open');
