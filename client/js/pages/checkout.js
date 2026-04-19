@@ -23,9 +23,10 @@ const payBtnLoader    = document.getElementById('pay-btn-loader');
 
 // ── Render summary ────────────────────────────────────────────
 function renderSummary() {
-const cart = getCart();
-const subtotal = getCartTotal();
-const total = subtotal + SHIPPING;
+  const cart     = getCart();
+  const subtotal = getCartTotal();
+  const total    = subtotal + SHIPPING;
+
   if (cart.length === 0) {
     summaryItems.style.display = 'none';
     summaryEmpty.style.display = 'block';
@@ -91,26 +92,18 @@ payBtn.addEventListener('click', async () => {
   setLoading(true);
 
   try {
-   const res = await fetch(`${API}/orders`, {
-  method: 'POST',
-  headers: {
-    'Content-Type': 'application/json',
-    'Authorization': `Bearer ${token}`,
-  },
-  body: JSON.stringify({
-    items: cart, // ✅ backend expects "items"
-    total,       // ✅ FIXED (this was missing)
-    shippingAddress: {
-      street,
-      city,
-      province,
-      postal,
-      phone
-    },
-    customerName: name,
-    customerEmail: email,
-  }),
-});
+    const res = await fetch(`${API}/orders`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`,
+      },
+      body: JSON.stringify({
+        customer: { name, email, phone },
+        address:  { street, city, province, postal },
+        cart,
+      }),
+    });
 
     const data = await res.json();
 
