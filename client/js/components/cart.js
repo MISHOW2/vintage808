@@ -1,6 +1,12 @@
 // ─── Constants ───────────────────────────────────────────────
 const STORAGE_KEY = 'v808_cart';
 
+// ─── Helpers ─────────────────────────────────────────────────
+// Normalise id — MongoDB uses _id, our cart uses id
+function normaliseId(product) {
+  return String(product._id || product.id || '');
+}
+
 // ─── State ───────────────────────────────────────────────────
 export function getCart() {
   try {
@@ -14,18 +20,16 @@ function saveCart(cart) {
   localStorage.setItem(STORAGE_KEY, JSON.stringify(cart));
 }
 
-
 // ─── Cart Actions ────────────────────────────────────────────
-
 export function addToCart(product) {
-  // product: { id, name, price (number), image (full URL) }
-  const cart = getCart();
-  const existing = cart.find(item => item.id === product.id);
+  const cart    = getCart();
+  const id      = normaliseId(product);
+  const existing = cart.find(item => item.id === id);
 
   if (existing) {
     existing.qty += 1;
   } else {
-    cart.push({ ...product, qty: 1 });
+    cart.push({ ...product, id, qty: 1 });
   }
 
   saveCart(cart);
@@ -48,7 +52,6 @@ export function changeQty(productId, delta) {
 
   item.qty += delta;
   if (item.qty <= 0) {
-    // Remove if qty drops to 0
     saveCart(cart.filter(i => i.id !== productId));
   } else {
     saveCart(cart);
@@ -72,12 +75,10 @@ export function getCartTotal() {
   return getCart().reduce((sum, item) => sum + item.price * item.qty, 0);
 }
 
-
 // ─── Render Drawer ───────────────────────────────────────────
-
 function renderCartDrawer() {
-  const body = document.getElementById('cart-drawer-body');
-  const footer = document.getElementById('cart-drawer-footer');
+  const body    = document.getElementById('cart-drawer-body');
+  const footer  = document.getElementById('cart-drawer-footer');
   const totalEl = document.getElementById('cart-drawer-total');
   if (!body) return;
 
@@ -91,15 +92,15 @@ function renderCartDrawer() {
 
   body.innerHTML = cart.map(item => `
     <div class="cart-item" data-id="${item.id}">
-      <img class="cart-item-img" src="${item.image}" alt="${item.name}" />
+      <img class="cart-item-img" src="${item.image || ''}" alt="${item.name}" />
       <div class="cart-item-info">
         <p class="cart-item-name">${item.name}</p>
         <p class="cart-item-price">R${(item.price * item.qty).toFixed(2)}</p>
         <div class="cart-item-qty">
-  <button class="qty-btn" data-id="${item.id}" data-delta="-1">−</button>
-  <span class="qty-count">${item.qty}</span>
-  <button class="qty-btn" data-id="${item.id}" data-delta="1">+</button>
-</div>
+          <button class="qty-btn" data-id="${item.id}" data-delta="-1">−</button>
+          <span class="qty-count">${item.qty}</span>
+          <button class="qty-btn" data-id="${item.id}" data-delta="1">+</button>
+        </div>
       </div>
       <button class="cart-item-remove" data-id="${item.id}" aria-label="Remove">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -109,11 +110,9 @@ function renderCartDrawer() {
     </div>
   `).join('');
 
-  // Footer
   if (footer) footer.style.display = 'flex';
   if (totalEl) totalEl.textContent = `R${getCartTotal().toFixed(2)}`;
 
-  // Bind qty + remove buttons
   body.querySelectorAll('.qty-btn').forEach(btn => {
     btn.addEventListener('click', () => {
       changeQty(btn.dataset.id, Number(btn.dataset.delta));
@@ -127,9 +126,7 @@ function renderCartDrawer() {
   });
 }
 
-
 // ─── Badges ──────────────────────────────────────────────────
-
 function updateBadges() {
   const count = getCartCount();
   document.querySelectorAll('.drawer-badge, .cart-badge').forEach(badge => {
@@ -138,9 +135,7 @@ function updateBadges() {
   });
 }
 
-
 // ─── Open / Close ────────────────────────────────────────────
-
 export function openDrawer() {
   document.getElementById('cart-drawer')?.classList.add('open');
   document.getElementById('cart-overlay')?.classList.add('open');
@@ -153,15 +148,11 @@ export function closeDrawer() {
   document.body.style.overflow = '';
 }
 
-
 // ─── Bind Controls ───────────────────────────────────────────
-
 function bindDrawerControls() {
   document.getElementById('cart-overlay')?.addEventListener('click', closeDrawer);
   document.getElementById('cart-drawer-close')?.addEventListener('click', closeDrawer);
-  document.addEventListener('keydown', e => {
-    if (e.key === 'Escape') closeDrawer();
-  });
+  document.addEventListener('keydown', e => { if (e.key === 'Escape') closeDrawer(); });
 }
 
 function bindCartIcons() {
@@ -173,14 +164,12 @@ function bindCartIcons() {
   });
 }
 
-
 // ─── Init ────────────────────────────────────────────────────
-
 export function init() {
   bindDrawerControls();
   bindCartIcons();
-  renderCartDrawer();  // render persisted cart on load
-  updateBadges();      // restore badge count on load
+  renderCartDrawer();
+  updateBadges();
 }
 
 export default { init, openDrawer, closeDrawer, addToCart, removeFromCart, changeQty, clearCart, getCartCount, getCartTotal };
