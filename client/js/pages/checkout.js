@@ -88,7 +88,7 @@ payBtn.addEventListener('click', async () => {
     return;
   }
 
-  // ✅ ADD THIS
+  // 
   const subtotal = getCartTotal();
   const total = subtotal + SHIPPING;
 
@@ -103,7 +103,7 @@ payBtn.addEventListener('click', async () => {
       },
       body: JSON.stringify({
         items: cart,
-        total, // ✅ now works correctly
+        total,
         shippingAddress: {
           street,
           city,
