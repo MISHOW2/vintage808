@@ -1,6 +1,7 @@
 // js/pages/shop.js
 import { getAllProducts, IMAGE_BASE_URL } from '../api/products.js';
 import { addToCart } from '../components/cart.js';
+import { showSkeletons } from '../utils/skeleton.js';
 
 // ─── State ────────────────────────────────────────────────────
 const state = {
@@ -31,7 +32,8 @@ async function loadProducts() {
   const grid = document.querySelector('.product-grid');
   if (!grid) return;
 
-  grid.innerHTML = `<p class="products-loading">Loading products…</p>`;
+  // Show skeletons while fetching
+  showSkeletons(grid, 6);
 
   try {
     const res      = await getAllProducts();
@@ -64,14 +66,10 @@ function renderPage() {
   }
 
   grid.innerHTML = pageItems.map(product => buildCard(product)).join('');
-
-  // Bind slider arrows/dots per card
   grid.querySelectorAll('.product-card').forEach(card => initSlider(card));
 
   // ── Event delegation for size picker + cart ──────────────────
   grid.addEventListener('click', e => {
-
-    // Size option selected
     const sizeBtn = e.target.closest('.size-option');
     if (sizeBtn) {
       const picker = sizeBtn.closest('.size-picker');
@@ -81,14 +79,12 @@ function renderPage() {
       return;
     }
 
-    // Add to Cart / Confirm clicked
     const cartBtn = e.target.closest('.btn-cart');
     if (!cartBtn) return;
 
     const card   = cartBtn.closest('.product-card');
     const picker = card.querySelector('.size-picker');
 
-    // No sizes for this product — add directly
     if (!picker) {
       addToCart({
         id:    card.dataset.id,
@@ -99,7 +95,6 @@ function renderPage() {
       return;
     }
 
-    // Picker not open yet — open it
     if (!picker.classList.contains('open')) {
       picker.classList.add('open');
       picker.setAttribute('aria-hidden', 'false');
@@ -107,23 +102,20 @@ function renderPage() {
       return;
     }
 
-    // Picker open but no size chosen
     const selectedSize = picker.querySelector('.size-option.selected');
     if (!selectedSize) {
       picker.querySelector('.size-error').textContent = 'Please select a size';
       return;
     }
 
-    // All good — add to cart
-addToCart({
-  id:    `${card.dataset.id}-${selectedSize.dataset.size}`,  // e.g. "507f1f-M"
-  name:  `${card.dataset.name} — ${selectedSize.dataset.size}`,
-  price: parseFloat(card.dataset.price),
-  size:  selectedSize.dataset.size,
-  image: card.querySelector('img')?.src || '',
-});
+    addToCart({
+      id:    `${card.dataset.id}-${selectedSize.dataset.size}`,
+      name:  `${card.dataset.name} — ${selectedSize.dataset.size}`,
+      price: parseFloat(card.dataset.price),
+      size:  selectedSize.dataset.size,
+      image: card.querySelector('img')?.src || '',
+    });
 
-    // Reset card state
     picker.classList.remove('open');
     picker.setAttribute('aria-hidden', 'true');
     picker.querySelectorAll('.size-option').forEach(b => b.classList.remove('selected'));
@@ -137,13 +129,10 @@ addToCart({
 // ─── Build product card HTML ──────────────────────────────────
 function buildCard(product) {
   const images = Array.isArray(product.images) && product.images.length > 0
-    ? product.images
-    : [null];
+    ? product.images : [null];
 
   const imagesHTML = images.map(img => {
-    const src = img
-      ? (img.startsWith('http') ? img : `${IMAGE_BASE_URL}${img}`)
-      : '';
+    const src = img ? (img.startsWith('http') ? img : `${IMAGE_BASE_URL}${img}`) : '';
     return src
       ? `<img src="${src}" alt="${product.name}" loading="lazy" />`
       : `<div style="width:100%;height:100%;background:var(--sand);display:flex;align-items:center;justify-content:center;">
@@ -154,8 +143,7 @@ function buildCard(product) {
   const dotsHTML = images.length > 1
     ? `<div class="product-image-dots">
         ${images.map((_, i) => `<button class="product-image-dot${i === 0 ? ' active' : ''}" data-index="${i}"></button>`).join('')}
-       </div>`
-    : '';
+       </div>` : '';
 
   const arrowsHTML = images.length > 1
     ? `<button class="product-image-prev" aria-label="Previous image">
@@ -163,14 +151,10 @@ function buildCard(product) {
        </button>
        <button class="product-image-next" aria-label="Next image">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg>
-       </button>`
-    : '';
+       </button>` : '';
 
-  const badge = product.isFeatured
-    ? `<span class="product-badge sale">New</span>`
-    : '';
+  const badge = product.isFeatured ? `<span class="product-badge sale">New</span>` : '';
 
-  // ── Size picker — same markup as home page ────────────────────
   const sizes = Array.isArray(product.sizes) && product.sizes.length > 0
     ? `<div class="size-picker" aria-hidden="true">
         <p class="size-picker-label">Select a size</p>
@@ -178,12 +162,11 @@ function buildCard(product) {
           ${product.sizes.map(s => `<button class="size-option" data-size="${s}">${s}</button>`).join('')}
         </div>
         <p class="size-error" aria-live="polite"></p>
-       </div>`
-    : '';
+       </div>` : '';
 
   return `
     <div class="product-card"
-      data-id="${product.id ?? product._id}"
+      data-id="${product._id || product.id}"
       data-name="${product.name}"
       data-price="${product.price}">
       <div class="product-image">
@@ -202,7 +185,7 @@ function buildCard(product) {
   `;
 }
 
-// ─── Image slider (arrows + dots) ────────────────────────────
+// ─── Image slider ─────────────────────────────────────────────
 function initSlider(card) {
   const track = card.querySelector('.product-image-track');
   const prev  = card.querySelector('.product-image-prev');
@@ -253,11 +236,7 @@ function renderPagination() {
     if (currentPage < totalPages) { currentPage++; renderPage(); scrollToProducts(); }
   });
   container.querySelectorAll('[data-page]').forEach(btn => {
-    btn.addEventListener('click', () => {
-      currentPage = parseInt(btn.dataset.page);
-      renderPage();
-      scrollToProducts();
-    });
+    btn.addEventListener('click', () => { currentPage = parseInt(btn.dataset.page); renderPage(); scrollToProducts(); });
   });
 }
 
@@ -271,16 +250,11 @@ function applyFilters() {
     const price    = product.price || 0;
     const category = (product.category || '').toLowerCase();
     const name     = (product.name || '').toLowerCase();
-
     const passPrice = price <= state.priceMax;
-    const passBadge = state.badges.length === 0 ||
-      (state.badges.includes('new') && product.isFeatured);
-    const passCat   = state.categories.length === 0 ||
-      state.categories.some(c => category.includes(c) || name.includes(c));
-
+    const passBadge = state.badges.length === 0 || (state.badges.includes('new') && product.isFeatured);
+    const passCat   = state.categories.length === 0 || state.categories.some(c => category.includes(c) || name.includes(c));
     return passPrice && passBadge && passCat;
   });
-
   currentPage = 1;
   renderPage();
   updateActiveCount();
@@ -289,43 +263,28 @@ function applyFilters() {
 function updateActiveCount() {
   const btn = document.querySelector('.filter-btn');
   if (!btn) return;
-
   let count = 0;
   if (state.priceMax < state.maxPrice) count++;
-  count += state.categories.length;
-  count += state.badges.length;
-
+  count += state.categories.length + state.badges.length;
   let badge = btn.querySelector('.filter-count');
   if (count > 0) {
-    if (!badge) {
-      badge = document.createElement('span');
-      badge.className = 'filter-count';
-      btn.appendChild(badge);
-    }
+    if (!badge) { badge = document.createElement('span'); badge.className = 'filter-count'; btn.appendChild(badge); }
     badge.textContent = count;
-  } else {
-    badge?.remove();
-  }
+  } else { badge?.remove(); }
 }
 
 function resetFilters() {
-  state.priceMax   = state.maxPrice;
-  state.categories = [];
-  state.badges     = [];
-
-  const slider   = document.getElementById('price-range');
+  state.priceMax = state.maxPrice; state.categories = []; state.badges = [];
+  const slider = document.getElementById('price-range');
   const priceVal = document.getElementById('price-value');
-  if (slider)   slider.value = state.maxPrice;
+  if (slider) slider.value = state.maxPrice;
   if (priceVal) priceVal.textContent = `R${state.maxPrice}`;
-
   document.querySelectorAll('.filter-chip').forEach(c => c.classList.remove('active'));
   applyFilters();
 }
 
-// ─── Filter Panel ─────────────────────────────────────────────
 function buildFilterPanel() {
   if (document.getElementById('filter-panel')) return;
-
   const overlay = document.createElement('div');
   overlay.id = 'filter-overlay';
   overlay.addEventListener('click', closePanel);
@@ -348,17 +307,12 @@ function buildFilterPanel() {
     <div class="fp-body">
       <div class="fp-section">
         <p class="fp-section-label">Price range</p>
-        <div class="fp-price-row">
-          <span>R0</span>
-          <span class="fp-price-cur" id="price-value">R${state.maxPrice}</span>
-        </div>
+        <div class="fp-price-row"><span>R0</span><span class="fp-price-cur" id="price-value">R${state.maxPrice}</span></div>
         <input type="range" id="price-range" class="fp-range" min="0" max="${state.maxPrice}" step="50" value="${state.maxPrice}" />
       </div>
       <div class="fp-section">
         <p class="fp-section-label">Tag</p>
-        <div class="fp-chips">
-          <button class="filter-chip" data-type="badge" data-value="new">New</button>
-        </div>
+        <div class="fp-chips"><button class="filter-chip" data-type="badge" data-value="new">New</button></div>
       </div>
       <div class="fp-section">
         <p class="fp-section-label">Category</p>
@@ -369,40 +323,30 @@ function buildFilterPanel() {
         </div>
       </div>
     </div>
-    <div class="fp-footer">
-      <button class="fp-apply" id="fp-apply">Show results</button>
-    </div>
+    <div class="fp-footer"><button class="fp-apply" id="fp-apply">Show results</button></div>
   `;
   document.body.appendChild(panel);
 
   document.getElementById('fp-close').addEventListener('click', closePanel);
   document.getElementById('fp-reset').addEventListener('click', resetFilters);
   document.getElementById('fp-apply').addEventListener('click', closePanel);
-
   document.getElementById('price-range').addEventListener('input', e => {
     state.priceMax = parseInt(e.target.value);
     document.getElementById('price-value').textContent = `R${state.priceMax}`;
     applyFilters();
   });
-
   panel.querySelectorAll('.filter-chip').forEach(chip => {
     chip.addEventListener('click', () => {
       chip.classList.toggle('active');
       const { type, value } = chip.dataset;
-
       if (type === 'badge') {
-        state.badges = state.badges.includes(value)
-          ? state.badges.filter(v => v !== value)
-          : [...state.badges, value];
+        state.badges = state.badges.includes(value) ? state.badges.filter(v => v !== value) : [...state.badges, value];
       } else if (type === 'cat') {
-        state.categories = state.categories.includes(value)
-          ? state.categories.filter(v => v !== value)
-          : [...state.categories, value];
+        state.categories = state.categories.includes(value) ? state.categories.filter(v => v !== value) : [...state.categories, value];
       }
       applyFilters();
     });
   });
-
   document.addEventListener('keydown', e => { if (e.key === 'Escape') closePanel(); });
 }
 
@@ -421,18 +365,12 @@ function closePanel() {
 }
 
 function bindFilterButton() {
-  document.querySelector('.filter-btn')?.addEventListener('click', () => {
-    state.open ? closePanel() : openPanel();
-  });
+  document.querySelector('.filter-btn')?.addEventListener('click', () => { state.open ? closePanel() : openPanel(); });
 }
 
-// ─── Nav account icon ─────────────────────────────────────────
 function bindAccountIcon() {
   const token = localStorage.getItem('v808_token');
   document.querySelectorAll('[aria-label="Account"]').forEach(btn => {
-    btn.addEventListener('click', e => {
-      e.preventDefault();
-      window.location.href = token ? './account.html' : './login.html';
-    });
+    btn.addEventListener('click', e => { e.preventDefault(); window.location.href = token ? './account.html' : './login.html'; });
   });
 }
