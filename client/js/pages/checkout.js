@@ -11,21 +11,21 @@ if (!token) {
 }
 
 // ── Elements ──────────────────────────────────────────────────
-const summaryItems    = document.getElementById('summary-items');
-const summaryEmpty    = document.getElementById('summary-empty');
+const summaryItems = document.getElementById('summary-items');
+const summaryEmpty = document.getElementById('summary-empty');
 const summarySubtotal = document.getElementById('summary-subtotal');
-const summaryTotal    = document.getElementById('summary-total');
-const errorBox        = document.getElementById('checkout-error');
-const errorMsg        = document.getElementById('checkout-error-msg');
-const payBtn          = document.getElementById('pay-btn');
-const payBtnText      = document.getElementById('pay-btn-text');
-const payBtnLoader    = document.getElementById('pay-btn-loader');
+const summaryTotal = document.getElementById('summary-total');
+const errorBox = document.getElementById('checkout-error');
+const errorMsg = document.getElementById('checkout-error-msg');
+const payBtn = document.getElementById('pay-btn');
+const payBtnText = document.getElementById('pay-btn-text');
+const payBtnLoader = document.getElementById('pay-btn-loader');
 
 // ── Render summary ────────────────────────────────────────────
 function renderSummary() {
-const cart = getCart();
-const subtotal = getCartTotal();
-const total = subtotal + SHIPPING;
+  const cart = getCart();
+  const subtotal = getCartTotal();
+  const total = subtotal + SHIPPING;
   if (cart.length === 0) {
     summaryItems.style.display = 'none';
     summaryEmpty.style.display = 'block';
@@ -43,7 +43,7 @@ const total = subtotal + SHIPPING;
   }
 
   summarySubtotal.textContent = `R${subtotal.toFixed(2)}`;
-  summaryTotal.textContent    = `R${(subtotal + SHIPPING).toFixed(2)}`;
+  summaryTotal.textContent = `R${(subtotal + SHIPPING).toFixed(2)}`;
 }
 
 renderSummary();
@@ -60,21 +60,21 @@ function hideError() {
 }
 
 function setLoading(loading) {
-  payBtn.disabled            = loading;
-  payBtnText.style.display   = loading ? 'none' : 'inline';
+  payBtn.disabled = loading;
+  payBtnText.style.display = loading ? 'none' : 'inline';
   payBtnLoader.style.display = loading ? 'inline-flex' : 'none';
 }
 
 payBtn.addEventListener('click', async () => {
   hideError();
 
-  const name     = document.getElementById('full-name').value.trim();
-  const email    = document.getElementById('email').value.trim();
-  const phone    = document.getElementById('phone').value.trim();
-  const street   = document.getElementById('street').value.trim();
-  const city     = document.getElementById('city').value.trim();
+  const name = document.getElementById('full-name').value.trim();
+  const email = document.getElementById('email').value.trim();
+  const phone = document.getElementById('phone').value.trim();
+  const street = document.getElementById('street').value.trim();
+  const city = document.getElementById('city').value.trim();
   const province = document.getElementById('province').value;
-  const postal   = document.getElementById('postal').value.trim();
+  const postal = document.getElementById('postal').value.trim();
 
   if (!name || !email || !phone || !street || !city || !province || !postal) {
     showError('Please fill in all fields before continuing.');
@@ -102,18 +102,18 @@ payBtn.addEventListener('click', async () => {
         'Authorization': `Bearer ${token}`,
       },
       body: JSON.stringify({
-  customerName:    name,
-  customerEmail:   email,
-  items:           cart,
-  total:           getCartTotal() + SHIPPING,
-  shippingAddress: {
-    street,
-    city,
-    province,
-    postal,
-    phone,
-  },
-}),
+        customerName: name,
+        customerEmail: email,
+        items: cart,
+        total: getCartTotal() + SHIPPING,
+        shippingAddress: {
+          street,
+          city,
+          province,
+          postal,
+          phone,
+        },
+      }),
     });
 
     const data = await res.json();
