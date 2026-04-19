@@ -1,9 +1,7 @@
 // js/main.js
 import { init as initCart } from './components/cart.js';
 import { nav } from './components/nav.js';
-import { renderFeaturedProducts } from './pages/home.js';
-import shop from './pages/shop.js';
-shop.init();
+
 document.addEventListener('DOMContentLoaded', () => {
 
   // ── Cart ──────────────────────────────────────────────────
@@ -28,14 +26,35 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
 
-  // ── Featured products (home page only) ───────────────────
-  if (document.querySelector('.product-grid')) {
-    renderFeaturedProducts();
+  // ── Page detection ────────────────────────────────────────
+  const page = document.body.dataset.page;
+
+  if (page === 'home') {
+    import('./pages/home.js').then(m => m.renderFeaturedProducts());
   }
 
-  // ── Shop filter (shop page only) ─────────────────────────
-  if (document.querySelector('.filter-btn')) {
+  if (page === 'shop') {
     import('./pages/shop.js').then(m => m.default.init());
+  }
+
+  if (page === 'checkout') {
+    import('./pages/checkout.js');
+  }
+
+  if (page === 'login') {
+    import('./pages/login.js');
+  }
+
+  if (page === 'register') {
+    import('./pages/register.js');
+  }
+
+  if (page === 'account') {
+    import('./pages/account.js');
+  }
+
+  if (page === 'order-confirmation') {
+    import('./pages/order-confirmation.js');
   }
 
 });

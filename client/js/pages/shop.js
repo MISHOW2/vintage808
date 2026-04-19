@@ -1,6 +1,7 @@
 // js/pages/shop.js
 import { getAllProducts, IMAGE_BASE_URL } from '../api/products.js';
-
+// at the top of shop.js add this import
+import { addToCart } from '../components/cart.js';
 // ─── State ────────────────────────────────────────────────────
 const state = {
   all:        [],   // all products from API
@@ -137,43 +138,32 @@ function buildCard(product) {
   `;
 }
 
-// ─── Image Slider ─────────────────────────────────────────────
 function initSlider(card) {
   const track  = card.querySelector('.product-image-track');
   const prev   = card.querySelector('.product-image-prev');
   const next   = card.querySelector('.product-image-next');
   const dots   = card.querySelectorAll('.product-image-dot');
 
-  if (!track || (!prev && !next)) return;
+  // ── Slider (only if multiple images) ──────────────────────
+  if (track && (prev || next)) {
+    const total = track.children.length;
+    let current = 0;
 
-  const total = track.children.length;
-  let current = 0;
+    function goTo(index) {
+      current = (index + total) % total;
+      track.style.transform = `translateX(-${current * 100}%)`;
+      dots.forEach((d, i) => d.classList.toggle('active', i === current));
+    }
 
-  function goTo(index) {
-    current = (index + total) % total;
-    track.style.transform = `translateX(-${current * 100}%)`;
-    dots.forEach((d, i) => d.classList.toggle('active', i === current));
+    prev?.addEventListener('click', (e) => { e.stopPropagation(); goTo(current - 1); });
+    next?.addEventListener('click', (e) => { e.stopPropagation(); goTo(current + 1); });
+    dots.forEach((dot, i) => {
+      dot.addEventListener('click', (e) => { e.stopPropagation(); goTo(i); });
+    });
   }
 
-  prev?.addEventListener('click', (e) => {
-    e.stopPropagation();
-    goTo(current - 1);
-  });
-
-  next?.addEventListener('click', (e) => {
-    e.stopPropagation();
-    goTo(current + 1);
-  });
-
-  dots.forEach((dot, i) => {
-    dot.addEventListener('click', (e) => {
-      e.stopPropagation();
-      goTo(i);
-    });
-  });
-
-  // Size picker + cart button
-  const sizePicker = card.querySelector('.size-picker');
+  // ── Size picker + cart (always runs) ──────────────────────
+  const sizePicker  = card.querySelector('.size-picker');
   const sizeOptions = card.querySelectorAll('.size-option');
   const sizeError   = card.querySelector('.size-error');
   const cartBtn     = card.querySelector('.btn-cart');
@@ -200,26 +190,20 @@ function initSlider(card) {
       return;
     }
 
-    // Add to cart
-    const { addToCart } = window.CartModule || {};
-    if (addToCart) {
-      addToCart({
-        id:    card.dataset.id + (selectedSize ? `-${selectedSize}` : ''),
-        name:  card.dataset.name,
-        price: parseFloat(card.dataset.price),
-        size:  selectedSize,
-        image: track.querySelector('img')?.src || '',
-      });
-    }
+    addToCart({
+      id:    `${card.dataset.id}-${selectedSize}`,
+      name:  `${card.dataset.name} — ${selectedSize}`,
+      price: parseFloat(card.dataset.price),
+      size:  selectedSize,
+      image: track?.querySelector('img')?.src || '',
+    });
 
-    // Reset
     if (sizePicker) sizePicker.classList.remove('open');
     cartBtn.textContent = 'Add to cart';
     selectedSize = null;
     sizeOptions.forEach(o => o.classList.remove('selected'));
   });
 }
-
 // ─── Pagination ───────────────────────────────────────────────
 function renderPagination() {
   const container = document.querySelector('.pagination');

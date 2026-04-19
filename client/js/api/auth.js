@@ -1,7 +1,7 @@
 // js/api/auth.js
 // All authentication-related API calls using native fetch.
 
-const BASE_URL = 'https://vintage808-api.vercel.app/auth';
+const BASE_URL = 'https://vintage808-api.vercel.app/api/auth';
 
 /**
  * Log in an existing user.

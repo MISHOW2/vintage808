@@ -2,7 +2,7 @@
 const STORAGE_KEY = 'v808_cart';
 
 // ─── State ───────────────────────────────────────────────────
-function getCart() {
+export function getCart() {
   try {
     return JSON.parse(localStorage.getItem(STORAGE_KEY)) ?? [];
   } catch {

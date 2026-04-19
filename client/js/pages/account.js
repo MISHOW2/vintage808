@@ -88,37 +88,42 @@
     if (profileSinceDisp) profileSinceDisp.textContent = user.memberSince || '—';
   }
 
-  function renderOrders(orders = []) {
-    if (!ordersList || !orders.length) return;
-    ordersList.innerHTML = orders.map(order => `
-      <div class="order-card">
-        <div class="order-card-header">
-          <span class="order-id">${order.id}</span>
-          <span class="order-date">${order.date}</span>
-          <span class="order-status order-status--${order.status}">${formatStatus(order.status)}</span>
-        </div>
-        <div class="order-card-body">
-          ${order.items.map(item => `
-            <div class="order-item">
-              <div class="order-item-img" style="background:var(--sand);">
-                ${item.image ? `<img src="${item.image}" alt="${item.name}" style="width:100%;height:100%;object-fit:cover;border-radius:2px;">` : ''}
-              </div>
-              <div class="order-item-info">
-                <div class="order-item-name">${item.name}</div>
-                <div class="order-item-meta">${item.meta}</div>
-              </div>
-              <span class="order-item-price">${item.price}</span>
-            </div>
-          `).join('')}
-        </div>
-        <div class="order-card-footer">
-          <span class="order-total-label">Order Total</span>
-          <span class="order-total-amount">${order.total}</span>
-        </div>
-      </div>
-    `).join('');
+function renderOrders(orders = []) {
+  if (!ordersList) return;
+
+  if (!orders.length) {
+    ordersList.innerHTML = '<p style="font-size:14px;color:var(--mid);padding:24px 0 12px;">No orders yet.</p>';
+    return;
   }
 
+  ordersList.innerHTML = orders.map(order => `
+    <div class="order-card">
+      <div class="order-card-header">
+        <span class="order-id">#${order.id}</span>
+        <span class="order-date">${new Date(order.createdAt).toLocaleDateString('en-ZA', { year: 'numeric', month: 'short', day: 'numeric' })}</span>
+        <span class="order-status order-status--${order.status}">${formatStatus(order.status)}</span>
+      </div>
+      <div class="order-card-body">
+        ${order.items.map(item => `
+          <div class="order-item">
+            <div class="order-item-img" style="background:var(--sand);">
+              ${item.image ? `<img src="${item.image}" alt="${item.name}" style="width:100%;height:100%;object-fit:cover;border-radius:2px;">` : ''}
+            </div>
+            <div class="order-item-info">
+              <div class="order-item-name">${item.name}</div>
+              <div class="order-item-meta">Size: ${item.size ?? '—'} · Qty: ${item.qty}</div>
+            </div>
+            <span class="order-item-price">R${(item.price * item.qty).toFixed(2)}</span>
+          </div>
+        `).join('')}
+      </div>
+      <div class="order-card-footer">
+        <span class="order-total-label">Order Total</span>
+        <span class="order-total-amount">R${order.total.toFixed(2)}</span>
+      </div>
+    </div>
+  `).join('');
+}
   function renderAddresses(addresses = []) {
     if (!addressesList) return;
     if (!addresses.length) {
@@ -133,29 +138,52 @@
     `).join('');
   }
 
-  /* ── API calls ─────────────────────────────────────────────── */
-  async function fetchOrders() {
-    try {
-      const res = await fetch('http://localhost:5000/api/orders', {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      if (!res.ok) return [];
-      const data = await res.json();
-      return data.orders ?? data ?? [];
-    } catch { return []; }
-  }
 
-  async function fetchAddresses() {
-    try {
-      const res = await fetch('http://localhost:5000/api/addresses', {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      if (!res.ok) return [];
-      const data = await res.json();
-      return data.addresses ?? data ?? [];
-    } catch { return []; }
-  }
+// ── API calls ─────────────────────────────────────────────────
 
+async function fetchOrders() {
+  try {
+    const res = await fetch('https://vintage808-api.vercel.app/api/orders', {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    if (!res.ok) return [];
+    const data = await res.json();
+
+    // Filter by logged in user's email
+    const allOrders = data.data ?? data.orders ?? data ?? [];
+    return allOrders.filter(o => o.customer?.email === user.email);
+
+  } catch { return []; }
+}
+
+async function fetchAddresses() {
+  try {
+    const res = await fetch('https://vintage808-api.vercel.app/api/orders', {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    if (!res.ok) return [];
+    const data = await res.json();
+
+    // Pull unique addresses from order history
+    const allOrders = (data.data ?? data.orders ?? data ?? [])
+      .filter(o => o.customer?.email === user.email);
+
+    const seen = new Set();
+    return allOrders
+      .map(o => o.address)
+      .filter(a => {
+        const key = JSON.stringify(a);
+        if (seen.has(key)) return false;
+        seen.add(key);
+        return true;
+      })
+      .map((a, i) => ({
+        label: `Address ${i + 1}`,
+        lines: [a.street, `${a.city}, ${a.province}`, a.postal]
+      }));
+
+  } catch { return []; }
+}
   /* ── Tab switching ─────────────────────────────────────────── */
   function switchTab(tabName) {
     document.querySelectorAll('.account-tab').forEach(t => t.classList.remove('active'));

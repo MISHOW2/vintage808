@@ -1,7 +1,6 @@
-// js/pages/checkout.js
+import { getCart, getCartTotal, clearCart } from '../components/cart.js';
 
-import { getCart, getCartTotal, clearCart } from '../api/cart.js';
-
+const API = 'https://vintage808-api.vercel.app/api';
 const SHIPPING = 80;
 
 // ── Auth guard ────────────────────────────────────────────────
@@ -11,21 +10,16 @@ if (!token) {
   window.location.href = './login.html';
 }
 
-// ── Nav account icon ──────────────────────────────────────────
-document.getElementById('nav-account-btn')?.addEventListener('click', () => {
-  window.location.href = token ? './account.html' : './login.html';
-});
-
 // ── Elements ──────────────────────────────────────────────────
-const summaryItems   = document.getElementById('summary-items');
-const summaryEmpty   = document.getElementById('summary-empty');
+const summaryItems    = document.getElementById('summary-items');
+const summaryEmpty    = document.getElementById('summary-empty');
 const summarySubtotal = document.getElementById('summary-subtotal');
-const summaryTotal   = document.getElementById('summary-total');
-const errorBox       = document.getElementById('checkout-error');
-const errorMsg       = document.getElementById('checkout-error-msg');
-const payBtn         = document.getElementById('pay-btn');
-const payBtnText     = document.getElementById('pay-btn-text');
-const payBtnLoader   = document.getElementById('pay-btn-loader');
+const summaryTotal    = document.getElementById('summary-total');
+const errorBox        = document.getElementById('checkout-error');
+const errorMsg        = document.getElementById('checkout-error-msg');
+const payBtn          = document.getElementById('pay-btn');
+const payBtnText      = document.getElementById('pay-btn-text');
+const payBtnLoader    = document.getElementById('pay-btn-loader');
 
 // ── Render summary ────────────────────────────────────────────
 function renderSummary() {
@@ -39,7 +33,7 @@ function renderSummary() {
   } else {
     summaryItems.innerHTML = cart.map(item => `
       <div class="summary-item">
-        <img class="summary-item-img" src="${item.image}" alt="${item.name}" />
+        <img class="summary-item-img" src="${item.image}" alt="${item.name}" onerror="this.style.display='none'" />
         <div class="summary-item-info">
           <p class="summary-item-name">${item.name}</p>
           <p class="summary-item-meta">Size: ${item.size ?? '—'} &nbsp;·&nbsp; Qty: ${item.qty}</p>
@@ -50,7 +44,7 @@ function renderSummary() {
   }
 
   summarySubtotal.textContent = `R${subtotal.toFixed(2)}`;
-  summaryTotal.textContent    = `R${total.toFixed(2)}`;
+  summaryTotal.textContent    = `R${(subtotal + SHIPPING).toFixed(2)}`;
 }
 
 renderSummary();
@@ -67,8 +61,8 @@ function hideError() {
 }
 
 function setLoading(loading) {
-  payBtn.disabled           = loading;
-  payBtnText.style.display  = loading ? 'none' : 'inline';
+  payBtn.disabled            = loading;
+  payBtnText.style.display   = loading ? 'none' : 'inline';
   payBtnLoader.style.display = loading ? 'inline-flex' : 'none';
 }
 
@@ -98,7 +92,7 @@ payBtn.addEventListener('click', async () => {
   setLoading(true);
 
   try {
-    const res  = await fetch('http://localhost:5000/api/orders', {
+    const res = await fetch(`${API}/orders`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -118,7 +112,7 @@ payBtn.addEventListener('click', async () => {
       return;
     }
 
-    // Clear cart and go to confirmation
+    // Save order and redirect to confirmation
     clearCart();
     sessionStorage.setItem('v808_last_order', JSON.stringify(data.data));
     window.location.href = './order-confirmation.html';
