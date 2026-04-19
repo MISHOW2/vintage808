@@ -17,9 +17,8 @@ document.getElementById('confirm-date').textContent =
   new Date(order.createdAt).toLocaleDateString('en-ZA', {
     year: 'numeric', month: 'short', day: 'numeric'
   });
-
 document.getElementById('confirm-total').textContent =
-  `R${order.total.toFixed(2)}`;
+  `R${Number(order.total).toFixed(2)}`;
 
 // ── Shipping address ──────────────────────────────────────────
 const a = order.shippingAddress;  // ← was order.address
