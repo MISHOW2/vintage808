@@ -23,10 +23,9 @@ const payBtnLoader    = document.getElementById('pay-btn-loader');
 
 // ── Render summary ────────────────────────────────────────────
 function renderSummary() {
-  const cart     = getCart();
-  const subtotal = getCartTotal();
-  const total    = subtotal + SHIPPING;
-
+const cart = getCart();
+const subtotal = getCartTotal();
+const total = subtotal + SHIPPING;
   if (cart.length === 0) {
     summaryItems.style.display = 'none';
     summaryEmpty.style.display = 'block';
@@ -66,7 +65,6 @@ function setLoading(loading) {
   payBtnLoader.style.display = loading ? 'inline-flex' : 'none';
 }
 
-// ── Place order ───────────────────────────────────────────────
 payBtn.addEventListener('click', async () => {
   hideError();
 
@@ -84,10 +82,15 @@ payBtn.addEventListener('click', async () => {
   }
 
   const cart = getCart();
+
   if (cart.length === 0) {
     showError('Your cart is empty.');
     return;
   }
+
+  // ✅ ADD THIS
+  const subtotal = getCartTotal();
+  const total = subtotal + SHIPPING;
 
   setLoading(true);
 
@@ -99,9 +102,17 @@ payBtn.addEventListener('click', async () => {
         'Authorization': `Bearer ${token}`,
       },
       body: JSON.stringify({
-        customer: { name, email, phone },
-        address:  { street, city, province, postal },
-        cart,
+        items: cart,
+        total, // ✅ now works correctly
+        shippingAddress: {
+          street,
+          city,
+          province,
+          postal,
+          phone
+        },
+        customerName: name,
+        customerEmail: email,
       }),
     });
 
@@ -112,7 +123,6 @@ payBtn.addEventListener('click', async () => {
       return;
     }
 
-    // Save order and redirect to confirmation
     clearCart();
     sessionStorage.setItem('v808_last_order', JSON.stringify(data.data));
     window.location.href = './order-confirmation.html';
