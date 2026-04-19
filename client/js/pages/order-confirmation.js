@@ -11,7 +11,7 @@ if (!order) {
 
 // ── Populate order details ────────────────────────────────────
 document.getElementById('confirm-order-id').textContent =
-  `#${order.id}`;
+  `#${order._id?.toString().slice(-6).toUpperCase() ?? '—'}`;
 
 document.getElementById('confirm-date').textContent =
   new Date(order.createdAt).toLocaleDateString('en-ZA', {
@@ -22,10 +22,13 @@ document.getElementById('confirm-total').textContent =
   `R${order.total.toFixed(2)}`;
 
 // ── Shipping address ──────────────────────────────────────────
-const a = order.address;
-document.getElementById('confirm-address').innerHTML =
-  `${a.street}<br/>${a.city}, ${a.province}<br/>${a.postal}`;
-
+const a = order.shippingAddress;  // ← was order.address
+if (a) {
+  document.getElementById('confirm-address').innerHTML =
+    `${a.street}<br/>${a.city}, ${a.province}<br/>${a.postal}`;
+} else {
+  document.getElementById('confirm-address').textContent = '—';
+}
 // ── Order items ───────────────────────────────────────────────
 const itemsEl = document.getElementById('confirm-items');
 
