@@ -63,9 +63,10 @@ button {
      </div>
    </section>
    ============================================================ */
-
 .hero {
-  background: var(--black);
+  background: 
+    linear-gradient(to bottom, rgba(0,0,0,0.45) 0%, rgba(0,0,0,0.65) 100%),
+    url('./../../assets/images/hero.jpg') center/cover no-repeat;
   color: var(--white);
   min-height: 520px;
   display: flex;
