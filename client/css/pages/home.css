@@ -49,13 +49,6 @@ button {
   font-family: inherit;
 }
 
-
-
-
-
-
-
-
 /* ============================================================
    HERO
    Expected HTML:
@@ -103,7 +96,7 @@ button {
   width: 120px;
   height: 120px;
   opacity: 0.12;
-  pointer-events: none;
+  pointer-events: none; 
 }
 
 .hero-x::before,

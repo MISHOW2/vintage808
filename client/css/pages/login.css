@@ -1,6 +1,22 @@
-/* ============================================================
-   Vintage808 — login.css
-   ============================================================ */
+/* ── Add these to your login.css ── */
+
+.auth-divider {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 20px 0;
+  color: var(--mid, #999186);
+  font-size: 12px;
+  letter-spacing: 0.06em;
+}
+
+.auth-divider::before,
+.auth-divider::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--sand, #ede9e3);
+}
 
 /* ── Page Layout ── */
 .auth-page {
