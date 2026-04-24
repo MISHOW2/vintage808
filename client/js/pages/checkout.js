@@ -1,14 +1,33 @@
+// js/pages/checkout.js
 import { getCart, getCartTotal, clearCart } from '../components/cart.js';
 
 const API      = 'https://vintage808-api.vercel.app/api';
 const SHIPPING = 80;
 
+// ── Auth guard ────────────────────────────────────────────────
 const token = localStorage.getItem('v808_token');
 if (!token) {
   sessionStorage.setItem('v808_return', '/checkout');
   window.location.href = '/login';
 }
 
+// ── Handle PayFast cancel return ─────────────────────────────
+const urlParams = new URLSearchParams(window.location.search);
+if (urlParams.get('status') === 'cancelled' && urlParams.get('restore') === '1') {
+  // Restore cart from sessionStorage if user cancelled payment
+  const pending = JSON.parse(sessionStorage.getItem('v808_pending_order') || 'null');
+  if (pending?.items) {
+    localStorage.setItem('v808_cart', JSON.stringify(pending.items));
+  }
+  // Show a gentle message
+  const banner = document.createElement('div');
+  banner.style.cssText = 'background:#1a1a1a;color:#fff;text-align:center;padding:12px;font-size:13px;';
+  banner.textContent = 'Payment was cancelled. Your cart has been restored.';
+  document.body.prepend(banner);
+  setTimeout(() => banner.remove(), 5000);
+}
+
+// ── Elements ──────────────────────────────────────────────────
 const summaryItems    = document.getElementById('summary-items');
 const summaryEmpty    = document.getElementById('summary-empty');
 const summarySubtotal = document.getElementById('summary-subtotal');
@@ -19,6 +38,7 @@ const payBtn          = document.getElementById('pay-btn');
 const payBtnText      = document.getElementById('pay-btn-text');
 const payBtnLoader    = document.getElementById('pay-btn-loader');
 
+// ── Render summary ────────────────────────────────────────────
 function renderSummary() {
   const cart     = getCart();
   const subtotal = getCartTotal();
@@ -46,6 +66,7 @@ function renderSummary() {
 
 renderSummary();
 
+// ── Helpers ───────────────────────────────────────────────────
 function showError(msg) {
   errorMsg.textContent = msg;
   errorBox.style.display = 'flex';
@@ -58,6 +79,7 @@ function setLoading(on) {
   payBtnLoader.style.display = on ? 'inline-flex' : 'none';
 }
 
+// ── Pay button ────────────────────────────────────────────────
 payBtn.addEventListener('click', async () => {
   hideError();
 
@@ -80,53 +102,45 @@ payBtn.addEventListener('click', async () => {
   const subtotal = getCartTotal();
   const total    = subtotal + SHIPPING;
 
-  // Split full name for PayFast
-  const nameParts   = fullName.split(' ');
-  const first_name  = nameParts[0];
-  const last_name   = nameParts.slice(1).join(' ') || '-';
+  const [first_name, ...rest] = fullName.split(' ');
+  const last_name = rest.join(' ') || '-';
 
-  // Save order details for confirmation page BEFORE leaving
-sessionStorage.setItem('v808_pending_order', JSON.stringify({
-  customerName: fullName,
-  customerEmail: email,
-  items: cart,
-  total,
-  shippingAddress: { street, city, province, postal, phone },
-  createdAt: new Date().toISOString(),
-}));
+  // Save order to sessionStorage so confirmation page can read it
+  sessionStorage.setItem('v808_pending_order', JSON.stringify({
+    customerName   : fullName,
+    customerEmail  : email,
+    items          : cart,
+    total,
+    shippingAddress: { street, city, province, postal, phone },
+    createdAt      : new Date().toISOString(),
+  }));
 
   setLoading(true);
+  clearCart();
 
-  try {
-    // ── Call your backend /pay route directly ─────────────────
-    const form = document.createElement('form');
-    form.method = 'POST';
-    form.action = `${API}/payfast/pay`; // ← matches your backend route
+  // POST a form to YOUR backend /api/payfast/pay
+  // The backend signs it and auto-redirects to PayFast sandbox
+  const form = document.createElement('form');
+  form.method = 'POST';
+  form.action = `${API}/payfast/pay`;
 
-    const fields = {
-      first_name,
-      last_name,
-      email,
-      cell_number: phone,
-      amount:      total.toFixed(2),
-      item_name:   'Vintage808 Order',
-    };
+  const fields = {
+    first_name,
+    last_name,
+    email,
+    cell_number : phone,
+    amount      : total.toFixed(2),
+    item_name   : 'Vintage808 Order',
+  };
 
-    Object.entries(fields).forEach(([key, value]) => {
-      const input = document.createElement('input');
-      input.type  = 'hidden';
-      input.name  = key;
-      input.value = value;
-      form.appendChild(input);
-    });
+  Object.entries(fields).forEach(([key, value]) => {
+    const input = document.createElement('input');
+    input.type  = 'hidden';
+    input.name  = key;
+    input.value = value;
+    form.appendChild(input);
+  });
 
-    clearCart();
-    document.body.appendChild(form);
-    form.submit(); // ← backend signs it and redirects to PayFast
-
-  } catch (err) {
-    console.error(err);
-    showError('Could not connect to server. Please try again.');
-    setLoading(false);
-  }
+  document.body.appendChild(form);
+  form.submit(); // → hits your backend → auto-redirects to PayFast
 });

@@ -1,19 +1,19 @@
 // js/pages/order-confirmation.js
 
 // ── Check URL params from PayFast return ──────────────────────
-const params  = new URLSearchParams(window.location.search);
-const status  = params.get('status');
+const params = new URLSearchParams(window.location.search);
+const status = params.get('status');
 
-// If payment was cancelled, go back to checkout
+// If payment was cancelled, go back to checkout (with .html for static site)
 if (status === 'cancelled') {
-  window.location.href = '/checkout';
+  window.location.href = './checkout.html';
 }
 
 // ── Read order from sessionStorage ───────────────────────────
 const order = JSON.parse(sessionStorage.getItem('v808_pending_order') || 'null');
 
 if (!order) {
-  window.location.href = '/shop';
+  window.location.href = './shop.html';
 }
 
 // ── Populate order details ────────────────────────────────────
