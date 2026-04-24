@@ -49,20 +49,7 @@ button {
   font-family: inherit;
 }
 
-/* ============================================================
-   HERO
-   Expected HTML:
-   <section class="hero">
-     <div class="hero-x hero-x--tl"></div>
-     <div class="hero-x hero-x--tr"></div>
-     <div class="hero-x hero-x--bl"></div>
-     <div class="hero-content">
-       <h1 class="hero-heading">…</h1>
-       <p class="hero-body">…</p>
-       <a href="#" class="btn btn-primary">Explore</a>
-     </div>
-   </section>
-   ============================================================ */
+
 .hero {
   background: 
     linear-gradient(to bottom, rgba(0,0,0,0.45) 0%, rgba(0,0,0,0.65) 100%),
