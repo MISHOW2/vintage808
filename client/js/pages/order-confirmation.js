@@ -1,62 +1,62 @@
-// js/pages/order-confirmation.js
+const API = 'https://vintage808-api.vercel.app/api';
 
-// ── Check URL params from PayFast return ──────────────────────
 const params = new URLSearchParams(window.location.search);
-const status = params.get('status');
+const orderId = params.get('order');
 
-// If payment was cancelled, go back to checkout (with .html for static site)
-if (status === 'cancelled') {
-  window.location.href = './checkout.html';
-}
+async function init() {
+  const res = await fetch(`${API}/payfast/status/${orderId}`);
+  const data = await res.json();
 
-// ── Read order from sessionStorage ───────────────────────────
-const order = JSON.parse(sessionStorage.getItem('v808_pending_order') || 'null');
+  if (!data.success || data.order.status !== 'paid') {
+    window.location.href = `./payment-processing.html?order=${orderId}`;
+    return;
+  }
 
-if (!order) {
-  window.location.href = './shop.html';
-}
+  const order = JSON.parse(sessionStorage.getItem('v808_pending_order') || 'null');
 
-// ── Populate order details ────────────────────────────────────
-document.getElementById('confirm-order-id').textContent =
-  `#${(order._id || order.id || Date.now()).toString().slice(-6).toUpperCase()}`;
+  if (!order) {
+    window.location.href = './shop.html';
+    return;
+  }
 
-document.getElementById('confirm-date').textContent =
-  new Date(order.createdAt).toLocaleDateString('en-ZA', {
-    year: 'numeric', month: 'short', day: 'numeric'
-  });
+  document.getElementById('confirm-order-id').textContent =
+    `#${orderId.slice(-6).toUpperCase()}`;
 
-document.getElementById('confirm-total').textContent =
-  `R${Number(order.total || 0).toFixed(2)}`;
+  document.getElementById('confirm-date').textContent =
+    new Date(order.createdAt).toLocaleDateString('en-ZA', {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric'
+    });
 
-// ── Shipping address ──────────────────────────────────────────
-const a = order.shippingAddress;
-if (a) {
-  document.getElementById('confirm-address').innerHTML =
-    `${a.street}<br/>${a.city}, ${a.province}<br/>${a.postal}`;
-} else {
-  document.getElementById('confirm-address').textContent = '—';
-}
+  document.getElementById('confirm-total').textContent =
+    `R${Number(order.total || 0).toFixed(2)}`;
 
-// ── Order items ───────────────────────────────────────────────
-const itemsEl = document.getElementById('confirm-items');
+  const a = order.shippingAddress;
 
-itemsEl.innerHTML = order.items.map(item => `
-  <div class="confirm-item">
-    <img
-      class="confirm-item-img"
-      src="${item.image ?? ''}"
-      alt="${item.name}"
-      onerror="this.style.display='none'"
-    />
-    <div class="confirm-item-info">
-      <p class="confirm-item-name">${item.name}</p>
-      <p class="confirm-item-meta">Size: ${item.size ?? '—'} &nbsp;·&nbsp; Qty: ${item.quantity ?? item.qty ?? 1}</p>
+  if (a) {
+    document.getElementById('confirm-address').innerHTML =
+      `${a.street}<br/>${a.city}, ${a.province}<br/>${a.postal}`;
+  }
+
+  const itemsEl = document.getElementById('confirm-items');
+
+  itemsEl.innerHTML = order.items.map(item => `
+    <div class="confirm-item">
+      <img class="confirm-item-img" src="${item.image ?? ''}" alt="${item.name}" />
+      <div class="confirm-item-info">
+        <p class="confirm-item-name">${item.name}</p>
+        <p class="confirm-item-meta">
+          Size: ${item.size ?? '—'} · Qty: ${item.quantity ?? item.qty ?? 1}
+        </p>
+      </div>
+      <span class="confirm-item-price">
+        R${(Number(item.price) * (item.quantity ?? item.qty ?? 1)).toFixed(2)}
+      </span>
     </div>
-    <span class="confirm-item-price">R${(Number(item.price) * (item.quantity ?? item.qty ?? 1)).toFixed(2)}</span>
-  </div>
-`).join('');
+  `).join('');
 
-// ── Clear session after rendering ─────────────────────────────
-window.addEventListener('pagehide', () => {
   sessionStorage.removeItem('v808_pending_order');
-});
+}
+
+init();

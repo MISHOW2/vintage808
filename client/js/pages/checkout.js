@@ -116,7 +116,7 @@ payBtn.addEventListener('click', async () => {
   }));
 
   setLoading(true);
-  clearCart();
+ 
 
   // POST a form to YOUR backend /api/payfast/pay
   // The backend signs it and auto-redirects to PayFast sandbox
