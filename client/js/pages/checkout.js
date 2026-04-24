@@ -86,14 +86,14 @@ payBtn.addEventListener('click', async () => {
   const last_name   = nameParts.slice(1).join(' ') || '-';
 
   // Save order details for confirmation page BEFORE leaving
-  sessionStorage.setItem('v808_pending_order', JSON.stringify({
-    customerName: fullName,
-    customerEmail: email,
-    items: cart,
-    total,
-    shippingAddress: { street, city, province, postal, phone },
-    createdAt: new Date().toISOString(),
-  }));
+sessionStorage.setItem('v808_pending_order', JSON.stringify({
+  customerName: fullName,
+  customerEmail: email,
+  items: cart,
+  total,
+  shippingAddress: { street, city, province, postal, phone },
+  createdAt: new Date().toISOString(),
+}));
 
   setLoading(true);
 
