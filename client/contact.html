@@ -267,59 +267,6 @@
 </footer>
 
 <script type="module" src="./js/main.js"></script>
-<script>
-  const submitBtn  = document.getElementById('contact-submit');
-  const submitText = document.getElementById('submit-text');
-  const submitLoader = document.getElementById('submit-loader');
-  const successBox = document.getElementById('contact-success');
-  const errorBox   = document.getElementById('contact-error');
-  const errorMsg   = document.getElementById('contact-error-msg');
-
-  submitBtn.addEventListener('click', async () => {
-    const name    = document.getElementById('contact-name').value.trim();
-    const email   = document.getElementById('contact-email').value.trim();
-    const message = document.getElementById('contact-message').value.trim();
-    const terms   = document.getElementById('terms').checked;
-
-    successBox.style.display = 'none';
-    errorBox.style.display   = 'none';
-
-    if (!name || !email || !message) {
-      errorMsg.textContent   = 'Please fill in all fields.';
-      errorBox.style.display = 'flex';
-      return;
-    }
-
-    if (!terms) {
-      errorMsg.textContent   = 'Please accept the terms.';
-      errorBox.style.display = 'flex';
-      return;
-    }
-
-    submitBtn.disabled         = true;
-    submitText.style.display   = 'none';
-    submitLoader.style.display = 'inline-flex';
-
-    try {
-      // Opens email client as fallback — replace with API call if you add a contact endpoint
-      const subject = encodeURIComponent(`Contact from ${name}`);
-      const body    = encodeURIComponent(`Name: ${name}\nEmail: ${email}\n\nMessage:\n${message}`);
-      window.location.href = `mailto:customersupport@vintage808info.com?subject=${subject}&body=${body}`;
-
-      successBox.style.display = 'flex';
-      document.getElementById('contact-name').value    = '';
-      document.getElementById('contact-email').value   = '';
-      document.getElementById('contact-message').value = '';
-      document.getElementById('terms').checked         = false;
-    } catch {
-      errorMsg.textContent   = 'Something went wrong. Please try again.';
-      errorBox.style.display = 'flex';
-    } finally {
-      submitBtn.disabled         = false;
-      submitText.style.display   = 'inline';
-      submitLoader.style.display = 'none';
-    }
-  });
-</script>
+<script type="module" src="./js/pages/contact.js"></script>
 </body>
 </html>
