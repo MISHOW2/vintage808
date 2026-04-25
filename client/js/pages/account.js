@@ -71,9 +71,11 @@
     return ((first?.[0] ?? '') + (last?.[0] ?? '')).toUpperCase() || '??';
   }
 
+  // ── FIX: added 'confirmed', fallback to 'Pending' not undefined
   function formatStatus(s) {
     const map = {
       pending:    'Pending',
+      confirmed:  'Confirmed',
       processing: 'Processing',
       shipped:    'Shipped',
       delivered:  'Delivered',
@@ -81,7 +83,7 @@
       paid:       'Paid',
       failed:     'Failed',
     };
-    return map[s] ?? s;
+    return map[s] ?? 'Pending';
   }
 
   function show(el) { el?.classList.remove('hidden'); }
@@ -115,33 +117,39 @@
       return;
     }
 
-    ordersList.innerHTML = orders.map(order => `
-      <div class="order-card">
-        <div class="order-card-header">
-          <span class="order-id">#${(order._id || order.id || '').toString().slice(-6).toUpperCase()}</span>
-          <span class="order-date">${new Date(order.createdAt).toLocaleDateString('en-ZA', { year: 'numeric', month: 'short', day: 'numeric' })}</span>
-          <span class="order-status order-status--${order.status}">${formatStatus(order.status)}</span>
-        </div>
-        <div class="order-card-body">
-          ${(order.items || []).map(item => `
-            <div class="order-item">
-              <div class="order-item-img" style="background:var(--sand);">
-                ${item.image ? `<img src="${item.image}" alt="${item.name}" style="width:100%;height:100%;object-fit:cover;border-radius:2px;">` : ''}
+    ordersList.innerHTML = orders.map(order => {
+      // ── FIX: check both field names — PayFast saves orderStatus,
+      //         manual orders save status. Use whichever is set.
+      const status = order.orderStatus || order.status || 'pending';
+
+      return `
+        <div class="order-card">
+          <div class="order-card-header">
+            <span class="order-id">#${(order._id || order.id || '').toString().slice(-6).toUpperCase()}</span>
+            <span class="order-date">${new Date(order.createdAt).toLocaleDateString('en-ZA', { year: 'numeric', month: 'short', day: 'numeric' })}</span>
+            <span class="order-status order-status--${status}">${formatStatus(status)}</span>
+          </div>
+          <div class="order-card-body">
+            ${(order.items || []).map(item => `
+              <div class="order-item">
+                <div class="order-item-img" style="background:var(--sand);">
+                  ${item.image ? `<img src="${item.image}" alt="${item.name}" style="width:100%;height:100%;object-fit:cover;border-radius:2px;">` : ''}
+                </div>
+                <div class="order-item-info">
+                  <div class="order-item-name">${item.name}</div>
+                  <div class="order-item-meta">Size: ${item.size ?? '—'} · Qty: ${item.quantity ?? item.qty ?? 1}</div>
+                </div>
+                <span class="order-item-price">R${(Number(item.price) * (item.quantity ?? item.qty ?? 1)).toFixed(2)}</span>
               </div>
-              <div class="order-item-info">
-                <div class="order-item-name">${item.name}</div>
-                <div class="order-item-meta">Size: ${item.size ?? '—'} · Qty: ${item.quantity ?? item.qty ?? 1}</div>
-              </div>
-              <span class="order-item-price">R${(Number(item.price) * (item.quantity ?? item.qty ?? 1)).toFixed(2)}</span>
-            </div>
-          `).join('')}
+            `).join('')}
+          </div>
+          <div class="order-card-footer">
+            <span class="order-total-label">Order Total</span>
+            <span class="order-total-amount">R${Number(order.total).toFixed(2)}</span>
+          </div>
         </div>
-        <div class="order-card-footer">
-          <span class="order-total-label">Order Total</span>
-          <span class="order-total-amount">R${Number(order.total).toFixed(2)}</span>
-        </div>
-      </div>
-    `).join('');
+      `;
+    }).join('');
   }
 
   /* ── Render addresses ──────────────────────────────────────── */
@@ -184,7 +192,6 @@
       if (!res.ok) return [];
       const data = await res.json();
       const allOrders = data.data ?? data.orders ?? data ?? [];
-      // Only show this user's orders
       return allOrders.filter(o =>
         o.customerEmail === user.email ||
         o.userId === (user._id || user.id)
