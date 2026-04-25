@@ -1,26 +1,29 @@
 // js/pages/login.js
-import { login, register, initGoogleSignIn, GOOGLE_CLIENT_ID } from '../api/auth.js';
+import { login, register, GOOGLE_CLIENT_ID } from '../api/auth.js';
+
+const API = 'https://vintage808-api.vercel.app';
 
 // ── If already logged in, skip ────────────────────────────────
 if (localStorage.getItem('v808_token')) {
   window.location.replace('./account.html');
 }
 
-// ── Panel toggle ─────────────────────────────────────────────
-const panelLogin    = document.getElementById('panel-login');
-const panelRegister = document.getElementById('panel-register');
+// ── All panels ────────────────────────────────────────────────
+const panels = {
+  login:  document.getElementById('panel-login'),
+  register: document.getElementById('panel-register'),
+  forgot: document.getElementById('panel-forgot'),
+  otp:    document.getElementById('panel-otp'),
+  reset:  document.getElementById('panel-reset'),
+};
 
-function showLogin() {
-  panelLogin.classList.remove('auth-form-wrap--hidden');
-  panelRegister.classList.add('auth-form-wrap--hidden');
-}
-function showRegister() {
-  panelRegister.classList.remove('auth-form-wrap--hidden');
-  panelLogin.classList.add('auth-form-wrap--hidden');
+function showPanel(name) {
+  Object.values(panels).forEach(p => p.classList.add('auth-form-wrap--hidden'));
+  panels[name].classList.remove('auth-form-wrap--hidden');
 }
 
-document.getElementById('go-to-register').addEventListener('click', showRegister);
-document.getElementById('go-to-login').addEventListener('click', showLogin);
+// ── Shared state for reset flow ───────────────────────────────
+let resetEmail = '';
 
 // ── Helpers ───────────────────────────────────────────────────
 function showError(boxId, msgId, msg) {
@@ -45,6 +48,8 @@ function bindPasswordToggle(btnId, inputId) {
 bindPasswordToggle('login-toggle-pw',    'login-password');
 bindPasswordToggle('reg-toggle-pw',      'reg-password');
 bindPasswordToggle('reg-toggle-confirm', 'reg-confirm');
+bindPasswordToggle('reset-toggle-pw',    'reset-password');
+bindPasswordToggle('reset-toggle-confirm', 'reset-confirm');
 
 // ── Session helpers ───────────────────────────────────────────
 function getReturnUrl() {
@@ -57,6 +62,13 @@ function saveSession(token, user) {
   localStorage.setItem('v808_token', token);
   localStorage.setItem('v808_user',  JSON.stringify(user));
 }
+
+// ── Panel navigation ──────────────────────────────────────────
+document.getElementById('go-to-register').addEventListener('click', () => showPanel('register'));
+document.getElementById('go-to-login').addEventListener('click',    () => showPanel('login'));
+document.getElementById('forgot-password-btn').addEventListener('click', () => showPanel('forgot'));
+document.getElementById('back-to-login-from-forgot').addEventListener('click', () => showPanel('login'));
+document.getElementById('back-to-forgot').addEventListener('click', () => showPanel('forgot'));
 
 // ── LOGIN ─────────────────────────────────────────────────────
 document.getElementById('login-btn').addEventListener('click', async () => {
@@ -115,6 +127,102 @@ document.getElementById('register-btn').addEventListener('click', async () => {
   }
 });
 
+// ── FORGOT PASSWORD ───────────────────────────────────────────
+document.getElementById('forgot-btn').addEventListener('click', async () => {
+  hideError('forgot-error');
+  const email = document.getElementById('forgot-email').value.trim();
+
+  if (!email) {
+    showError('forgot-error', 'forgot-error-msg', 'Please enter your email.');
+    return;
+  }
+
+  setLoading('forgot-btn', 'forgot-btn-text', 'forgot-btn-loader', true);
+  try {
+    const res  = await fetch(`${API}/api/auth/forgot-password`, {
+      method:  'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body:    JSON.stringify({ email }),
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.message || 'Failed to send code');
+
+    resetEmail = email;
+    document.getElementById('otp-sub').textContent = `We sent a 6-digit code to ${email}`;
+    showPanel('otp');
+  } catch (err) {
+    showError('forgot-error', 'forgot-error-msg', err.message || 'Something went wrong.');
+  } finally {
+    setLoading('forgot-btn', 'forgot-btn-text', 'forgot-btn-loader', false);
+  }
+});
+
+// ── VERIFY OTP ────────────────────────────────────────────────
+document.getElementById('otp-btn').addEventListener('click', async () => {
+  hideError('otp-error');
+  const otp = document.getElementById('otp-input').value.trim();
+
+  if (!otp || otp.length !== 6) {
+    showError('otp-error', 'otp-error-msg', 'Please enter the 6-digit code.');
+    return;
+  }
+
+  setLoading('otp-btn', 'otp-btn-text', 'otp-btn-loader', true);
+  try {
+    const res  = await fetch(`${API}/api/auth/verify-otp`, {
+      method:  'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body:    JSON.stringify({ email: resetEmail, otp }),
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.message || 'Invalid code');
+
+    showPanel('reset');
+  } catch (err) {
+    showError('otp-error', 'otp-error-msg', err.message || 'Something went wrong.');
+  } finally {
+    setLoading('otp-btn', 'otp-btn-text', 'otp-btn-loader', false);
+  }
+});
+
+// ── RESET PASSWORD ────────────────────────────────────────────
+document.getElementById('reset-btn').addEventListener('click', async () => {
+  hideError('reset-error');
+  const password = document.getElementById('reset-password').value;
+  const confirm  = document.getElementById('reset-confirm').value;
+
+  if (!password) {
+    showError('reset-error', 'reset-error-msg', 'Please enter a new password.');
+    return;
+  }
+  if (password.length < 8) {
+    showError('reset-error', 'reset-error-msg', 'Password must be at least 8 characters.');
+    return;
+  }
+  if (password !== confirm) {
+    showError('reset-error', 'reset-error-msg', 'Passwords do not match.');
+    return;
+  }
+
+  setLoading('reset-btn', 'reset-btn-text', 'reset-btn-loader', true);
+  try {
+    const res  = await fetch(`${API}/api/auth/reset-password`, {
+      method:  'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body:    JSON.stringify({ email: resetEmail, password }),
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.message || 'Failed to reset password');
+
+    document.getElementById('reset-success').style.display = 'flex';
+    setTimeout(() => showPanel('login'), 2000);
+  } catch (err) {
+    showError('reset-error', 'reset-error-msg', err.message || 'Something went wrong.');
+  } finally {
+    setLoading('reset-btn', 'reset-btn-text', 'reset-btn-loader', false);
+  }
+});
+
 // ── GOOGLE SIGN IN ────────────────────────────────────────────
 function onGoogleSuccess(data) {
   saveSession(data.token, data.user);
@@ -125,11 +233,9 @@ function onGoogleError(msg) {
   showError('login-error', 'login-error-msg', msg);
 }
 
-// Render Google button on both login and register panels
 window.onGoogleLibraryLoad = () => {
   if (!window.google || !GOOGLE_CLIENT_ID || GOOGLE_CLIENT_ID === 'YOUR_GOOGLE_CLIENT_ID') return;
 
-  // Shared callback
   google.accounts.id.initialize({
     client_id: GOOGLE_CLIENT_ID,
     callback: async (response) => {
@@ -143,13 +249,11 @@ window.onGoogleLibraryLoad = () => {
     },
   });
 
-  // Render on login panel
   google.accounts.id.renderButton(
     document.getElementById('google-signin-btn'),
     { theme: 'outline', size: 'large', width: 320, text: 'continue_with', shape: 'rectangular' }
   );
 
-  // Render on register panel
   google.accounts.id.renderButton(
     document.getElementById('google-signin-btn-register'),
     { theme: 'outline', size: 'large', width: 320, text: 'signup_with', shape: 'rectangular' }

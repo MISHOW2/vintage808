@@ -1,5 +1,52 @@
 /* ── Add these to your login.css ── */
+/* ── Auth sub text ── */
+.auth-sub {
+  font-size: 13px;
+  color: var(--mid, #999);
+  margin-bottom: 24px;
+  line-height: 1.6;
+}
 
+/* ── OTP input ── */
+.auth-input--otp {
+  font-family: var(--font-mono);
+  font-size: 24px;
+  letter-spacing: 8px;
+  text-align: center;
+}
+
+/* ── Success box ── */
+.auth-success {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: #f0fdf4;
+  border: 1px solid #bbf7d0;
+  border-radius: 2px;
+  padding: 10px 14px;
+  font-size: 12px;
+  color: #15803d;
+  margin-bottom: 20px;
+}
+
+/* ── Forgot button styled as link ── */
+button.auth-forgot {
+  background: none;
+  border: none;
+  padding: 0;
+  font: inherit;
+  font-size: 11px;
+  color: var(--mid, #999);
+  cursor: pointer;
+  text-transform: none;
+  letter-spacing: 0;
+  font-weight: 400;
+  transition: color 0.15s;
+}
+
+button.auth-forgot:hover {
+  color: var(--black, #111);
+}
 .auth-divider {
   display: flex;
   align-items: center;
