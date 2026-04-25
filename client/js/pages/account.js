@@ -1,13 +1,13 @@
 /* ============================================================
-   Vintage808 — js/pages/account.js
+   Vintage808 — js/pages/account.js  (retail-grade rewrite)
    ============================================================ */
 
 (function () {
   'use strict';
 
-  const API   = 'https://vintage808-api.vercel.app';
-  const token = localStorage.getItem('v808_token');
-  const userRaw = localStorage.getItem('v808_user');
+  const API      = 'https://vintage808-api.vercel.app';
+  const token    = localStorage.getItem('v808_token');
+  const userRaw  = localStorage.getItem('v808_user');
 
   // ── Auth guard ───────────────────────────────────────────────
   if (!token || !userRaw) {
@@ -38,12 +38,27 @@
       .toLocaleDateString('en-ZA', { month: 'long', year: 'numeric' });
   }
 
-  /* ── DOM refs ──────────────────────────────────────────────── */
+  // ── CONSTANTS ────────────────────────────────────────────────
+  const STATUS_STEPS = ['confirmed', 'processing', 'shipped', 'delivered'];
+
+  const STATUS_LABELS = {
+    pending:    'Pending',
+    confirmed:  'Confirmed',
+    processing: 'Processing',
+    shipped:    'Shipped',
+    delivered:  'Delivered',
+    cancelled:  'Cancelled',
+    paid:       'Paid',
+    failed:     'Failed',
+  };
+
+  // ── DOM refs ─────────────────────────────────────────────────
   const avatarInitials   = document.getElementById('avatar-initials');
   const avatarName       = document.getElementById('avatar-name');
   const avatarEmail      = document.getElementById('avatar-email');
   const profileNameDisp  = document.getElementById('profile-name-display');
   const profileEmailDisp = document.getElementById('profile-email-display');
+  const profilePhoneDisp = document.getElementById('profile-phone-display');
   const profileSinceDisp = document.getElementById('profile-since-display');
   const profileView      = document.getElementById('profile-view');
   const profileEdit      = document.getElementById('profile-edit');
@@ -66,41 +81,96 @@
   const logoutBtn        = document.getElementById('logout-btn');
   const navItems         = document.querySelectorAll('.account-nav-item');
 
-  /* ── Helpers ───────────────────────────────────────────────── */
+  // Modal refs
+  const modalOverlay  = document.getElementById('modal-overlay');
+  const modalOrderId  = document.getElementById('modal-order-id');
+  const modalOrderDt  = document.getElementById('modal-order-date');
+  const modalBody     = document.getElementById('modal-body');
+  const modalCloseBtn = document.getElementById('modal-close-btn');
+
+  // ── HELPERS ──────────────────────────────────────────────────
+
   function getInitials(first, last) {
     return ((first?.[0] ?? '') + (last?.[0] ?? '')).toUpperCase() || '??';
   }
 
-  // ── FIX: added 'confirmed', fallback to 'Pending' not undefined
-  function formatStatus(s) {
+  function fmtStatus(s) {
+    return STATUS_LABELS[s] ?? 'Pending';
+  }
+
+  function fmtDate(iso, opts = { year: 'numeric', month: 'short', day: 'numeric' }) {
+    try { return new Date(iso).toLocaleDateString('en-ZA', opts); }
+    catch { return '—'; }
+  }
+
+  function fmtCurrency(n) {
+    return 'R' + Number(n).toFixed(2);
+  }
+
+  function badgeClass(s) {
     const map = {
-      pending:    'Pending',
-      confirmed:  'Confirmed',
-      processing: 'Processing',
-      shipped:    'Shipped',
-      delivered:  'Delivered',
-      cancelled:  'Cancelled',
-      paid:       'Paid',
-      failed:     'Failed',
+      pending:    'order-badge--pending',
+      confirmed:  'order-badge--confirmed',
+      paid:       'order-badge--paid',
+      processing: 'order-badge--processing',
+      shipped:    'order-badge--shipped',
+      delivered:  'order-badge--delivered',
+      cancelled:  'order-badge--cancelled',
+      failed:     'order-badge--failed',
     };
-    return map[s] ?? 'Pending';
+    return map[s] ?? 'order-badge--pending';
+  }
+
+  function stepState(orderStatus, step) {
+    if (orderStatus === 'pending') return step === 'confirmed' ? 'active' : 'future';
+    if (orderStatus === 'cancelled') return 'future';
+    const oi = STATUS_STEPS.indexOf(orderStatus);
+    const si = STATUS_STEPS.indexOf(step);
+    if (si < oi)  return 'done';
+    if (si === oi) return 'active';
+    return 'future';
   }
 
   function show(el) { el?.classList.remove('hidden'); }
   function hide(el) { el?.classList.add('hidden'); }
 
-  /* ── Render user info ──────────────────────────────────────── */
-  function renderUserInfo() {
-    const fullName = `${user.firstName ?? ''} ${user.lastName ?? ''}`.trim();
-    if (avatarInitials)   avatarInitials.textContent  = getInitials(user.firstName, user.lastName);
-    if (avatarName)       avatarName.textContent       = fullName || user.email;
-    if (avatarEmail)      avatarEmail.textContent      = user.email;
-    if (profileNameDisp)  profileNameDisp.textContent  = fullName || '—';
-    if (profileEmailDisp) profileEmailDisp.textContent = user.email || '—';
-    if (profileSinceDisp) profileSinceDisp.textContent = user.memberSince || '—';
+  function escHtml(str) {
+    return String(str ?? '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
   }
 
-  /* ── Render orders ─────────────────────────────────────────── */
+  // ── RENDER USER INFO ─────────────────────────────────────────
+
+  function renderUserInfo() {
+    const fullName = `${user.firstName ?? ''} ${user.lastName ?? ''}`.trim();
+
+    if (avatarInitials)   avatarInitials.textContent  = getInitials(user.firstName, user.lastName);
+    if (avatarName)       avatarName.textContent       = fullName || user.email;
+    if (avatarEmail)      avatarEmail.textContent      = user.email ?? '';
+    if (profileNameDisp)  profileNameDisp.textContent  = fullName || '—';
+    if (profileEmailDisp) profileEmailDisp.textContent = user.email ?? '—';
+    if (profilePhoneDisp) profilePhoneDisp.textContent = user.phone ?? '—';
+    if (profileSinceDisp) profileSinceDisp.textContent = user.memberSince ?? '—';
+  }
+
+  // ── RENDER ORDERS LIST ───────────────────────────────────────
+
+  function buildStepperHtml(status) {
+    return STATUS_STEPS.map((step, i) => {
+      const state = stepState(status, step);
+      const isLastStep = i === STATUS_STEPS.length - 1;
+      const nextState = !isLastStep ? stepState(status, STATUS_STEPS[i + 1]) : '';
+      const lineClass = (nextState === 'done' || nextState === 'active') ? 'ostep-line done' : 'ostep-line';
+      const label = step.charAt(0).toUpperCase() + step.slice(1);
+      return `
+        <div class="ostep ${state}">
+          <div class="ostep-dot"></div>
+          <div class="ostep-label">${escHtml(label)}</div>
+        </div>
+        ${!isLastStep ? `<div class="${lineClass}"></div>` : ''}
+      `;
+    }).join('');
+  }
+
   function renderOrders(orders = []) {
     if (!ordersList) return;
 
@@ -118,56 +188,314 @@
     }
 
     ordersList.innerHTML = orders.map(order => {
-      // ── FIX: check both field names — PayFast saves orderStatus,
-      //         manual orders save status. Use whichever is set.
       const status = order.orderStatus || order.status || 'pending';
+      const displayId = order.orderNumber || ('#' + (order._id || order.id || '').toString().slice(-8).toUpperCase());
+      const hasTracking = order.tracking?.number;
+
+      const trackingBar = hasTracking ? `
+        <div class="order-tracking-bar">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <rect x="1" y="3" width="15" height="13" rx="2"/>
+            <path d="M16 8h4l3 5v3h-7V8z"/>
+            <circle cx="5.5" cy="18.5" r="2.5"/>
+            <circle cx="18.5" cy="18.5" r="2.5"/>
+          </svg>
+          <span class="order-tracking-bar-text">${escHtml(order.tracking.courier ? order.tracking.courier + ' · ' : '')}${escHtml(order.tracking.number)}</span>
+          ${order.tracking.url ? `<a href="${escHtml(order.tracking.url)}" target="_blank" class="order-track-link" onclick="event.stopPropagation()">Track</a>` : ''}
+        </div>` : '';
+
+      const thumbsHtml = (order.items || []).slice(0, 3).map(item => item.image
+        ? `<img class="order-thumb" src="${escHtml(item.image)}" alt="${escHtml(item.name)}" />`
+        : `<div class="order-thumb-placeholder">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--mid)" stroke-width="1.5">
+              <rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/>
+            </svg>
+           </div>`
+      ).join('') + ((order.items || []).length > 3
+        ? `<div class="order-thumb-more">+${(order.items.length - 3)}</div>` : '');
 
       return `
-        <div class="order-card">
+        <div class="order-card" data-order-id="${escHtml((order._id || order.id || '').toString())}" role="button" tabindex="0">
           <div class="order-card-header">
-            <span class="order-id">#${(order._id || order.id || '').toString().slice(-6).toUpperCase()}</span>
-            <span class="order-date">${new Date(order.createdAt).toLocaleDateString('en-ZA', { year: 'numeric', month: 'short', day: 'numeric' })}</span>
-            <span class="order-status order-status--${status}">${formatStatus(status)}</span>
+            <div class="order-card-meta">
+              <div class="order-number">${escHtml(displayId)}</div>
+              <div class="order-date">${fmtDate(order.createdAt)}</div>
+            </div>
+            <div class="order-card-right">
+              <span class="order-badge ${badgeClass(status)}">${fmtStatus(status)}</span>
+              <span class="order-card-total">${fmtCurrency(order.total)}</span>
+            </div>
           </div>
-          <div class="order-card-body">
-            ${(order.items || []).map(item => `
-              <div class="order-item">
-                <div class="order-item-img" style="background:var(--sand);">
-                  ${item.image ? `<img src="${item.image}" alt="${item.name}" style="width:100%;height:100%;object-fit:cover;border-radius:2px;">` : ''}
-                </div>
-                <div class="order-item-info">
-                  <div class="order-item-name">${item.name}</div>
-                  <div class="order-item-meta">Size: ${item.size ?? '—'} · Qty: ${item.quantity ?? item.qty ?? 1}</div>
-                </div>
-                <span class="order-item-price">R${(Number(item.price) * (item.quantity ?? item.qty ?? 1)).toFixed(2)}</span>
-              </div>
-            `).join('')}
-          </div>
+
+          <div class="order-stepper">${buildStepperHtml(status)}</div>
+
+          ${trackingBar}
+
+          <div class="order-items-row">${thumbsHtml}</div>
+
           <div class="order-card-footer">
-            <span class="order-total-label">Order Total</span>
-            <span class="order-total-amount">R${Number(order.total).toFixed(2)}</span>
+            <span class="order-card-footer-left">${(order.items || []).length} item${(order.items || []).length !== 1 ? 's' : ''}</span>
+            <span class="order-card-footer-right">
+              View Details
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M5 12h14M12 5l7 7-7 7"/>
+              </svg>
+            </span>
           </div>
-        </div>
-      `;
+        </div>`;
     }).join('');
+
+    // Attach click/keyboard handlers
+    ordersList.querySelectorAll('.order-card').forEach(card => {
+      card.addEventListener('click', () => openOrderModal(card.dataset.orderId));
+      card.addEventListener('keydown', e => {
+        if (e.key === 'Enter' || e.key === ' ') openOrderModal(card.dataset.orderId);
+      });
+    });
   }
 
-  /* ── Render addresses ──────────────────────────────────────── */
+  // ── ORDER DETAIL MODAL ───────────────────────────────────────
+
+  let _cachedOrders = [];
+
+  async function openOrderModal(orderId) {
+    // Try cache first, then fetch individually
+    let order = _cachedOrders.find(o => (o._id || o.id || '').toString() === orderId);
+
+    if (!order) {
+      try {
+        const res = await fetch(`${API}/api/orders/${orderId}`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        if (res.ok) {
+          const data = await res.json();
+          order = data.data ?? data;
+        }
+      } catch { /* fall through */ }
+    }
+
+    if (!order) return;
+
+    const status   = order.orderStatus || order.status || 'pending';
+    const displayId = order.orderNumber || ('#' + (order._id || order.id || '').toString().slice(-8).toUpperCase());
+
+    if (modalOrderId) modalOrderId.textContent = displayId;
+    if (modalOrderDt) modalOrderDt.textContent = fmtDate(order.createdAt, { year: 'numeric', month: 'long', day: 'numeric' });
+
+    const hasTracking = order.tracking?.number;
+    const history     = order.statusHistory || [];
+
+    // ── Build timeline ──
+    const timelineHtml = STATUS_STEPS.map(step => {
+      const state   = stepState(status, step);
+      const hist    = history.find(h => h.status === step);
+      const label   = step.charAt(0).toUpperCase() + step.slice(1);
+      return `
+        <div class="mstep ${state}">
+          <div class="mstep-left">
+            <div class="mstep-dot"></div>
+            <div class="mstep-line"></div>
+          </div>
+          <div class="mstep-right">
+            <div class="mstep-name">${escHtml(label)}</div>
+            ${hist?.timestamp ? `<div class="mstep-time">${escHtml(hist.timestamp)}</div>` : ''}
+            ${hist?.note      ? `<div class="mstep-note">${escHtml(hist.note)}</div>` : ''}
+          </div>
+        </div>`;
+    }).join('');
+
+    // ── Build tracking section ──
+    const trackingHtml = hasTracking ? `
+      <div class="modal-section">
+        <div class="modal-section-title">Tracking</div>
+        <div class="modal-inner-card">
+          <div class="modal-tracking-detail">
+            ${order.tracking.courier ? `<div class="modal-tracking-courier">${escHtml(order.tracking.courier)}</div>` : ''}
+            <div class="modal-tracking-number">${escHtml(order.tracking.number)}</div>
+            ${order.estimatedDelivery ? `<div class="modal-tracking-eta">Estimated delivery: <strong>${fmtDate(order.estimatedDelivery, { weekday: 'long', day: 'numeric', month: 'long' })}</strong></div>` : ''}
+            ${order.tracking.url ? `
+              <button class="modal-track-btn" onclick="window.open('${escHtml(order.tracking.url)}','_blank')">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <rect x="1" y="3" width="15" height="13" rx="2"/>
+                  <path d="M16 8h4l3 5v3h-7V8z"/>
+                  <circle cx="5.5" cy="18.5" r="2.5"/>
+                  <circle cx="18.5" cy="18.5" r="2.5"/>
+                </svg>
+                Track Parcel
+              </button>` : ''}
+          </div>
+        </div>
+      </div>` : '';
+
+    // ── Build items ──
+    const itemsHtml = (order.items || []).map(item => `
+      <div class="modal-item">
+        <div class="modal-item-img">
+          ${item.image
+            ? `<img src="${escHtml(item.image)}" alt="${escHtml(item.name)}" style="width:100%;height:100%;object-fit:cover;border-radius:4px;">`
+            : `<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--mid)" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg>`}
+        </div>
+        <div class="modal-item-info">
+          <div class="modal-item-name">${escHtml(item.name)}</div>
+          <div class="modal-item-meta">
+            ${item.size && item.size !== '—' ? `Size: ${escHtml(item.size)}<br>` : ''}
+            Qty: ${item.quantity ?? item.qty ?? 1}
+          </div>
+        </div>
+        <div class="modal-item-price">${fmtCurrency((item.price ?? 0) * (item.quantity ?? item.qty ?? 1))}</div>
+      </div>`).join('');
+
+    // ── Build totals ──
+    const shipping = order.shippingFee ?? order.shipping ?? 0;
+    const totalsHtml = `
+      <div class="modal-totals">
+        <div class="modal-total-row">
+          <span>Subtotal</span>
+          <span>${fmtCurrency(order.subtotal ?? order.total ?? 0)}</span>
+        </div>
+        <div class="modal-total-row">
+          <span>Shipping</span>
+          <span>${shipping === 0 ? 'Free' : fmtCurrency(shipping)}</span>
+        </div>
+        <div class="modal-total-row final">
+          <span>Total</span>
+          <span>${fmtCurrency(order.total)}</span>
+        </div>
+      </div>`;
+
+    // ── Build address ──
+    const addr = order.shippingAddress || {};
+    const addressHtml = `
+      <div class="modal-address-text">
+        ${escHtml(order.customerName || '')}<br>
+        ${addr.street  ? escHtml(addr.street)  + '<br>' : ''}
+        ${(addr.city && addr.province) ? escHtml(addr.city) + ', ' + escHtml(addr.province) + '<br>' : ''}
+        ${addr.postal  ? escHtml(addr.postal)  + '<br>' : ''}
+        <span style="color:var(--mid)">${escHtml(addr.phone || order.customerPhone || '')}</span>
+      </div>`;
+
+    // ── Build payment ──
+    const payStatus = order.payment?.status || (status === 'confirmed' ? 'paid' : 'pending');
+    const paymentHtml = `
+      <div class="modal-info-rows">
+        <div class="modal-info-row">
+          <span class="modal-info-key">Method</span>
+          <span class="modal-info-val">${escHtml(order.payment?.method || 'PayFast')}</span>
+        </div>
+        <div class="modal-info-row">
+          <span class="modal-info-key">Status</span>
+          <span class="modal-info-val">
+            <span class="order-badge ${badgeClass(payStatus)}">${fmtStatus(payStatus)}</span>
+          </span>
+        </div>
+        ${order.payment?.transactionId ? `
+          <div class="modal-info-row">
+            <span class="modal-info-key">Ref</span>
+            <span class="modal-info-val mono">${escHtml(order.payment.transactionId)}</span>
+          </div>` : ''}
+        ${order.payment?.paidAt ? `
+          <div class="modal-info-row">
+            <span class="modal-info-key">Paid</span>
+            <span class="modal-info-val">${fmtDate(order.payment.paidAt)}</span>
+          </div>` : ''}
+      </div>`;
+
+    // ── Build contact ──
+    const contactHtml = `
+      <div class="modal-info-rows">
+        <div class="modal-info-row">
+          <span class="modal-info-key">Name</span>
+          <span class="modal-info-val">${escHtml(order.customerName || '—')}</span>
+        </div>
+        <div class="modal-info-row">
+          <span class="modal-info-key">Email</span>
+          <span class="modal-info-val" style="font-size:12px">${escHtml(order.customerEmail || '—')}</span>
+        </div>
+        ${addr.phone ? `
+          <div class="modal-info-row">
+            <span class="modal-info-key">Phone</span>
+            <span class="modal-info-val">${escHtml(addr.phone)}</span>
+          </div>` : ''}
+      </div>`;
+
+    // ── Assemble modal body ──
+    modalBody.innerHTML = `
+
+      <div class="modal-section">
+        <div class="modal-section-title">Order status</div>
+        <div class="modal-inner-card">
+          <div class="modal-timeline">${timelineHtml}</div>
+        </div>
+      </div>
+
+      ${trackingHtml}
+
+      <div class="modal-section">
+        <div class="modal-section-title">Items (${(order.items || []).length})</div>
+        <div>${itemsHtml}</div>
+      </div>
+
+      <div class="modal-section">
+        <div class="modal-section-title">Order summary</div>
+        <div class="modal-inner-card">${totalsHtml}</div>
+      </div>
+
+      <div class="modal-two-col">
+        <div class="modal-section">
+          <div class="modal-section-title">Delivery address</div>
+          <div class="modal-inner-card">${addressHtml}</div>
+        </div>
+        <div class="modal-section">
+          <div class="modal-section-title">Payment</div>
+          <div class="modal-inner-card">${paymentHtml}</div>
+        </div>
+      </div>
+
+      <div class="modal-section">
+        <div class="modal-section-title">Contact</div>
+        <div class="modal-inner-card">${contactHtml}</div>
+      </div>`;
+
+    modalOverlay?.classList.add('open');
+    document.body.style.overflow = 'hidden';
+  }
+
+  function closeModal() {
+    modalOverlay?.classList.remove('open');
+    document.body.style.overflow = '';
+  }
+
+  // Close on overlay click or close button
+  modalOverlay?.addEventListener('click', e => {
+    if (e.target === modalOverlay) closeModal();
+  });
+  modalCloseBtn?.addEventListener('click', closeModal);
+
+  // Close on Escape
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Escape') closeModal();
+  });
+
+  // ── RENDER ADDRESSES ─────────────────────────────────────────
+
   function renderAddresses(addresses = []) {
     if (!addressesList) return;
+
     if (!addresses.length) {
-      addressesList.innerHTML = '<p style="font-size:14px;color:var(--mid);padding:24px 0 12px;">No saved addresses.</p>';
+      addressesList.innerHTML = '<p style="font-size:14px;color:var(--mid);padding:24px 0 12px;">No saved addresses yet.</p>';
       return;
     }
+
     addressesList.innerHTML = addresses.map(addr => `
       <div class="address-card">
-        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
-          <div class="address-label">${addr.label}</div>
-          <button class="address-delete-btn" data-id="${addr._id}" style="background:none;border:none;font-size:12px;color:var(--mid);cursor:pointer;text-decoration:underline;">Remove</button>
+        <div class="address-card-top">
+          <div class="address-label">${escHtml(addr.label || 'Address')}</div>
+          <div class="address-actions">
+            <button class="address-action-btn danger address-delete-btn" data-id="${escHtml(addr._id)}">Remove</button>
+          </div>
         </div>
         <div class="address-text">${addr.lines.join('<br>')}</div>
-      </div>
-    `).join('');
+      </div>`).join('');
 
     addressesList.querySelectorAll('.address-delete-btn').forEach(btn => {
       btn.addEventListener('click', async () => {
@@ -183,7 +511,8 @@
     });
   }
 
-  /* ── API calls ─────────────────────────────────────────────── */
+  // ── API CALLS ─────────────────────────────────────────────────
+
   async function fetchOrders() {
     try {
       const res = await fetch(`${API}/api/orders`, {
@@ -192,10 +521,12 @@
       if (!res.ok) return [];
       const data = await res.json();
       const allOrders = data.data ?? data.orders ?? data ?? [];
-      return allOrders.filter(o =>
+      const filtered = allOrders.filter(o =>
         o.customerEmail === user.email ||
         o.userId === (user._id || user.id)
       );
+      _cachedOrders = filtered;
+      return filtered;
     } catch { return []; }
   }
 
@@ -214,7 +545,8 @@
     } catch { return []; }
   }
 
-  /* ── Tab switching ─────────────────────────────────────────── */
+  // ── TAB SWITCHING ─────────────────────────────────────────────
+
   function switchTab(tabName) {
     document.querySelectorAll('.account-tab').forEach(t => t.classList.remove('active'));
     navItems.forEach(b => b.classList.remove('active'));
@@ -227,7 +559,8 @@
   const savedTab = sessionStorage.getItem('account_tab');
   if (savedTab) switchTab(savedTab);
 
-  /* ── Edit profile ──────────────────────────────────────────── */
+  // ── EDIT PROFILE ──────────────────────────────────────────────
+
   function openEdit() {
     if (editFirstName) editFirstName.value = user.firstName ?? '';
     if (editLastName)  editLastName.value  = user.lastName  ?? '';
@@ -288,8 +621,8 @@
       });
 
       if (!res.ok) {
-        const data = await res.json().catch(() => ({}));
-        if (saveErrorMsg) saveErrorMsg.textContent = data.message || 'Could not save changes.';
+        const d = await res.json().catch(() => ({}));
+        if (saveErrorMsg) saveErrorMsg.textContent = d.message || 'Could not save changes.';
         show(saveError);
         return;
       }
@@ -310,7 +643,8 @@
     }
   });
 
-  /* ── Add address ───────────────────────────────────────────── */
+  // ── ADD ADDRESS ───────────────────────────────────────────────
+
   addAddressBtn?.addEventListener('click', () => {
     const existing = document.getElementById('add-address-form');
     if (existing) { existing.remove(); return; }
@@ -337,8 +671,7 @@
         <button id="addr-save-btn"   class="account-btn-primary"   style="flex:1;">Save address</button>
         <button id="addr-cancel-btn" class="account-btn-secondary" style="flex:1;">Cancel</button>
       </div>
-      <p id="addr-error" style="font-size:12px;color:#b91c1c;display:none;"></p>
-    `;
+      <p id="addr-error" style="font-size:12px;color:#b91c1c;display:none;"></p>`;
 
     addAddressBtn.after(form);
     document.getElementById('addr-cancel-btn').addEventListener('click', () => form.remove());
@@ -352,18 +685,17 @@
       const errEl    = document.getElementById('addr-error');
 
       if (!street || !city || !province || !postal) {
-        errEl.textContent = 'Please fill in all fields.';
+        errEl.textContent = 'Please fill in all required fields.';
         errEl.style.display = 'block';
         return;
       }
 
       try {
         const res = await fetch(`${API}/api/auth/addresses`, {
-          method: 'POST',
+          method:  'POST',
           headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
-          body: JSON.stringify({ label, street, city, province, postal }),
+          body:    JSON.stringify({ label, street, city, province, postal }),
         });
-
         if (!res.ok) { errEl.textContent = 'Could not save address.'; errEl.style.display = 'block'; return; }
         form.remove();
         fetchAddresses().then(renderAddresses);
@@ -374,7 +706,8 @@
     });
   });
 
-  /* ── Logout ─────────────────────────────────────────────────── */
+  // ── LOGOUT ────────────────────────────────────────────────────
+
   logoutBtn?.addEventListener('click', () => {
     localStorage.removeItem('v808_token');
     localStorage.removeItem('v808_user');
@@ -382,7 +715,8 @@
     window.location.href = './index.html';
   });
 
-  /* ── Boot ───────────────────────────────────────────────────── */
+  // ── BOOT ──────────────────────────────────────────────────────
+
   renderUserInfo();
   fetchOrders().then(renderOrders);
   fetchAddresses().then(renderAddresses);

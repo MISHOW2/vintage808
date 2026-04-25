@@ -10,192 +10,10 @@
   <link rel="stylesheet" href="./css/main.css" />
   <link rel="stylesheet" href="./css/components.css" />
   <link rel="stylesheet" href="./css/pages/account.css" />
-
 </head>
 <body data-page="account">
-<!-- ── Navigation ── -->
 
-
-<!-- ── Navigation ── -->
-<nav>
-  <a href="./index.html" class="nav-logo"><img src="./assets/logos/logo.png" alt="Vintage808" /></a>
-
-  <ul class="nav-links">
-    <li><a href="./shop.html" class="active">Shop</a></li>
-    <li><a href="./contact.html">Contact</a></li>
-  </ul>
-
-  <div class="nav-actions">
-    <div class="nav-icons">
-      <div class="cart-wrap">
-        <button class="nav-icon-btn" aria-label="Cart">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/>
-            <line x1="3" y1="6" x2="21" y2="6"/>
-            <path d="M16 10a4 4 0 0 1-8 0"/>
-          </svg>
-        </button>
-        <span class="cart-badge">2</span>
-      </div>
-      <button class="nav-icon-btn" aria-label="Account">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
-          <circle cx="12" cy="7" r="4"/>
-        </svg>
-      </button>
-    </div>
-
-    <button class="nav-burger" aria-label="Toggle menu" aria-expanded="false">
-      <span></span>
-      <span></span>
-      <span></span>
-    </button>
-  </div>
-</nav>
-
-<!-- ── Mobile Drawer ── -->
-<div class="nav-drawer" aria-hidden="true">
-  <ul class="nav-drawer-links">
-    <li><a href="./shop.html" class="active">Shop</a></li>
-    <li><a href="./contact.html">Contact</a></li>
-  </ul>
-  <div class="nav-drawer-bottom">
-    <div class="nav-drawer-icons">
-      <button class="nav-drawer-icon-btn" aria-label="Cart">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/>
-          <line x1="3" y1="6" x2="21" y2="6"/>
-          <path d="M16 10a4 4 0 0 1-8 0"/>
-        </svg>
-        Cart
-        <span class="drawer-badge">2</span>
-      </button>
-    </div>
-    <div class="nav-drawer-social">
-      <a href="#" class="drawer-social-link">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/></svg>
-        Facebook
-      </a>
-      <a href="#" class="drawer-social-link">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-          <rect x="2" y="2" width="20" height="20" rx="5"/>
-          <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/>
-          <line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/>
-        </svg>
-        Instagram
-      </a>
-      <a href="#" class="drawer-social-link">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
-        X
-      </a>
-    </div>
-  </div>
-</div>
-
-<!-- Cart Overlay -->
-<div id="cart-overlay"></div>
-
-<!-- Cart Drawer -->
-<aside id="cart-drawer">
-  <div class="cart-drawer-header">
-    <h2 class="cart-drawer-title">Your cart</h2>
-    <button id="cart-drawer-close" aria-label="Close cart">
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-        <line x1="18" y1="6" x2="6" y2="18"/>
-        <line x1="6" y1="6" x2="18" y2="18"/>
-      </svg>
-    </button>
-  </div>
-  <div class="cart-drawer-body" id="cart-drawer-body">
-    <div class="cart-empty">
-      <p>Your cart is empty</p>
-    </div>
-  </div>
-  <div class="cart-drawer-footer" id="cart-drawer-footer" style="display:none;">
-    <div class="cart-drawer-subtotal">
-      <span>Subtotal</span>
-      <span id="cart-drawer-total">R0.00</span>
-    </div>
-    <p class="cart-shipping-note">Shipping calculated at checkout</p>
-    <a href="./checkout.html" class="btn-checkout">Checkout</a>
-  </div>
-</aside>
-<!-- ── Mobile Drawer ── -->
-<div class="nav-drawer" aria-hidden="true">
-  <ul class="nav-drawer-links">
-    <li><a href="./shop.html" class="active">Shop</a></li>
-    <li><a href="./contact.html">Contact</a></li>
-  </ul>
-  <div class="nav-drawer-bottom">
-    <div class="nav-drawer-icons">
-      <button class="nav-drawer-icon-btn" aria-label="Cart">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/>
-          <line x1="3" y1="6" x2="21" y2="6"/>
-          <path d="M16 10a4 4 0 0 1-8 0"/>
-        </svg>
-        Cart
-        <span class="drawer-badge">2</span>
-      </button>
-      <button class="nav-drawer-icon-btn" aria-label="Account">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
-          <circle cx="12" cy="7" r="4"/>
-        </svg>
-        Account
-      </button>
-    </div>
-    <div class="nav-drawer-social">
-      <a href="#" class="drawer-social-link">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/></svg>
-        Facebook
-      </a>
-      <a href="#" class="drawer-social-link">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-          <rect x="2" y="2" width="20" height="20" rx="5"/>
-          <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/>
-          <line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/>
-        </svg>
-        Instagram
-      </a>
-      <a href="#" class="drawer-social-link">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
-        X
-      </a>
-    </div>
-  </div>
-</div>
-
-<!-- Cart Overlay -->
-<div id="cart-overlay"></div>
-
-<!-- Cart Drawer -->
-<aside id="cart-drawer">
-  <div class="cart-drawer-header">
-    <h2 class="cart-drawer-title">Your cart</h2>
-    <button id="cart-drawer-close" aria-label="Close cart">
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-        <line x1="18" y1="6" x2="6" y2="18"/>
-        <line x1="6" y1="6" x2="18" y2="18"/>
-      </svg>
-    </button>
-  </div>
-
-  <div class="cart-drawer-body" id="cart-drawer-body">
-    <div class="cart-empty">
-      <p>Your cart is empty</p>
-    </div>
-  </div>
-
-  <div class="cart-drawer-footer" id="cart-drawer-footer" style="display:none;">
-    <div class="cart-drawer-subtotal">
-      <span>Subtotal</span>
-      <span id="cart-drawer-total">R0.00</span>
-    </div>
-    <p class="cart-shipping-note">Shipping calculated at checkout</p>
-    <a href="./checkout.html" class="btn-checkout">Checkout</a>
-  </div>
-</aside>
+<!-- ── Your existing nav include goes here ── -->
 
 <!-- ── Account Page ─────────────────────────────────────────── -->
 <main class="account-page">
@@ -204,16 +22,14 @@
     <!-- ── Sidebar ──────────────────────────────────────────── -->
     <aside class="account-sidebar">
 
-      <!-- Avatar -->
       <div class="account-avatar">
         <div class="avatar-circle" id="avatar-initials">--</div>
         <div>
-          <div class="avatar-name" id="avatar-name">Loading…</div>
+          <div class="avatar-name"  id="avatar-name">Loading…</div>
           <div class="avatar-email" id="avatar-email"></div>
         </div>
       </div>
 
-      <!-- Nav items ONLY — logout is NOT inside here -->
       <nav class="account-nav">
         <button class="account-nav-item active" data-tab="profile">
           <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -238,10 +54,16 @@
         </button>
       </nav>
 
-    
+      <button class="account-logout" id="logout-btn">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/>
+          <polyline points="16 17 21 12 16 7"/>
+          <line x1="21" y1="12" x2="9" y2="12"/>
+        </svg>
+        Log out
+      </button>
+
     </aside>
-
-
 
     <!-- ── Content ──────────────────────────────────────────── -->
     <div class="account-content">
@@ -263,6 +85,10 @@
               <span class="profile-val" id="profile-email-display">—</span>
             </div>
             <div class="profile-row">
+              <span class="profile-key">Phone</span>
+              <span class="profile-val" id="profile-phone-display">—</span>
+            </div>
+            <div class="profile-row">
               <span class="profile-key">Member Since</span>
               <span class="profile-val" id="profile-since-display">—</span>
             </div>
@@ -280,7 +106,9 @@
           </div>
           <div class="account-error hidden" id="save-error">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-              <circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/>
+              <circle cx="12" cy="12" r="10"/>
+              <line x1="15" y1="9" x2="9" y2="15"/>
+              <line x1="9" y1="9" x2="15" y2="15"/>
             </svg>
             <span id="save-error-msg">Something went wrong.</span>
           </div>
@@ -334,13 +162,16 @@
         <div class="account-eyebrow">My Account</div>
         <h1 class="account-heading">Orders</h1>
         <div id="orders-list">
-          <div class="account-empty">
-            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" color="var(--mid)">
-              <rect x="2" y="3" width="20" height="14" rx="2"/>
-              <path d="M8 21h8M12 17v4"/>
-            </svg>
-            <p>No orders yet.</p>
-            <a class="account-btn-secondary" href="shop.html">Browse the Shop</a>
+          <!-- Skeleton loader -->
+          <div class="order-card" style="pointer-events:none;opacity:.5;">
+            <div class="order-card-header">
+              <div style="width:120px;height:14px;background:var(--sand);border-radius:3px;"></div>
+              <div style="width:60px;height:20px;background:var(--sand);border-radius:20px;"></div>
+            </div>
+            <div style="padding:16px 20px;display:flex;gap:8px;">
+              <div style="width:48px;height:56px;background:var(--sand);border-radius:4px;"></div>
+              <div style="width:48px;height:56px;background:var(--sand);border-radius:4px;"></div>
+            </div>
           </div>
         </div>
       </div>
@@ -350,24 +181,46 @@
         <div class="account-eyebrow">My Account</div>
         <h1 class="account-heading">Addresses</h1>
         <div id="addresses-list"></div>
-        <button class="account-btn-secondary" id="add-address-btn">Add New Address</button>
+        <button class="account-btn-secondary" id="add-address-btn" style="margin-top:8px;">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="12" y1="5" x2="12" y2="19"/>
+            <line x1="5" y1="12" x2="19" y2="12"/>
+          </svg>
+          Add New Address
+        </button>
       </div>
-      <!-- Logout — AFTER </nav>, never inside it -->
-      <button class="account-logout" id="logout-btn">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/>
-          <polyline points="16 17 21 12 16 7"/>
-          <line x1="21" y1="12" x2="9" y2="12"/>
-        </svg>
-        Log out
-      </button>
+
     </div><!-- /.account-content -->
   </div><!-- /.account-container -->
-
-  
 </main>
 
-<script type="module" src="./js/pages/account.js"></script>
+<!-- ── Order Detail Modal (slide-over) ───────────────────────── -->
+<div class="modal-overlay" id="modal-overlay" role="dialog" aria-modal="true" aria-label="Order details">
+
+  <div class="order-modal">
+
+    <div class="modal-header">
+      <div class="modal-header-left">
+        <div class="modal-order-id" id="modal-order-id">—</div>
+        <div class="modal-order-date" id="modal-order-date">—</div>
+      </div>
+      <button class="modal-close" id="modal-close-btn" aria-label="Close order details">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <line x1="18" y1="6" x2="6" y2="18"/>
+          <line x1="6" y1="6" x2="18" y2="18"/>
+        </svg>
+      </button>
+    </div>
+
+    <div class="modal-body" id="modal-body">
+      <!-- Filled dynamically by account.js -->
+    </div>
+
+  </div>
+</div>
+
+<!-- ── Your existing cart drawer / scripts ── -->
+<script src="./js/pages/account.js"></script>
 <script type="module" src="./js/main.js"></script>
 
 </body>
