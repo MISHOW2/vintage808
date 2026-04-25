@@ -1,62 +1,96 @@
 const API = 'https://vintage808-api.vercel.app/api';
 
-const params = new URLSearchParams(window.location.search);
+const params  = new URLSearchParams(window.location.search);
 const orderId = params.get('order');
 
+// ── Guard: no order ID → go home ─────────────────────────────
+if (!orderId) {
+  window.location.replace('./index.html');
+}
+
 async function init() {
-  const res = await fetch(`${API}/payfast/status/${orderId}`);
-  const data = await res.json();
+  try {
+    const res  = await fetch(`${API}/payfast/status/${orderId}`);
+    const data = await res.json();
 
-  if (!data.success || data.order.status !== 'paid') {
-    window.location.href = `./payment-processing.html?order=${orderId}`;
-    return;
+    // ── FIX: check payment.status, not order.status ──────────
+    const payStatus = data.order?.payment?.status;
+
+    if (!data.success || payStatus !== 'paid') {
+      // Only send back to processing if it's genuinely still pending
+      // — not if the page was already confirmed (timeout param)
+      const isTimeout = params.get('timeout') === '1';
+      if (!isTimeout && (payStatus === 'pending' || payStatus === undefined)) {
+        window.location.replace(`./payment-processing.html?order=${orderId}`);
+      }
+      // If failed/cancelled or unknown, go to checkout
+      else if (payStatus === 'failed' || payStatus === 'cancelled') {
+        window.location.replace('./checkout.html?status=cancelled&restore=1');
+      }
+      return;
+    }
+
+    // ── Fetch full order from API (more reliable than sessionStorage) ─
+    let order = data.order;
+
+    // Fallback to sessionStorage if API order is missing items
+    if (!order.items?.length) {
+      const stored = sessionStorage.getItem('v808_pending_order');
+      if (stored) order = { ...JSON.parse(stored), ...order };
+    }
+
+    // ── Render order ID ───────────────────────────────────────
+    const idEl = document.getElementById('confirm-order-id');
+    if (idEl) idEl.textContent = `#${orderId.slice(-6).toUpperCase()}`;
+
+    // ── Render date ───────────────────────────────────────────
+    const dateEl = document.getElementById('confirm-date');
+    if (dateEl) {
+      dateEl.textContent = new Date(order.createdAt).toLocaleDateString('en-ZA', {
+        year: 'numeric', month: 'short', day: 'numeric',
+      });
+    }
+
+    // ── Render total ──────────────────────────────────────────
+    const totalEl = document.getElementById('confirm-total');
+    if (totalEl) totalEl.textContent = `R${Number(order.total || 0).toFixed(2)}`;
+
+    // ── Render address ────────────────────────────────────────
+    const addrEl = document.getElementById('confirm-address');
+    const a = order.shippingAddress;
+    if (addrEl && a) {
+      addrEl.innerHTML = `${a.street}<br/>${a.city}, ${a.province}<br/>${a.postal}`;
+    }
+
+    // ── Render items ──────────────────────────────────────────
+    const itemsEl = document.getElementById('confirm-items');
+    if (itemsEl && order.items?.length) {
+      itemsEl.innerHTML = order.items.map(item => `
+        <div class="confirm-item">
+          <img class="confirm-item-img" src="${item.image ?? ''}" alt="${item.name}" />
+          <div class="confirm-item-info">
+            <p class="confirm-item-name">${item.name}</p>
+            <p class="confirm-item-meta">
+              Size: ${item.size ?? '—'} · Qty: ${item.quantity ?? item.qty ?? 1}
+            </p>
+          </div>
+          <span class="confirm-item-price">
+            R${(Number(item.price) * (item.quantity ?? item.qty ?? 1)).toFixed(2)}
+          </span>
+        </div>
+      `).join('');
+    }
+
+    // ── Clean up ──────────────────────────────────────────────
+    sessionStorage.removeItem('v808_pending_order');
+    localStorage.removeItem('v808_cart');
+
+  } catch (err) {
+    console.error('[OrderConfirmation] Error:', err);
+    // Network error — don't loop, just show a fallback message
+    const el = document.getElementById('confirm-order-id');
+    if (el) el.textContent = `#${orderId.slice(-6).toUpperCase()}`;
   }
-
-  const order = JSON.parse(sessionStorage.getItem('v808_pending_order') || 'null');
-
-  if (!order) {
-    window.location.href = './shop.html';
-    return;
-  }
-
-  document.getElementById('confirm-order-id').textContent =
-    `#${orderId.slice(-6).toUpperCase()}`;
-
-  document.getElementById('confirm-date').textContent =
-    new Date(order.createdAt).toLocaleDateString('en-ZA', {
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric'
-    });
-
-  document.getElementById('confirm-total').textContent =
-    `R${Number(order.total || 0).toFixed(2)}`;
-
-  const a = order.shippingAddress;
-
-  if (a) {
-    document.getElementById('confirm-address').innerHTML =
-      `${a.street}<br/>${a.city}, ${a.province}<br/>${a.postal}`;
-  }
-
-  const itemsEl = document.getElementById('confirm-items');
-
-  itemsEl.innerHTML = order.items.map(item => `
-    <div class="confirm-item">
-      <img class="confirm-item-img" src="${item.image ?? ''}" alt="${item.name}" />
-      <div class="confirm-item-info">
-        <p class="confirm-item-name">${item.name}</p>
-        <p class="confirm-item-meta">
-          Size: ${item.size ?? '—'} · Qty: ${item.quantity ?? item.qty ?? 1}
-        </p>
-      </div>
-      <span class="confirm-item-price">
-        R${(Number(item.price) * (item.quantity ?? item.qty ?? 1)).toFixed(2)}
-      </span>
-    </div>
-  `).join('');
-
-  sessionStorage.removeItem('v808_pending_order');
 }
 
 init();
