@@ -14,12 +14,10 @@ if (!token) {
 // ── Handle PayFast cancel return ─────────────────────────────
 const urlParams = new URLSearchParams(window.location.search);
 if (urlParams.get('status') === 'cancelled' && urlParams.get('restore') === '1') {
-  // Restore cart from sessionStorage if user cancelled payment
   const pending = JSON.parse(sessionStorage.getItem('v808_pending_order') || 'null');
   if (pending?.items) {
     localStorage.setItem('v808_cart', JSON.stringify(pending.items));
   }
-  // Show a gentle message
   const banner = document.createElement('div');
   banner.style.cssText = 'background:#1a1a1a;color:#fff;text-align:center;padding:12px;font-size:13px;';
   banner.textContent = 'Payment was cancelled. Your cart has been restored.';
@@ -49,7 +47,7 @@ function renderSummary() {
   } else {
     summaryItems.innerHTML = cart.map(item => `
       <div class="summary-item">
-        <img class="summary-item-img" src="${item.image}" alt="${item.name}"
+        <img class="summary-item-img" src="${item.image ?? item.images?.[0] ?? ''}" alt="${item.name}"
              onerror="this.style.display='none'" />
         <div class="summary-item-info">
           <p class="summary-item-name">${item.name}</p>
@@ -105,21 +103,32 @@ payBtn.addEventListener('click', async () => {
   const [first_name, ...rest] = fullName.split(' ');
   const last_name = rest.join(' ') || '-';
 
-  // Save order to sessionStorage so confirmation page can read it
+  // ── Normalise cart items so image is always a single string ──
+  const items = cart.map(item => ({
+    productId: item.productId || item._id || item.id || '',
+    name:      item.name,
+    price:     item.price,
+    size:      item.size ?? '',
+    quantity:  item.qty ?? item.quantity ?? 1,
+    // FIX: cart stores image or images[] — normalise to one string
+    image:     item.image || item.images?.[0] || '',
+  }));
+
+  const address = { street, city, province, postal, phone };
+
+  // Save to sessionStorage for confirmation page fallback
   sessionStorage.setItem('v808_pending_order', JSON.stringify({
-    customerName   : fullName,
-    customerEmail  : email,
-    items          : cart,
+    customerName:    fullName,
+    customerEmail:   email,
+    items,
     total,
-    shippingAddress: { street, city, province, postal, phone },
-    createdAt      : new Date().toISOString(),
+    shippingAddress: address,
+    createdAt:       new Date().toISOString(),
   }));
 
   setLoading(true);
- 
 
-  // POST a form to YOUR backend /api/payfast/pay
-  // The backend signs it and auto-redirects to PayFast sandbox
+  // POST form to backend — backend signs and redirects to PayFast
   const form = document.createElement('form');
   form.method = 'POST';
   form.action = `${API}/payfast/pay`;
@@ -131,6 +140,10 @@ payBtn.addEventListener('click', async () => {
     cell_number : phone,
     amount      : total.toFixed(2),
     item_name   : 'Vintage808 Order',
+    // ── FIX: send items + address so backend saves them on the order
+    items       : JSON.stringify(items),
+    address     : JSON.stringify(address),
+    userId      : JSON.parse(localStorage.getItem('v808_user') || '{}')._id || '',
   };
 
   Object.entries(fields).forEach(([key, value]) => {
@@ -142,5 +155,5 @@ payBtn.addEventListener('click', async () => {
   });
 
   document.body.appendChild(form);
-  form.submit(); // → hits your backend → auto-redirects to PayFast
+  form.submit();
 });
