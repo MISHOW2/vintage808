@@ -2,61 +2,64 @@
 
 const API = 'https://vintage808-api.vercel.app';
 
-const submitBtn    = document.getElementById('contact-submit');
-const submitText   = document.getElementById('submit-text');
-const submitLoader = document.getElementById('submit-loader');
-const successBox   = document.getElementById('contact-success');
-const errorBox     = document.getElementById('contact-error');
-const errorMsg     = document.getElementById('contact-error-msg');
+const form = document.getElementById('contact-form');
 
-submitBtn.addEventListener('click', async () => {
-  const name    = document.getElementById('contact-name').value.trim();
-  const email   = document.getElementById('contact-email').value.trim();
-  const message = document.getElementById('contact-message').value.trim();
-  const terms   = document.getElementById('terms').checked;
+// Guard: only run on the contact page
+if (form) {
+  const submitBtn    = document.getElementById('contact-submit');
+  const submitText   = document.getElementById('submit-text');
+  const submitLoader = document.getElementById('submit-loader');
+  const successBox   = document.getElementById('contact-success');
+  const errorBox     = document.getElementById('contact-error');
+  const errorMsg     = document.getElementById('contact-error-msg');
 
-  successBox.style.display = 'none';
-  errorBox.style.display   = 'none';
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
 
-  if (!name || !email || !message) {
-    errorMsg.textContent   = 'Please fill in all fields.';
-    errorBox.style.display = 'flex';
-    return;
-  }
+    const name    = document.getElementById('contact-name').value.trim();
+    const email   = document.getElementById('contact-email').value.trim();
+    const message = document.getElementById('contact-message').value.trim();
+    const terms   = document.getElementById('terms').checked;
 
-  if (!terms) {
-    errorMsg.textContent   = 'Please accept the terms.';
-    errorBox.style.display = 'flex';
-    return;
-  }
+    successBox.style.display = 'none';
+    errorBox.style.display   = 'none';
 
-  submitBtn.disabled         = true;
-  submitText.style.display   = 'none';
-  submitLoader.style.display = 'inline-flex';
+    if (!name || !email || !message) {
+      errorMsg.textContent   = 'Please fill in all fields.';
+      errorBox.style.display = 'flex';
+      return;
+    }
 
-  try {
-    const res  = await fetch(`${API}/api/contact`, {
-      method:  'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body:    JSON.stringify({ name, email, message }),
-    });
+    if (!terms) {
+      errorMsg.textContent   = 'Please accept the terms.';
+      errorBox.style.display = 'flex';
+      return;
+    }
 
-    const data = await res.json();
+    submitBtn.disabled         = true;
+    submitText.style.display   = 'none';
+    submitLoader.style.display = 'inline-flex';
 
-    if (!res.ok) throw new Error(data.message || 'Failed to send message');
+    try {
+      const res  = await fetch(`${API}/api/contact`, {
+        method:  'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body:    JSON.stringify({ name, email, message }),
+      });
 
-    successBox.style.display = 'flex';
-    document.getElementById('contact-name').value    = '';
-    document.getElementById('contact-email').value   = '';
-    document.getElementById('contact-message').value = '';
-    document.getElementById('terms').checked         = false;
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.message || 'Failed to send message');
 
-  } catch (err) {
-    errorMsg.textContent   = err.message || 'Something went wrong. Please try again.';
-    errorBox.style.display = 'flex';
-  } finally {
-    submitBtn.disabled         = false;
-    submitText.style.display   = 'inline';
-    submitLoader.style.display = 'none';
-  }
-});
+      successBox.style.display = 'flex';
+      form.reset();
+
+    } catch (err) {
+      errorMsg.textContent   = err.message || 'Something went wrong. Please try again.';
+      errorBox.style.display = 'flex';
+    } finally {
+      submitBtn.disabled         = false;
+      submitText.style.display   = 'inline';
+      submitLoader.style.display = 'none';
+    }
+  });
+}

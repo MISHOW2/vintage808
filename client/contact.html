@@ -126,30 +126,36 @@
       <span id="contact-error-msg">Something went wrong.</span>
     </div>
 
-    <div class="form-group">
-      <label class="form-label" for="contact-name">Name</label>
-      <input class="form-input" type="text" id="contact-name" placeholder="Your name" />
-    </div>
-    <div class="form-group">
-      <label class="form-label" for="contact-email">Email</label>
-      <input class="form-input" type="email" id="contact-email" placeholder="you@example.com" />
-    </div>
-    <div class="form-group">
-      <label class="form-label" for="contact-message">Message</label>
-      <textarea class="form-input form-textarea" id="contact-message" placeholder="Type your message..."></textarea>
-    </div>
+    <!-- ↓ ADDED: form tag wrapping the fields -->
+    <form id="contact-form" novalidate>
+      <div class="form-group">
+        <label class="form-label" for="contact-name">Name</label>
+        <input class="form-input" type="text" id="contact-name" placeholder="Your name" />
+      </div>
+      <div class="form-group">
+        <label class="form-label" for="contact-email">Email</label>
+        <input class="form-input" type="email" id="contact-email" placeholder="you@example.com" />
+      </div>
+      <div class="form-group">
+        <label class="form-label" for="contact-message">Message</label>
+        <textarea class="form-input form-textarea" id="contact-message" placeholder="Type your message..."></textarea>
+      </div>
 
-    <div class="terms-row">
-      <input type="checkbox" id="terms" />
-      <label for="terms">I accept the <a href="#">Terms</a></label>
-    </div>
+      <div class="terms-row">
+        <input type="checkbox" id="terms" />
+        <label for="terms">I accept the <a href="#">Terms</a></label>
+      </div>
 
-    <button class="btn-submit" id="contact-submit">
-      <span id="submit-text">Send message</span>
-      <span id="submit-loader" style="display:none;">
-        <svg class="contact-spinner" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/></svg>
-      </span>
-    </button>
+      <!-- ↓ CHANGED: type="submit" -->
+      <button class="btn-submit" id="contact-submit" type="submit">
+        <span id="submit-text">Send message</span>
+        <span id="submit-loader" style="display:none;">
+          <svg class="contact-spinner" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/></svg>
+        </span>
+      </button>
+    </form>
+    <!-- ↑ ADDED: closing form tag -->
+
   </div>
 
   <div class="contact-image-side">
