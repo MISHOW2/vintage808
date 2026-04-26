@@ -40,11 +40,21 @@
   position: sticky;
   top: 88px;
   min-width: 0;
+  overflow: visible;
+  height: fit-content;  /* ← ADD THIS */
 }
 
 .account-sidebar > * {
   width: 100%;
   box-sizing: border-box;
+  flex-shrink: 0;
+}
+
+.account-nav {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  width: 100%;
 }
 
 .account-avatar {
@@ -87,11 +97,7 @@
   word-break: break-all;
 }
 
-.account-nav {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-}
+/* account-nav defined above with sidebar */
 
 .account-nav-item {
   display: flex;
@@ -136,9 +142,11 @@
   text-align: left;
   transition: all 0.15s;
   width: 100%;
+  min-width: 0;
   box-sizing: border-box;
   margin-top: 6px;
   flex-shrink: 0;
+  overflow: hidden;
 }
 
 .account-logout:hover {

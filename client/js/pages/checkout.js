@@ -2,7 +2,7 @@
 import { getCart, getCartTotal, clearCart } from '../components/cart.js';
 
 const API      = 'https://vintage808-api.vercel.app/api';
-const SHIPPING = 80;
+const SHIPPING = 150;
 
 // ── Auth guard ────────────────────────────────────────────────
 const token = localStorage.getItem('v808_token');
