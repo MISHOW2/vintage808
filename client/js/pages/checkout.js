@@ -144,6 +144,8 @@ payBtn.addEventListener('click', async () => {
     items       : JSON.stringify(items),
     address     : JSON.stringify(address),
     userId      : JSON.parse(localStorage.getItem('v808_user') || '{}')._id || '',
+    subtotal    : subtotal.toFixed(2),
+    shippingFee : SHIPPING.toFixed(2),
   };
 
   Object.entries(fields).forEach(([key, value]) => {
