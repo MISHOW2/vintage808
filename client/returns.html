@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Returns & Refunds — Vintage808</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=DM+Sans:wght@400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="./css/main.css" />
+  <link rel="stylesheet" href="./css/components.css" />
+  <style>
+    :root {
+      --black: #111111; --white: #ffffff; --sand: #ede9e3; --sand2: #f7f5f2;
+      --mid: #999186; --accent: #d4006b;
+      --font-display: 'DM Serif Display', serif;
+      --font-body: 'DM Sans', sans-serif;
+      --font-mono: 'DM Mono', monospace;
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: var(--font-body); background: var(--sand2); color: var(--black); -webkit-font-smoothing: antialiased; }
+    a { color: var(--accent); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+
+    .legal-hero {
+      background: var(--black);
+      padding: 72px 40px 56px;
+      text-align: center;
+    }
+    .legal-hero-eyebrow {
+      font-family: var(--font-mono);
+      font-size: 10px;
+      letter-spacing: .2em;
+      text-transform: uppercase;
+      color: var(--mid);
+      margin-bottom: 14px;
+    }
+    .legal-hero h1 {
+      font-family: var(--font-display);
+      font-size: clamp(32px, 5vw, 52px);
+      font-weight: 400;
+      color: var(--white);
+      letter-spacing: -.02em;
+    }
+    .legal-hero-sub {
+      margin-top: 14px;
+      font-size: 13px;
+      color: var(--mid);
+    }
+
+    .legal-body {
+      max-width: 760px;
+      margin: 0 auto;
+      padding: 64px 24px 100px;
+    }
+
+    .legal-toc {
+      background: var(--white);
+      border: 1px solid #e8e4de;
+      border-radius: 6px;
+      padding: 24px 28px;
+      margin-bottom: 56px;
+    }
+    .legal-toc-title {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: .16em;
+      text-transform: uppercase;
+      color: var(--mid);
+      margin-bottom: 14px;
+    }
+    .legal-toc ol {
+      padding-left: 18px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .legal-toc li { font-size: 13px; }
+    .legal-toc a { color: var(--black); font-weight: 500; }
+    .legal-toc a:hover { color: var(--accent); text-decoration: none; }
+
+    .legal-section { margin-bottom: 52px; }
+
+    .legal-section-num {
+      font-family: var(--font-mono);
+      font-size: 10px;
+      letter-spacing: .18em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 8px;
+    }
+
+    .legal-section h2 {
+      font-family: var(--font-display);
+      font-size: clamp(20px, 3vw, 26px);
+      font-weight: 400;
+      letter-spacing: -.01em;
+      color: var(--black);
+      margin-bottom: 18px;
+    }
+
+    .legal-section p {
+      font-size: 14px;
+      line-height: 1.85;
+      color: #444;
+      margin-bottom: 14px;
+    }
+
+    .legal-section p:last-child { margin-bottom: 0; }
+
+    .legal-section ul, .legal-section ol {
+      padding-left: 20px;
+      margin-bottom: 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .legal-section li {
+      font-size: 14px;
+      line-height: 1.75;
+      color: #444;
+    }
+
+    .legal-highlight {
+      background: var(--white);
+      border: 1px solid #e8e4de;
+      border-left: 4px solid var(--accent);
+      border-radius: 4px;
+      padding: 18px 20px;
+      margin: 20px 0;
+    }
+
+    .legal-highlight p {
+      margin: 0;
+      font-size: 13px;
+      line-height: 1.75;
+      color: #444;
+    }
+
+    .legal-highlight strong { color: var(--black); }
+
+    .legal-divider {
+      height: 1px;
+      background: #e8e4de;
+      margin: 52px 0;
+    }
+
+    .legal-contact-card {
+      background: var(--black);
+      color: var(--white);
+      border-radius: 6px;
+      padding: 32px 36px;
+      margin-top: 52px;
+    }
+
+    .legal-contact-card h3 {
+      font-family: var(--font-display);
+      font-size: 22px;
+      font-weight: 400;
+      margin-bottom: 12px;
+    }
+
+    .legal-contact-card p {
+      font-size: 14px;
+      color: #aaa;
+      line-height: 1.8;
+      margin-bottom: 0;
+    }
+
+    .legal-contact-card a { color: var(--accent); }
+
+    @media (max-width: 600px) {
+      .legal-hero { padding: 48px 20px 40px; }
+      .legal-body { padding: 40px 16px 72px; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- Your nav include goes here -->
+
+<div class="legal-hero">
+  <div class="legal-hero-eyebrow">Vintage808 · Legal</div>
+  <h1>Returns &amp; Refunds</h1>
+  <p class="legal-hero-sub">Last updated: April 2025</p>
+</div>
+
+<div class="legal-body">
+
+  <!-- Table of contents -->
+  <div class="legal-toc">
+    <div class="legal-toc-title">Contents</div>
+    <ol>
+      <li><a href="#eligibility">Eligibility &amp; return window</a></li>
+      <li><a href="#non-returnable">Non-returnable items</a></li>
+      <li><a href="#how-to-return">How to initiate a return</a></li>
+      <li><a href="#condition">Condition requirements</a></li>
+      <li><a href="#refunds">Refunds</a></li>
+      <li><a href="#exchanges">Exchanges</a></li>
+      <li><a href="#shipping-cost">Shipping costs</a></li>
+      <li><a href="#cpa">Your rights under the CPA</a></li>
+      <li><a href="#contact">Contact us</a></li>
+    </ol>
+  </div>
+
+  <!-- 1 -->
+  <div class="legal-section" id="eligibility">
+    <div class="legal-section-num">01</div>
+    <h2>Eligibility &amp; Return Window</h2>
+    <p>We accept returns on eligible items within <strong>7 days</strong> of the confirmed delivery date. To be eligible, your item must meet the condition requirements in section 4.</p>
+    <p>Returns requested after 7 days of delivery will not be accepted unless the item is defective or damaged, in which case the Consumer Protection Act provisions in section 8 apply.</p>
+  </div>
+
+  <!-- 2 -->
+  <div class="legal-section" id="non-returnable">
+    <div class="legal-section-num">02</div>
+    <h2>Non-Returnable Items</h2>
+    <p>The following items cannot be returned:</p>
+    <ul>
+      <li>Items marked <strong>"Final Sale"</strong> or sold at clearance pricing</li>
+      <li>Items that have been worn, washed, or altered</li>
+      <li>Items without original tags and packaging</li>
+      <li>Gift cards and digital products</li>
+    </ul>
+  </div>
+
+  <!-- 3 -->
+  <div class="legal-section" id="how-to-return">
+    <div class="legal-section-num">03</div>
+    <h2>How to Initiate a Return</h2>
+    <p>To start a return, email us at <a href="mailto:customersupport@vintage808info.com">customersupport@vintage808info.com</a> within 7 days of delivery with the subject line <strong>"Return Request — [Your Order Number]"</strong>.</p>
+    <p>Include the following in your email:</p>
+    <ul>
+      <li>Your order number</li>
+      <li>The item(s) you want to return</li>
+      <li>The reason for the return</li>
+      <li>Photos of the item if it is defective or damaged</li>
+    </ul>
+    <p>We will respond within 2 business days with return instructions. Do not send items back before receiving a return authorisation — unauthorised returns will not be processed.</p>
+    <div class="legal-highlight">
+      <p><strong>Important:</strong> Returns sent without prior authorisation will not be accepted and will be returned to the sender at their own cost.</p>
+    </div>
+  </div>
+
+  <!-- 4 -->
+  <div class="legal-section" id="condition">
+    <div class="legal-section-num">04</div>
+    <h2>Condition Requirements</h2>
+    <p>Items must be returned in the same condition in which they were received:</p>
+    <ul>
+      <li>Unworn and unwashed</li>
+      <li>Original tags still attached</li>
+      <li>In original packaging where possible</li>
+      <li>Free from odours, stains, pet hair, and damage</li>
+    </ul>
+    <p>We reserve the right to refuse a return or charge a restocking fee if the item does not meet these conditions.</p>
+  </div>
+
+  <!-- 5 -->
+  <div class="legal-section" id="refunds">
+    <div class="legal-section-num">05</div>
+    <h2>Refunds</h2>
+    <p>Once your return is received and inspected, we will email you to confirm receipt and advise whether your refund has been approved or rejected.</p>
+    <p>Approved refunds are processed to the original payment method within <strong>5–10 business days</strong>. PayFast refunds are subject to PayFast's processing timeline.</p>
+    <p>Shipping fees are non-refundable unless the item was defective or we made an error with your order.</p>
+    <div class="legal-highlight">
+      <p><strong>Please note:</strong> We do not refund the original shipping fee unless the return is due to our error or a defective product.</p>
+    </div>
+  </div>
+
+  <!-- 6 -->
+  <div class="legal-section" id="exchanges">
+    <div class="legal-section-num">06</div>
+    <h2>Exchanges</h2>
+    <p>We offer exchanges for different sizes or colours where stock is available. To request an exchange, follow the same process as a return (section 3) and specify which item and size you would like in exchange.</p>
+    <p>Exchanges are subject to stock availability. If the requested size or colour is unavailable, we will issue a refund instead.</p>
+  </div>
+
+  <!-- 7 -->
+  <div class="legal-section" id="shipping-cost">
+    <div class="legal-section-num">07</div>
+    <h2>Shipping Costs</h2>
+    <p>Return shipping costs are the responsibility of the customer unless the return is due to a defective product or an error on our part, in which case we will cover the cost of the return courier.</p>
+    <p>We recommend using a trackable shipping service. Vintage808 is not responsible for items lost or damaged in transit during a return.</p>
+  </div>
+
+  <!-- 8 -->
+  <div class="legal-section" id="cpa">
+    <div class="legal-section-num">08</div>
+    <h2>Your Rights Under the Consumer Protection Act</h2>
+    <p>As a South African consumer, you are protected by the Consumer Protection Act 68 of 2008 (CPA). Nothing in this returns policy limits or overrides your rights under the CPA.</p>
+    <p>Under the CPA, you have the right to:</p>
+    <ul>
+      <li>Return a defective product within <strong>6 months</strong> of purchase for a repair, replacement, or refund — your choice</li>
+      <li>Receive goods that are of good quality, in good working order, and free of defects</li>
+      <li>Receive goods that match the description, sample, or demonstration provided</li>
+    </ul>
+    <p>If you believe your rights under the CPA have been violated and we are unable to resolve the issue, you may contact the <a href="https://www.thencc.org.za" target="_blank" rel="noopener">National Consumer Commission</a>.</p>
+  </div>
+
+  <div class="legal-divider"></div>
+
+  <!-- Contact card -->
+  <div class="legal-contact-card" id="contact">
+    <h3>Questions about a return?</h3>
+    <p>
+      Email us at <a href="mailto:customersupport@vintage808info.com">customersupport@vintage808info.com</a> and we'll get back to you within 2 business days.<br/><br/>
+      <!-- TODO: Add physical address -->
+      <!-- [BUSINESS NAME], [STREET ADDRESS], [CITY], [PROVINCE], [POSTAL CODE], South Africa -->
+    </p>
+  </div>
+
+</div>
+
+<!-- Your footer include goes here -->
+<script type="module" src="./js/main.js"></script>
+</body>
+</html>
