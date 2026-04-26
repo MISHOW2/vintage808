@@ -9,7 +9,6 @@
   const token   = localStorage.getItem('v808_token');
   const userRaw = localStorage.getItem('v808_user');
 
-  // ── Auth guard ───────────────────────────────────────────────
   if (!token || !userRaw) {
     sessionStorage.setItem('v808_return', './account.html');
     window.location.replace('./login.html');
@@ -37,7 +36,6 @@
       .toLocaleDateString('en-ZA', { month: 'long', year: 'numeric' });
   }
 
-  // ── Constants ─────────────────────────────────────────────────
   const STATUS_STEPS  = ['confirmed', 'processing', 'shipped', 'delivered'];
   const STATUS_LABELS = {
     pending: 'Pending', confirmed: 'Confirmed', processing: 'Processing',
@@ -45,10 +43,8 @@
     paid: 'Paid', failed: 'Failed',
   };
 
-  // ── DOM refs ──────────────────────────────────────────────────
   const $ = id => document.getElementById(id);
 
-  // ── Helpers ───────────────────────────────────────────────────
   const esc = s => String(s ?? '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
   const fmtDate = (iso, opts = { year:'numeric', month:'short', day:'numeric' }) => {
     try { return new Date(iso).toLocaleDateString('en-ZA', opts); } catch { return '—'; }
@@ -92,48 +88,38 @@
     }).join('');
   }
 
-  // ── Render user info ──────────────────────────────────────────
   function renderUserInfo() {
-    const full = `${user.firstName ?? ''} ${user.lastName ?? ''}`.trim();
+    const full     = `${user.firstName ?? ''} ${user.lastName ?? ''}`.trim();
     const initials = ((user.firstName?.[0] ?? '') + (user.lastName?.[0] ?? '')).toUpperCase() || '??';
-
-    if ($('avatar-initials'))   $('avatar-initials').textContent  = initials;
-    if ($('avatar-name'))       $('avatar-name').textContent       = full || user.email;
-    if ($('avatar-email'))      $('avatar-email').textContent      = user.email ?? '';
+    if ($('avatar-initials'))       $('avatar-initials').textContent       = initials;
+    if ($('avatar-name'))           $('avatar-name').textContent           = full || user.email;
+    if ($('avatar-email'))          $('avatar-email').textContent          = user.email ?? '';
     if ($('profile-name-display'))  $('profile-name-display').textContent  = full || '—';
     if ($('profile-email-display')) $('profile-email-display').textContent = user.email ?? '—';
     if ($('profile-phone-display')) $('profile-phone-display').textContent = user.phone ?? '—';
     if ($('profile-since-display')) $('profile-since-display').textContent = user.memberSince ?? '—';
   }
 
-  // ── Render dashboard recent orders ────────────────────────────
   function renderDashboardOrders(orders) {
     const el = $('dashboard-orders-list');
     if (!el) return;
-
     if (!orders.length) {
       el.innerHTML = `<div style="padding:24px 20px;font-size:13px;color:var(--acc-mid);">No orders yet. <a href="./shop.html" style="color:var(--acc-black);font-weight:500;">Browse the shop →</a></div>`;
       return;
     }
-
-    // Show most recent 3
     el.innerHTML = orders.slice(0, 3).map(order => {
       const status    = order.orderStatus || order.status || 'pending';
       const displayId = order.orderNumber || ('#' + (order._id || order.id || '').toString().slice(-8).toUpperCase());
       const img       = order.items?.[0]?.image;
-
       return `
         <div class="recent-order-item" style="cursor:pointer;" data-order-id="${esc((order._id || order.id || '').toString())}">
           ${img
             ? `<img class="recent-order-img" src="${esc(img)}" alt="item" onerror="this.style.display='none'" />`
-            : `<div class="recent-order-img-placeholder"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--acc-mid)" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg></div>`
-          }
+            : `<div class="recent-order-img-placeholder"></div>`}
           <div class="recent-order-info">
             <div class="recent-order-number">${esc(displayId)}</div>
             <div class="recent-order-date">${fmtDate(order.createdAt)}</div>
-            <div class="recent-order-status">
-              <span class="order-badge ${badgeClass(status)}">${fmtStatus(status)}</span>
-            </div>
+            <div class="recent-order-status"><span class="order-badge ${badgeClass(status)}">${fmtStatus(status)}</span></div>
           </div>
           <div class="recent-order-right">
             <div class="recent-order-total">${fmtCurrency(order.total)}</div>
@@ -141,42 +127,34 @@
           </div>
         </div>`;
     }).join('');
-
-    // Click to open modal
     el.querySelectorAll('.recent-order-item').forEach(item => {
       item.addEventListener('click', () => openOrderModal(item.dataset.orderId));
     });
   }
 
-  // ── Render account stats ──────────────────────────────────────
   function renderStats(orders) {
     if ($('stat-total-orders')) $('stat-total-orders').textContent = orders.length;
     if ($('stat-total-spent'))  $('stat-total-spent').textContent  = fmtCurrency(orders.reduce((s, o) => s + Number(o.total || 0), 0));
     if ($('stat-last-order'))   $('stat-last-order').textContent   = orders.length ? fmtDate(orders[0].createdAt) : '—';
   }
 
-  // ── Render dashboard address preview ─────────────────────────
   function renderDashboardAddress(addresses) {
     const el = $('dashboard-address-preview');
     if (!el) return;
-
     if (!addresses.length) {
       el.innerHTML = `<p style="font-size:13px;color:var(--acc-mid);">No saved addresses yet.</p>`;
       return;
     }
-
     const a = addresses[0];
     el.innerHTML = `
       <div style="font-size:11px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;color:var(--acc-mid);margin-bottom:8px;">${esc(a.label)}</div>
       <div style="font-size:13px;color:var(--acc-black);line-height:1.7;">${a.lines.join('<br>')}</div>
-      ${addresses.length > 1 ? `<div style="margin-top:8px;font-size:12px;color:var(--acc-mid);">+${addresses.length - 1} more address${addresses.length - 1 !== 1 ? 'es' : ''}</div>` : ''}`;
+      ${addresses.length > 1 ? `<div style="margin-top:8px;font-size:12px;color:var(--acc-mid);">+${addresses.length - 1} more</div>` : ''}`;
   }
 
-  // ── Render full orders list ───────────────────────────────────
   function renderOrders(orders = []) {
     const el = $('orders-list');
     if (!el) return;
-
     if (!orders.length) {
       el.innerHTML = `
         <div class="account-empty">
@@ -188,14 +166,13 @@
         </div>`;
       return;
     }
-
     el.innerHTML = orders.map(order => {
       const status    = order.orderStatus || order.status || 'pending';
       const displayId = order.orderNumber || ('#' + (order._id || order.id || '').toString().slice(-8).toUpperCase());
       const thumbs    = (order.items || []).slice(0, 3).map(item =>
         item.image
           ? `<img class="order-thumb" src="${esc(item.image)}" alt="${esc(item.name)}" />`
-          : `<div class="order-thumb-placeholder"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--acc-mid)" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg></div>`
+          : `<div class="order-thumb-placeholder"></div>`
       ).join('') + ((order.items || []).length > 3 ? `<div class="order-thumb-more">+${order.items.length - 3}</div>` : '');
 
       return `
@@ -228,16 +205,13 @@
     });
   }
 
-  // ── Render addresses ──────────────────────────────────────────
   function renderAddresses(addresses = []) {
     const el = $('addresses-list');
     if (!el) return;
-
     if (!addresses.length) {
       el.innerHTML = '<p style="font-size:14px;color:var(--acc-mid);padding:24px 0 12px;">No saved addresses yet.</p>';
       return;
     }
-
     el.innerHTML = addresses.map(addr => `
       <div class="address-card">
         <div class="address-card-top">
@@ -246,7 +220,6 @@
         </div>
         <div class="address-text">${addr.lines.join('<br>')}</div>
       </div>`).join('');
-
     el.querySelectorAll('.address-delete-btn').forEach(btn => {
       btn.addEventListener('click', async () => {
         if (!confirm('Remove this address?')) return;
@@ -264,13 +237,24 @@
   let _cachedOrders = [];
 
   async function openOrderModal(orderId) {
-    let order = _cachedOrders.find(o => (o._id || o.id || '').toString() === orderId);
+    // ── Always fetch fresh from API so admin status changes show ─
+    let order;
+    try {
+      const res = await fetch(`${API}/api/orders/${orderId}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      if (res.ok) {
+        const d = await res.json();
+        order   = d.data ?? d;
+        // Update cache entry too
+        const idx = _cachedOrders.findIndex(o => (o._id || o.id || '').toString() === orderId);
+        if (idx > -1) _cachedOrders[idx] = order;
+      }
+    } catch { /* fall through to cache */ }
 
+    // Fallback to cache if fetch failed
     if (!order) {
-      try {
-        const res = await fetch(`${API}/api/orders/${orderId}`, { headers: { Authorization: `Bearer ${token}` } });
-        if (res.ok) { const d = await res.json(); order = d.data ?? d; }
-      } catch { /* fall through */ }
+      order = _cachedOrders.find(o => (o._id || o.id || '').toString() === orderId);
     }
 
     if (!order) return;
@@ -290,8 +274,8 @@
           <div class="mstep-left"><div class="mstep-dot"></div><div class="mstep-line"></div></div>
           <div class="mstep-right">
             <div class="mstep-name">${step.charAt(0).toUpperCase() + step.slice(1)}</div>
-            ${hist?.timestamp ? `<div class="mstep-time">${esc(hist.timestamp)}</div>` : ''}
-            ${hist?.note      ? `<div class="mstep-note">${esc(hist.note)}</div>`      : ''}
+            ${hist?.timestamp ? `<div class="mstep-time">${esc(String(hist.timestamp))}</div>` : ''}
+            ${hist?.note      ? `<div class="mstep-note">${esc(hist.note)}</div>`              : ''}
           </div>
         </div>`;
     }).join('');
@@ -374,8 +358,18 @@
       if (!res.ok) return [];
       const data = await res.json();
       const all  = data.data ?? data.orders ?? data ?? [];
-      const filtered = all.filter(o => o.customerEmail === user.email || o.userId === (user._id || user.id));
-      _cachedOrders  = filtered;
+
+      // ── FIX: normalise both sides before comparing ────────────
+      const myId    = String(user._id || user.id || '').trim();
+      const myEmail = String(user.email || '').toLowerCase().trim();
+
+      const filtered = all.filter(o => {
+        const emailMatch = String(o.customerEmail || '').toLowerCase().trim() === myEmail;
+        const idMatch    = myId && String(o.userId || '').trim() === myId;
+        return emailMatch || idMatch;
+      });
+
+      _cachedOrders = filtered;
       return filtered;
     } catch { return []; }
   }
@@ -401,11 +395,19 @@
     document.getElementById(`tab-${name}`)?.classList.add('active');
     document.querySelector(`.account-nav-item[data-tab="${name}"]`)?.classList.add('active');
     sessionStorage.setItem('account_tab', name);
+
+    // ── Refresh orders when switching to orders tab ───────────
+    if (name === 'orders') {
+      fetchOrders().then(orders => {
+        renderOrders(orders);
+        renderDashboardOrders(orders);
+        renderStats(orders);
+      });
+    }
   }
 
   navItems.forEach(btn => btn.addEventListener('click', () => switchTab(btn.dataset.tab)));
 
-  // ── Dashboard shortcuts ───────────────────────────────────────
   $('view-all-orders-btn')?.addEventListener('click', () => switchTab('orders'));
   $('dashboard-orders-footer-btn')?.addEventListener('click', () => switchTab('orders'));
   $('manage-addresses-btn')?.addEventListener('click', () => switchTab('addresses'));
@@ -414,7 +416,6 @@
     setTimeout(() => $('add-address-btn')?.click(), 100);
   });
 
-  // Restore last tab
   const savedTab = sessionStorage.getItem('account_tab');
   if (savedTab) switchTab(savedTab);
 
