@@ -44,6 +44,7 @@
   };
 
   const $ = id => document.getElementById(id);
+
   const esc = s => String(s ?? '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
   const fmtDate = (iso, opts = { year:'numeric', month:'short', day:'numeric' }) => {
     try { return new Date(iso).toLocaleDateString('en-ZA', opts); } catch { return '—'; }
@@ -151,15 +152,13 @@
       ${addresses.length > 1 ? `<div style="margin-top:8px;font-size:12px;color:var(--acc-mid);">+${addresses.length - 1} more</div>` : ''}`;
   }
 
-  // ── Render full orders list ───────────────────────────────────
   function renderOrders(orders = []) {
     const el = $('orders-list');
     if (!el) return;
-
     if (!orders.length) {
       el.innerHTML = `
         <div class="account-empty">
-          <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+          <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" color="var(--acc-mid)">
             <rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/>
           </svg>
           <p>No orders yet.</p>
@@ -167,7 +166,6 @@
         </div>`;
       return;
     }
-
     el.innerHTML = orders.map(order => {
       const status    = order.orderStatus || order.status || 'pending';
       const displayId = order.orderNumber || ('#' + (order._id || order.id || '').toString().slice(-8).toUpperCase());
@@ -239,6 +237,7 @@
   let _cachedOrders = [];
 
   async function openOrderModal(orderId) {
+    // ── Always fetch fresh from API so admin status changes show ─
     let order;
     try {
       const res = await fetch(`${API}/api/orders/${orderId}`, {
@@ -247,11 +246,13 @@
       if (res.ok) {
         const d = await res.json();
         order   = d.data ?? d;
+        // Update cache entry too
         const idx = _cachedOrders.findIndex(o => (o._id || o.id || '').toString() === orderId);
         if (idx > -1) _cachedOrders[idx] = order;
       }
-    } catch { /* fall through */ }
+    } catch { /* fall through to cache */ }
 
+    // Fallback to cache if fetch failed
     if (!order) {
       order = _cachedOrders.find(o => (o._id || o.id || '').toString() === orderId);
     }
@@ -351,29 +352,63 @@
   document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
 
   // ── API calls ─────────────────────────────────────────────────
-  // ✅ FIX: No client-side filtering — the backend already returns
-  // only the logged-in user's orders via JWT. Filtering by email/userId
-  // on the client was causing new PayFast orders (which use customerEmail)
-  // to be excluded when the stored user object had slightly different fields.
-  async function fetchOrders() {
-    try {
-      const res = await fetch(`${API}/api/orders`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      if (!res.ok) {
-        console.error('[Orders] Failed:', res.status);
-        return [];
-      }
-      const data    = await res.json();
-      const orders  = data.data ?? data.orders ?? data ?? [];
-      _cachedOrders = orders;
-      console.log('[Orders] Fetched:', orders.length);
-      return orders;
-    } catch (err) {
-      console.error('[Orders] Error:', err);
+async function fetchOrders() {
+  try {
+    console.log('[Orders] Fetching orders...');
+
+    const res = await fetch(`${API}/api/orders`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    console.log('[Orders] Response status:', res.status);
+
+    if (!res.ok) {
+      console.error('[Orders] API failed:', res.status);
       return [];
     }
+
+    const data = await res.json();
+
+    console.log('[Orders] Raw response:', data);
+
+    const rawOrders = data.data ?? data.orders ?? [];
+
+    if (!Array.isArray(rawOrders)) {
+      console.error('[Orders] Invalid format:', rawOrders);
+      return [];
+    }
+
+    const orders = rawOrders.map(order => ({
+      ...order,
+
+      // normalize IDs
+      id: order.id || order._id,
+
+      // normalize status
+      orderStatus: order.orderStatus || order.status || 'pending',
+
+      // normalize totals
+      total: Number(order.total || 0),
+
+      // normalize items
+      items: Array.isArray(order.items) ? order.items : [],
+
+      // normalize createdAt
+      createdAt: order.createdAt || new Date().toISOString(),
+    }));
+
+    console.log('[Orders] Normalized orders:', orders);
+
+    _cachedOrders = orders;
+
+    return orders;
+  } catch (err) {
+    console.error('[Orders] Fetch error:', err);
+    return [];
   }
+}
 
   async function fetchAddresses() {
     try {
@@ -397,9 +432,8 @@
     document.querySelector(`.account-nav-item[data-tab="${name}"]`)?.classList.add('active');
     sessionStorage.setItem('account_tab', name);
 
-    // Always refresh orders when switching to orders tab
+    // ── Refresh orders when switching to orders tab ───────────
     if (name === 'orders') {
-      $('orders-list').innerHTML = '<div style="padding:24px 20px;font-size:13px;color:var(--acc-mid);">Loading orders…</div>';
       fetchOrders().then(orders => {
         renderOrders(orders);
         renderDashboardOrders(orders);
@@ -410,9 +444,9 @@
 
   navItems.forEach(btn => btn.addEventListener('click', () => switchTab(btn.dataset.tab)));
 
-  $('view-all-orders-btn')?.addEventListener('click',          () => switchTab('orders'));
-  $('dashboard-orders-footer-btn')?.addEventListener('click',  () => switchTab('orders'));
-  $('manage-addresses-btn')?.addEventListener('click',         () => switchTab('addresses'));
+  $('view-all-orders-btn')?.addEventListener('click', () => switchTab('orders'));
+  $('dashboard-orders-footer-btn')?.addEventListener('click', () => switchTab('orders'));
+  $('manage-addresses-btn')?.addEventListener('click', () => switchTab('addresses'));
   $('add-address-shortcut-btn')?.addEventListener('click', () => {
     switchTab('addresses');
     setTimeout(() => $('add-address-btn')?.click(), 100);

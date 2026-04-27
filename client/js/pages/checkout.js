@@ -81,13 +81,13 @@ function setLoading(on) {
 payBtn.addEventListener('click', async () => {
   hideError();
 
-  const fullName = document.getElementById('full-name').value.trim();
-  const email    = document.getElementById('email').value.trim();
-  const phone    = document.getElementById('phone').value.trim();
-  const street   = document.getElementById('street').value.trim();
-  const city     = document.getElementById('city').value.trim();
-  const province = document.getElementById('province').value;
-  const postal   = document.getElementById('postal').value.trim();
+  const fullName    = document.getElementById('full-name').value.trim();
+  const email       = document.getElementById('email').value.trim(); // shipping/recipient email
+  const phone       = document.getElementById('phone').value.trim();
+  const street      = document.getElementById('street').value.trim();
+  const city        = document.getElementById('city').value.trim();
+  const province    = document.getElementById('province').value;
+  const postal      = document.getElementById('postal').value.trim();
 
   if (!fullName || !email || !phone || !street || !city || !province || !postal) {
     showError('Please fill in all fields before continuing.');
@@ -97,29 +97,32 @@ payBtn.addEventListener('click', async () => {
   const cart = getCart();
   if (cart.length === 0) { showError('Your cart is empty.'); return; }
 
+  // ✅ Always get the logged-in user's real email from their stored profile
+  const loggedInUser  = JSON.parse(localStorage.getItem('v808_user') || '{}');
+  const accountEmail  = loggedInUser.email || '';  // ✅ real owner of the order
+  const recipientEmail = email;                     // ✅ what they typed — may be different
+
   const subtotal = getCartTotal();
   const total    = subtotal + SHIPPING;
 
   const [first_name, ...rest] = fullName.split(' ');
   const last_name = rest.join(' ') || '-';
 
-  // ── Normalise cart items so image is always a single string ──
   const items = cart.map(item => ({
     productId: item.productId || item._id || item.id || '',
     name:      item.name,
     price:     item.price,
     size:      item.size ?? '',
     quantity:  item.qty ?? item.quantity ?? 1,
-    // FIX: cart stores image or images[] — normalise to one string
     image:     item.image || item.images?.[0] || '',
   }));
 
   const address = { street, city, province, postal, phone };
 
-  // Save to sessionStorage for confirmation page fallback
   sessionStorage.setItem('v808_pending_order', JSON.stringify({
     customerName:    fullName,
-    customerEmail:   email,
+    customerEmail:   accountEmail,   // ✅ store account email
+    recipientEmail:  recipientEmail, // ✅ store recipient email
     items,
     total,
     shippingAddress: address,
@@ -128,7 +131,6 @@ payBtn.addEventListener('click', async () => {
 
   setLoading(true);
 
-  // POST form to backend — backend signs and redirects to PayFast
   const form = document.createElement('form');
   form.method = 'POST';
   form.action = `${API}/payfast/pay`;
@@ -136,23 +138,24 @@ payBtn.addEventListener('click', async () => {
   const fields = {
     first_name,
     last_name,
-    email,
+    email       : recipientEmail,    // PayFast uses the form email (recipient)
     cell_number : phone,
     amount      : total.toFixed(2),
     item_name   : 'Vintage808 Order',
-    // ── FIX: send items + address so backend saves them on the order
     items       : JSON.stringify(items),
     address     : JSON.stringify(address),
-    userId      : JSON.parse(localStorage.getItem('v808_user') || '{}')._id || '',
+    userId      : loggedInUser._id || loggedInUser.id || '',
+    accountEmail: accountEmail,      // ✅ send account email separately to backend
+    recipientEmail: recipientEmail,  // ✅ send recipient email separately
     subtotal    : subtotal.toFixed(2),
     shippingFee : SHIPPING.toFixed(2),
   };
 
   Object.entries(fields).forEach(([key, value]) => {
-    const input = document.createElement('input');
-    input.type  = 'hidden';
-    input.name  = key;
-    input.value = value;
+    const input   = document.createElement('input');
+    input.type    = 'hidden';
+    input.name    = key;
+    input.value   = value;
     form.appendChild(input);
   });
 
