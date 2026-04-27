@@ -1029,7 +1029,7 @@
 /* ── Responsive ── */
 @media (max-width: 860px) {
   .account-container {
-    grid-template-columns: 1fr;
+    grid-template-columns: 1fr ;
   }
 
   .account-sidebar {
