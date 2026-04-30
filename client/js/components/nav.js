@@ -51,3 +51,67 @@ export function nav() {
     }
   });
 }
+
+
+
+// js/nav.js
+// Drop this script into every account page.
+// On desktop (>860px): switches tabs in place.
+// On mobile (≤860px): navigates to a separate HTML page.
+
+const MOBILE_BREAKPOINT = 860;
+
+const PAGE_MAP = {
+  profile:     '/client/account.html',
+  orders:      '/client/pages/account-page/orders.html',
+  addresses:   '/client/pages/account-page/addresses.html',
+  returns:     '/client/pages/account-page/returns.html',
+  wishlist:    '/client/pages/account-page/wishlist.html',
+  preferences: '/client/pages/account-page/preferences.html',
+};
+
+function isMobile() {
+  return window.innerWidth <= MOBILE_BREAKPOINT;
+}
+
+// Called by each nav button: data-tab="orders" etc.
+function handleNav(tab) {
+  if (isMobile() && tab !== 'profile') {
+    window.location.href = PAGE_MAP[tab];
+  } else {
+    switchTab(tab);
+  }
+}
+
+// Desktop tab switching (only runs on account.html)
+function switchTab(tab) {
+  // tabs use id="tab-orders" etc.
+  document.querySelectorAll('.account-tab').forEach(el => {
+    el.classList.toggle('active', el.id === 'tab-' + tab);
+  });
+  document.querySelectorAll('.account-nav-item').forEach(btn => {
+    btn.classList.toggle('active', btn.dataset.tab === tab);
+  });
+}
+// Wire up all nav buttons once DOM is ready
+document.addEventListener('DOMContentLoaded', () => {
+  document.querySelectorAll('.account-nav-item[data-tab]').forEach(btn => {
+    btn.addEventListener('click', () => handleNav(btn.dataset.tab));
+  });
+
+  // On desktop account.html, activate the right tab from URL hash
+  // e.g. /account.html#orders opens the orders tab automatically
+  if (!isMobile()) {
+    const hash = window.location.hash.replace('#', '');
+    if (hash && PAGE_MAP[hash]) switchTab(hash);
+  }
+
+  // Mark the active nav item on standalone pages (mobile)
+  // Each page sets <body data-page="orders"> etc.
+  const currentPage = document.body.dataset.page;
+  if (currentPage) {
+    document.querySelectorAll('.account-nav-item').forEach(btn => {
+      btn.classList.toggle('active', btn.dataset.tab === currentPage);
+    });
+  }
+});

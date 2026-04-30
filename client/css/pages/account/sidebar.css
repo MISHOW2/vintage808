@@ -1,0 +1,237 @@
+/* ============================================================
+   Vintage808 — sidebar.css
+   ONE file. No duplicates.
+   ============================================================ */
+
+/* ── Desktop: sidebar shell ── */
+.account-sidebar {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  position: sticky;
+  top: 88px;
+  height: fit-content;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.account-sidebar > * {
+  width: 100%;
+  box-sizing: border-box;
+  flex-shrink: 0;
+}
+
+/* ── Avatar block ── */
+.account-avatar {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 20px;
+  background: var(--acc-white);
+  border: 1px solid var(--acc-sand);
+  border-radius: var(--acc-radius);
+  margin-bottom: 6px;
+  min-width: 0;
+}
+
+.avatar-circle {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: var(--acc-black);
+  color: var(--acc-white);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-display, 'Archivo Black', sans-serif);
+  font-size: 16px;
+  letter-spacing: 0.02em;
+  flex-shrink: 0;
+  user-select: none;
+}
+
+.avatar-name {
+  font-family: var(--font-display, 'Archivo Black', sans-serif);
+  font-size: 14px;
+  color: var(--acc-black);
+  letter-spacing: -0.01em;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.avatar-email {
+  font-size: 11px;
+  color: var(--acc-mid);
+  margin-top: 2px;
+  word-break: break-all;
+  line-height: 1.4;
+}
+
+/* ── Nav list ── */
+.account-nav {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  width: 100%;
+}
+
+/* ── Nav items ── */
+.account-nav-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 16px;
+  width: 100%;
+  box-sizing: border-box;
+  text-align: left;
+  background: var(--acc-white);
+  border: 1px solid var(--acc-sand);
+  border-radius: var(--acc-radius);
+  font-family: var(--font-body, 'Archivo', sans-serif);
+  font-size: 13px;
+  color: var(--acc-mid);
+  cursor: pointer;
+  transition: color 0.15s, border-color 0.15s, background 0.15s;
+}
+
+.account-nav-item svg {
+  flex-shrink: 0;
+  opacity: 0.6;
+  transition: opacity 0.15s;
+}
+
+.account-nav-item:hover {
+  color: var(--acc-black);
+  border-color: #c8c3bb;
+}
+
+.account-nav-item:hover svg { opacity: 1; }
+
+.account-nav-item.active {
+  background: var(--acc-black);
+  color: var(--acc-white);
+  border-color: var(--acc-black);
+}
+
+.account-nav-item.active svg { opacity: 1; }
+
+.account-nav-item:focus-visible {
+  outline: 2px solid var(--acc-black);
+  outline-offset: 2px;
+}
+
+/* ── Log out button ── */
+.account-logout {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 16px;
+  width: 100%;
+  box-sizing: border-box;
+  text-align: left;
+  margin-top: 6px;
+  background: transparent;
+  border: 1px solid var(--acc-sand);
+  border-radius: var(--acc-radius);
+  font-family: var(--font-body, 'Archivo', sans-serif);
+  font-size: 13px;
+  color: var(--acc-red);
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s;
+}
+
+.account-logout svg {
+  flex-shrink: 0;
+  opacity: 0.8;
+}
+
+.account-logout:hover {
+  background: var(--acc-red-bg);
+  border-color: #fecaca;
+}
+
+.account-logout:focus-visible {
+  outline: 2px solid var(--acc-red);
+  outline-offset: 2px;
+}
+
+/* ── Mobile ── */
+@media (max-width: 860px) {
+
+  /* Collapse the two-column page grid into a single column */
+  .account-container {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  /* Sidebar becomes a normal block — no sticky, no overlap */
+  .account-sidebar {
+    position: static;
+    width: 100%;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .account-avatar {
+    margin-bottom: 0;
+  }
+
+  /* 3-column grid: Profile / Orders / Addresses on row 1
+                    Returns / Wishlist / Preferences on row 2 */
+  .account-nav {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 6px;
+  }
+
+  /* Each button: icon on top, label below, centred */
+  .account-nav-item {
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    gap: 5px;
+    padding: 10px 6px;
+    font-size: 11px;
+  }
+
+  .account-nav-item svg {
+    width: 16px;
+    height: 16px;
+  }
+
+  /* Logout spans full width below the grid */
+  .account-logout {
+    width: 100%;
+    justify-content: center;
+    margin-top: 0;
+  }
+
+  .account-content {
+    width: 100%;
+  }
+}
+
+/* ── Small phones ── */
+@media (max-width: 420px) {
+  .account-avatar {
+    padding: 14px;
+    gap: 10px;
+  }
+
+  .avatar-circle {
+    width: 40px;
+    height: 40px;
+    font-size: 14px;
+  }
+
+  .avatar-name  { font-size: 13px; }
+  .avatar-email { font-size: 11px; }
+
+  .account-nav-item {
+    padding: 9px 4px;
+    font-size: 10px;
+  }
+}

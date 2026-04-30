@@ -32,127 +32,8 @@
   align-items: start;
 }
 
-/* ── Sidebar ── */
-.account-sidebar {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-  position: sticky;
-  top: 88px;
-  min-width: 0;
-  overflow: visible;
-  height: fit-content;  /* ← ADD THIS */
-}
 
-.account-sidebar > * {
-  width: 100%;
-  box-sizing: border-box;
-  flex-shrink: 0;
-}
 
-.account-nav {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-  width: 100%;
-}
-
-.account-avatar {
-  background: var(--acc-white);
-  border: 1px solid var(--acc-sand);
-  border-radius: var(--acc-radius);
-  padding: 20px;
-  display: flex;
-  align-items: center;
-  gap: 14px;
-  margin-bottom: 6px;
-}
-
-.avatar-circle {
-  width: 48px;
-  height: 48px;
-  border-radius: 50%;
-  background: var(--acc-black);
-  color: var(--acc-white);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-family: var(--font-display, 'Archivo Black', sans-serif);
-  font-size: 16px;
-  letter-spacing: 0.02em;
-  flex-shrink: 0;
-}
-
-.avatar-name {
-  font-family: var(--font-display, 'Archivo Black', sans-serif);
-  font-size: 14px;
-  color: var(--acc-black);
-  letter-spacing: -0.01em;
-}
-
-.avatar-email {
-  font-size: 11px;
-  color: var(--acc-mid);
-  margin-top: 2px;
-  word-break: break-all;
-}
-
-/* account-nav defined above with sidebar */
-
-.account-nav-item {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 12px 16px;
-  background: var(--acc-white);
-  border: 1px solid var(--acc-sand);
-  border-radius: var(--acc-radius);
-  font-family: var(--font-body, 'Archivo', sans-serif);
-  font-size: 13px;
-  color: var(--acc-mid);
-  cursor: pointer;
-  text-align: left;
-  transition: all 0.15s;
-  width: 100%;
-}
-
-.account-nav-item:hover {
-  color: var(--acc-black);
-  border-color: #c8c3bb;
-}
-
-.account-nav-item.active {
-  background: var(--acc-black);
-  color: var(--acc-white);
-  border-color: var(--acc-black);
-}
-
-.account-logout {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 12px 16px;
-  background: transparent;
-  border: 1px solid var(--acc-sand);
-  border-radius: var(--acc-radius);
-  font-family: var(--font-body, 'Archivo', sans-serif);
-  font-size: 13px;
-  color: var(--acc-red);
-  cursor: pointer;
-  text-align: left;
-  transition: all 0.15s;
-  width: 100%;
-  min-width: 0;
-  box-sizing: border-box;
-  margin-top: 6px;
-  flex-shrink: 0;
-  overflow: hidden;
-}
-
-.account-logout:hover {
-  background: var(--acc-red-bg);
-  border-color: #fecaca;
-}
 
 /* ── Content area ── */
 .account-content {
@@ -861,9 +742,10 @@
   flex-direction: column;
   gap: 24px;
 }
-
+.modal-section { padding: 20px 20px 0; }
+.modal-section:last-child { padding-bottom: 20px; }
 .modal-section-title {
-  font-size: 11px;
+  font-size: 10px;
   font-weight: 600;
   letter-spacing: 0.1em;
   text-transform: uppercase;
@@ -994,6 +876,30 @@
 .modal-info-val { color: var(--acc-black); }
 .modal-info-val.mono { font-family: var(--font-mono, 'Space Mono', monospace); font-size: 11px; }
 
+/* ── Tracking box ─────────────────────────────────────────── */
+.modal-tracking-box,
+.modal-return-box {
+  background: var(--acc-sand, #f5f5f5);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.modal-tracking-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 9px 14px;
+  border-bottom: 1px solid rgba(0,0,0,0.06);
+  font-size: 13px;
+  gap: 12px;
+}
+
+.modal-tracking-row:last-child { border-bottom: none; }
+.modal-tracking-key  { color: var(--acc-mid); flex-shrink: 0; font-size: 12px; }
+.modal-tracking-val  { color: var(--acc-black, #111); text-align: right; }
+.modal-tracking-val.mono { font-family: 'Space Mono', monospace; font-size: 11px; }
+.modal-tracking-link { color: var(--acc-black, #111); font-weight: 500; text-decoration: underline; }
+
 .modal-tracking-detail { padding: 16px 20px; }
 .modal-tracking-courier { font-size: 11px; color: var(--acc-mid); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 4px; }
 .modal-tracking-number  { font-family: var(--font-mono, 'Space Mono', monospace); font-size: 14px; color: var(--acc-black); margin-bottom: 6px; }
@@ -1017,6 +923,94 @@
 
 .modal-track-btn:hover { background: #333; }
 
+
+/* ── Status history ───────────────────────────────────────── */
+.modal-history { display: flex; flex-direction: column; gap: 0; }
+.modal-history-row {
+  display: flex;
+  gap: 12px;
+  padding: 10px 0;
+  border-bottom: 1px solid rgba(0,0,0,0.06);
+  position: relative;
+}
+.modal-history-row:last-child { border-bottom: none; }
+.modal-history-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--acc-black, #111);
+  flex-shrink: 0;
+  margin-top: 4px;
+}
+.modal-history-row:not(:first-child) .modal-history-dot { background: var(--acc-mid); }
+.modal-history-status { font-size: 13px; font-weight: 500; color: var(--acc-black, #111); }
+.modal-history-note   { font-size: 12px; color: var(--acc-mid); margin-top: 2px; }
+.modal-history-time   { font-size: 11px; color: var(--acc-mid); margin-top: 2px; font-family: 'Space Mono', monospace; }
+
+
+/* ── Return section ───────────────────────────────────────── */
+.modal-return-prompt { display: flex; flex-direction: column; gap: 10px; }
+.modal-return-desc   { font-size: 13px; color: var(--acc-mid); }
+.modal-return-textarea {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid var(--acc-border, #e0e0e0);
+  border-radius: 6px;
+  font-size: 13px;
+  font-family: inherit;
+  resize: vertical;
+  outline: none;
+  transition: border-color 0.15s;
+}
+.modal-return-textarea:focus { border-color: var(--acc-black, #111); }
+.modal-return-msg { font-size: 12px; padding: 8px 12px; border-radius: 6px; }
+.modal-return-msg.hidden { display: none; }
+
+/* ── Return badges ────────────────────────────────────────── */
+.badge-return-requested { background: #fff8e1; color: #b45309; border: 1px solid #fde68a; }
+.badge-return-approved  { background: #f0fdf4; color: #166534; border: 1px solid #bbf7d0; }
+.badge-return-rejected  { background: #fef2f2; color: #991b1b; border: 1px solid #fecaca; }
+
+
+/* ── Totals ───────────────────────────────────────────────── */
+.modal-totals { border-top: 1px solid rgba(0,0,0,0.07); margin-top: 12px; }
+.modal-total-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 8px 0;
+  font-size: 13px;
+  color: var(--acc-mid);
+  border-bottom: 1px solid rgba(0,0,0,0.04);
+}
+.modal-total-row:last-child { border-bottom: none; }
+.modal-total-row--final { color: var(--acc-black, #111); font-weight: 600; font-size: 14px; }
+
+/* ── Modal items ──────────────────────────────────────────── */
+.modal-items { display: flex; flex-direction: column; gap: 1px; }
+.modal-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 0;
+  border-bottom: 1px solid rgba(0,0,0,0.06);
+}
+.modal-item:last-child { border-bottom: none; }
+.modal-item-img {
+  width: 50px;
+  height: 58px;
+  object-fit: cover;
+  border-radius: 4px;
+  background: var(--acc-sand);
+  flex-shrink: 0;
+}
+.modal-item-img--placeholder { background: var(--acc-sand, #f5f5f5); }
+.modal-item-info { flex: 1; min-width: 0; }
+.modal-item-name { font-size: 13px; font-weight: 500; color: var(--acc-black, #111); }
+.modal-item-meta { font-size: 11px; color: var(--acc-mid); margin-top: 2px; }
+.modal-item-price { font-size: 13px; font-weight: 500; color: var(--acc-black, #111); flex-shrink: 0; }
+
+.modal-status-strip { padding: 16px 20px 0; }
+.modal-stepper { padding: 0 20px; }
 /* ── Spinner ── */
 .account-spinner {
   animation: spin 0.8s linear infinite;
@@ -1027,25 +1021,79 @@
 .hidden { display: none !important; }
 
 /* ── Responsive ── */
+/* Replace the existing @media blocks at the bottom of account.css with this */
+
 @media (max-width: 860px) {
   .account-container {
-    grid-template-columns: 1fr ;
+    grid-template-columns: 1fr;
   }
 
+  /* Sidebar: un-stick and reset to normal flow */
   .account-sidebar {
     position: static;
-    flex-direction: row;
-    flex-wrap: wrap;
-    gap: 8px;
+    width: 100%;
   }
 
-  .account-avatar { width: 100%; }
-  .account-nav { flex-direction: row; flex: 1; }
-  .account-nav-item { flex: 1; justify-content: center; }
-  .account-logout { width: auto; }
-  .dashboard-grid { grid-template-columns: 1fr; }
-  .modal-two-col { grid-template-columns: 1fr; }
-  .order-modal { width: 100vw; }
+  /* Avatar stretches full width */
+  .account-avatar {
+    width: 100%;
+    margin-bottom: 0;
+  }
+
+  /* Nav becomes a 3-column grid: 3 top, 3 bottom */
+  .account-nav {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 6px;
+  }
+
+  /* Each button: icon stacked above label, centred */
+  .account-nav-item {
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    gap: 5px;
+    padding: 10px 6px;
+    font-size: 11px;
+  }
+
+  .account-nav-item svg {
+    width: 16px;
+    height: 16px;
+  }
+
+  /* Logout spans full width */
+  .account-logout {
+    width: 100%;
+    justify-content: center;
+    margin-top: 6px;
+  }
+
+  .dashboard-grid  { grid-template-columns: 1fr; }
+  .modal-two-col   { grid-template-columns: 1fr; }
+  .order-modal     { width: 100vw; }
+}
+
+@media (max-width: 520px) {
+  .account-page  { padding: 16px 12px 60px; }
+  .edit-fields   { grid-template-columns: 1fr; }
+
+  .account-avatar {
+    padding: 14px;
+    gap: 10px;
+  }
+
+  .avatar-circle {
+    width: 40px;
+    height: 40px;
+    font-size: 14px;
+  }
+
+  .account-nav-item {
+    padding: 9px 4px;
+    font-size: 10px;
+  }
 }
 
 @media (max-width: 520px) {
