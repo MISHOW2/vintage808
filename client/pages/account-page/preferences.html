@@ -7,20 +7,20 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Archivo:wght@300;400;500&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="/client/css/main.css" />
-  <link rel="stylesheet" href="/client/css/components.css" />
-  <link rel="stylesheet" href="/client/css/pages/account/account.css" />
-  <link rel="stylesheet" href="/client/css/pages/account/sidebar.css" />
+  <link rel="stylesheet" href="/css/main.css" />
+  <link rel="stylesheet" href="/css/components.css" />
+  <link rel="stylesheet" href="/css/pages/account/account.css" />
+  <link rel="stylesheet" href="/css/pages/account/sidebar.css" />
 </head>
 <body data-page="preferences">
 
 <nav>
-  <a href="/client/index.html" class="nav-logo">
-    <img src="/client/assets/logos/logo.png" alt="Vintage808" />
+  <a href="/index.html" class="nav-logo">
+    <img src="/assets/logos/logo.png" alt="Vintage808" />
   </a>
   <ul class="nav-links">
-    <li><a href="/client/shop.html">Shop</a></li>
-    <li><a href="/client/contact.html">Contact</a></li>
+    <li><a href="/shop.html">Shop</a></li>
+    <li><a href="/contact.html">Contact</a></li>
   </ul>
   <div class="nav-actions">
     <div class="nav-icons">
@@ -49,8 +49,8 @@
 
 <div class="nav-drawer" aria-hidden="true">
   <ul class="nav-drawer-links">
-    <li><a href="/client/shop.html">Shop</a></li>
-    <li><a href="/client/contact.html">Contact</a></li>
+    <li><a href="/shop.html">Shop</a></li>
+    <li><a href="/contact.html">Contact</a></li>
   </ul>
   <div class="nav-drawer-bottom">
     <div class="nav-drawer-icons">
@@ -100,7 +100,7 @@
       <span id="cart-drawer-total">R0.00</span>
     </div>
     <p class="cart-shipping-note">Shipping calculated at checkout</p>
-    <a href="/client/checkout.html" class="btn-checkout">Checkout</a>
+    <a href="/checkout.html" class="btn-checkout">Checkout</a>
   </div>
 </aside>
 
@@ -213,9 +213,9 @@
 <footer>
   <div class="footer-grid">
     <div><p class="footer-col-title">Shop</p><ul class="footer-links"><li><a href="#">All items</a></li><li><a href="#">Hats</a></li><li><a href="#">T-shirt</a></li><li><a href="#">Shorts</a></li></ul></div>
-    <div><p class="footer-col-title">Company</p><ul class="footer-links"><li><a href="#">About us</a></li><li><a href="/client/contact.html">Contact</a></li><li><a href="#">Support</a></li></ul></div>
+    <div><p class="footer-col-title">Company</p><ul class="footer-links"><li><a href="#">About us</a></li><li><a href="/contact.html">Contact</a></li><li><a href="#">Support</a></li></ul></div>
     <div><p class="footer-col-title">Help</p><ul class="footer-links"><li><a href="#">FAQ</a></li><li><a href="#">Shipping info</a></li><li><a href="#">Returns</a></li><li><a href="#">Size guide</a></li></ul></div>
-    <div><p class="footer-col-title">Legal</p><ul class="footer-links"><li><a href="/client/privacy.html">Privacy policy</a></li><li><a href="/client/terms.html">Terms policy</a></li><li><a href="#">Cookie policy</a></li></ul></div>
+    <div><p class="footer-col-title">Legal</p><ul class="footer-links"><li><a href="/privacy.html">Privacy policy</a></li><li><a href="/terms.html">Terms policy</a></li><li><a href="#">Cookie policy</a></li></ul></div>
     <div>
       <p class="footer-col-title">Follow Us</p>
       <ul class="social-links">
@@ -231,33 +231,33 @@
   </div>
 </footer>
 
-<script src="/client/js/pages/account.js"></script>
-<script type="module" src="/client/js/main.js"></script>
+<script src="../../js/pages/account.js"></script>
+<script type="module" src="../../js/main.js"></script>
 <script>
   document.addEventListener('DOMContentLoaded', () => {
     const MOBILE_BREAKPOINT = 860;
     const PAGE_MAP = {
-      profile:     '/client/account.html',
-      orders:      '/client/pages/account-page/orders.html',
-      addresses:   '/client/pages/account-page/addresses.html',
-      returns:     '/client/pages/account-page/returns.html',
-      wishlist:    '/client/pages/account-page/wishlist.html',
-      preferences: '/client/pages/account-page/preferences.html',
+      profile:     '/account.html',
+      orders:      '/pages/account-page/orders.html',
+      addresses:   '/pages/account-page/addresses.html',
+      returns:     '/pages/account-page/returns.html',
+      wishlist:    '/pages/account-page/wishlist.html',
+      preferences: '/pages/account-page/preferences.html',
     };
     if (window.innerWidth > MOBILE_BREAKPOINT) {
-      window.location.replace(`/client/account.html#${document.body.dataset.page}`);
+      window.location.replace(`/account.html#${document.body.dataset.page}`);
       return;
     }
     document.querySelectorAll('.account-nav-item[data-tab]').forEach(btn => {
       btn.addEventListener('click', () => {
-        window.location.href = PAGE_MAP[btn.dataset.tab] || '/client/account.html';
+        window.location.href = PAGE_MAP[btn.dataset.tab] || '/account.html';
       });
       btn.classList.toggle('active', btn.dataset.tab === document.body.dataset.page);
     });
     document.getElementById('logout-btn')?.addEventListener('click', () => {
       localStorage.removeItem('token');
       localStorage.removeItem('user');
-      window.location.href = '/client/login.html';
+      window.location.href = '/login.html';
     });
 
     // Restore saved preferences

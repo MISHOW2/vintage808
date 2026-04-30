@@ -62,12 +62,12 @@ export function nav() {
 const MOBILE_BREAKPOINT = 860;
 
 const PAGE_MAP = {
-  profile:     '/client/account.html',
-  orders:      '/client/pages/account-page/orders.html',
-  addresses:   '/client/pages/account-page/addresses.html',
-  returns:     '/client/pages/account-page/returns.html',
-  wishlist:    '/client/pages/account-page/wishlist.html',
-  preferences: '/client/pages/account-page/preferences.html',
+  profile:     '/account.html',
+  orders:      '/pages/account-page/orders.html',
+  addresses:   '/pages/account-page/addresses.html',
+  returns:     '/pages/account-page/returns.html',
+  wishlist:    '/pages/account-page/wishlist.html',
+  preferences: '/pages/account-page/preferences.html',
 };
 
 function isMobile() {
