@@ -1020,124 +1020,72 @@
 
 .hidden { display: none !important; }
 
-/* ── Responsive ── */
-/* Replace the existing @media blocks at the bottom of account.css with this */
 
+
+/* ── Responsive ── */
 @media (max-width: 860px) {
   .account-container {
     grid-template-columns: 1fr;
   }
 
-  /* Sidebar: un-stick and reset to normal flow */
-  .account-sidebar {
-    position: static;
-    width: 100%;
+  .dashboard-grid {
+    grid-template-columns: 1fr;
   }
 
-  /* Avatar stretches full width */
-  .account-avatar {
-    width: 100%;
-    margin-bottom: 0;
+  .modal-two-col {
+    grid-template-columns: 1fr;
   }
 
-  /* Nav becomes a 3-column grid: 3 top, 3 bottom */
-  .account-nav {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 6px;
+  .order-modal {
+    width: 100vw;
   }
 
-  /* Each button: icon stacked above label, centred */
-  .account-nav-item {
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    text-align: center;
-    gap: 5px;
-    padding: 10px 6px;
-    font-size: 11px;
-  }
-
-  .account-nav-item svg {
-    width: 16px;
-    height: 16px;
-  }
-/* ── Preference toggle ── */
-.pref-toggle {
-  position: relative;
-  display: inline-block;
-  width: 40px;
-  height: 22px;
-  flex-shrink: 0;
-  cursor: pointer;
-}
-
-.pref-toggle input { display: none; }
-
-.pref-toggle-track {
-  position: absolute;
-  inset: 0;
-  background: var(--acc-sand);
-  border: 1px solid #c0bbb3;
-  border-radius: 20px;
-  transition: background 0.2s;
-}
-
-.pref-toggle-track::after {
-  content: '';
-  position: absolute;
-  width: 16px;
-  height: 16px;
-  border-radius: 50%;
-  background: var(--acc-white);
-  top: 2px;
-  left: 2px;
-  transition: transform 0.2s;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.2);
-}
-
-.pref-toggle input:checked + .pref-toggle-track {
-  background: var(--acc-black);
-  border-color: var(--acc-black);
-}
-
-.pref-toggle input:checked + .pref-toggle-track::after {
-  transform: translateX(18px);
-}
-  /* Logout spans full width */
-  .account-logout {
-    width: 100%;
-    justify-content: center;
-    margin-top: 6px;
-  }
-
-  .dashboard-grid  { grid-template-columns: 1fr; }
-  .modal-two-col   { grid-template-columns: 1fr; }
-  .order-modal     { width: 100vw; }
-}
-
-@media (max-width: 520px) {
-  .account-page  { padding: 16px 12px 60px; }
-  .edit-fields   { grid-template-columns: 1fr; }
-
-  .account-avatar {
-    padding: 14px;
-    gap: 10px;
-  }
-
-  .avatar-circle {
-    width: 40px;
-    height: 40px;
-    font-size: 14px;
-  }
-
-  .account-nav-item {
-    padding: 9px 4px;
-    font-size: 10px;
+  .account-page {
+    padding: 24px 16px 80px;
   }
 }
 
 @media (max-width: 520px) {
-  .account-page { padding: 16px 12px 60px; }
-  .edit-fields { grid-template-columns: 1fr; }
+  .account-page    { padding: 16px 12px 80px; }
+  .edit-fields     { grid-template-columns: 1fr; }
+  .account-heading { margin-bottom: 16px; }
+  .card-body       { padding: 14px; }
+  .modal-body      { padding: 16px; gap: 16px; }
+
+  .order-stepper {
+    padding: 12px 14px;
+  }
+
+  .ostep-label {
+    font-size: 9px;
+  }
+
+  .order-items-row {
+    padding: 10px 14px;
+  }
+
+  .order-card-header {
+    padding: 12px 14px 10px;
+  }
+
+  .order-card-footer {
+    padding: 8px 14px;
+  }
+
+  .modal-total-row,
+  .modal-info-row {
+    padding: 9px 14px;
+  }
+
+  .modal-item {
+    padding: 12px 14px;
+  }
+
+  .modal-address-text {
+    padding: 12px 14px;
+  }
+
+  .recent-order-item {
+    padding: 12px 14px;
+  }
 }

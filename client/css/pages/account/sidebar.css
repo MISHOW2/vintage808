@@ -1,23 +1,21 @@
-/* ============================================================
-   Vintage808 — sidebar.css
-   ================================= */
-
 /* ── Desktop: sidebar shell ── */
 .account-sidebar {
   display: flex;
   flex-direction: column;
-  gap: 2px;
+  gap: 0;
   position: sticky;
   top: 88px;
   height: fit-content;
   width: 100%;
   box-sizing: border-box;
+  min-width: 0;
 }
 
 .account-sidebar > * {
   width: 100%;
   box-sizing: border-box;
   flex-shrink: 0;
+  min-width: 0;
 }
 
 /* ── Avatar block ── */
@@ -28,8 +26,11 @@
   padding: 20px;
   background: var(--acc-white);
   border: 1px solid var(--acc-sand);
-  border-radius: var(--acc-radius);
-  margin-bottom: 6px;
+  border-radius: var(--acc-radius) var(--acc-radius) 0 0;
+  border-bottom: none;
+  margin-bottom: 0;
+  width: 100%;
+  box-sizing: border-box;
   min-width: 0;
 }
 
@@ -57,6 +58,7 @@
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+  min-width: 0;
 }
 
 .avatar-email {
@@ -65,14 +67,16 @@
   margin-top: 2px;
   word-break: break-all;
   line-height: 1.4;
+  min-width: 0;
 }
 
 /* ── Nav list ── */
 .account-nav {
   display: flex;
   flex-direction: column;
-  gap: 2px;
+  gap: 0;
   width: 100%;
+  box-sizing: border-box;
 }
 
 /* ── Nav items ── */
@@ -86,12 +90,20 @@
   text-align: left;
   background: var(--acc-white);
   border: 1px solid var(--acc-sand);
-  border-radius: var(--acc-radius);
+  border-top: none;
+  border-radius: 0;
   font-family: var(--font-body, 'Archivo', sans-serif);
   font-size: 13px;
   color: var(--acc-mid);
   cursor: pointer;
   transition: color 0.15s, border-color 0.15s, background 0.15s;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+/* last nav item gets rounded bottom corners */
+.account-nav-item:last-child {
+  border-radius: 0 0 var(--acc-radius) var(--acc-radius);
 }
 
 .account-nav-item svg {
@@ -102,7 +114,7 @@
 
 .account-nav-item:hover {
   color: var(--acc-black);
-  border-color: #c8c3bb;
+  background: var(--acc-bg);
 }
 
 .account-nav-item:hover svg { opacity: 1; }
@@ -111,6 +123,10 @@
   background: var(--acc-black);
   color: var(--acc-white);
   border-color: var(--acc-black);
+}
+
+.account-nav-item.active + .account-nav-item {
+  border-top: 1px solid var(--acc-sand);
 }
 
 .account-nav-item.active svg { opacity: 1; }
@@ -140,10 +156,7 @@
   transition: background 0.15s, border-color 0.15s;
 }
 
-.account-logout svg {
-  flex-shrink: 0;
-  opacity: 0.8;
-}
+.account-logout svg { flex-shrink: 0; opacity: 0.8; }
 
 .account-logout:hover {
   background: var(--acc-red-bg);
@@ -155,82 +168,86 @@
   outline-offset: 2px;
 }
 
-/* ── Mobile ── */
+/* ── Responsive ── */
 @media (max-width: 860px) {
-
-  /* Collapse the two-column page grid into a single column */
   .account-container {
-    display: flex;
-    flex-direction: column;
+    grid-template-columns: 1fr;
     gap: 16px;
   }
 
-  /* Sidebar becomes a normal block — no sticky, no overlap */
   .account-sidebar {
-    position: static;
-    width: 100%;
+    position: static !important;
+    width: 100% !important;
     flex-direction: column;
-    gap: 6px;
+    gap: 0;
   }
 
   .account-avatar {
-    margin-bottom: 0;
+    width: 100%;
+    box-sizing: border-box;
+    border-radius: var(--acc-radius) var(--acc-radius) 0 0;
+    border-bottom: none;
   }
 
-  /* 3-column grid: Profile / Orders / Addresses on row 1
-                    Returns / Wishlist / Preferences on row 2 */
   .account-nav {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 6px;
-  }
-
-  /* Each button: icon on top, label below, centred */
-  .account-nav-item {
     flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    text-align: center;
-    gap: 5px;
-    padding: 10px 6px;
-    font-size: 11px;
+    width: 100%;
+    gap: 0;
   }
 
-  .account-nav-item svg {
-    width: 16px;
-    height: 16px;
+  .account-nav-item {
+    width: 100%;
+    box-sizing: border-box;
+    white-space: normal;
+    border-radius: 0;
+    border-top: none;
   }
 
-  /* Logout spans full width below the grid */
+  .account-nav-item:last-child {
+    border-radius: 0 0 var(--acc-radius) var(--acc-radius);
+  }
+
   .account-logout {
     width: 100%;
-    justify-content: center;
-    margin-top: 0;
+    box-sizing: border-box;
+    margin-top: 6px;
+    border-radius: var(--acc-radius);
   }
 
   .account-content {
     width: 100%;
+    min-width: 0;
   }
+
+  .dashboard-grid { grid-template-columns: 1fr; }
+  .modal-two-col  { grid-template-columns: 1fr; }
+  .order-modal    { width: 100vw; }
+  .account-page   { padding: 24px 16px 80px; }
 }
 
-/* ── Small phones ── */
-@media (max-width: 420px) {
-  .account-avatar {
-    padding: 14px;
-    gap: 10px;
-  }
+@media (max-width: 520px) {
+  .account-page    { padding: 16px 12px 80px; }
+  .edit-fields     { grid-template-columns: 1fr; }
+  .account-heading { margin-bottom: 16px; }
+  .card-body       { padding: 14px; }
+  .modal-body      { padding: 16px; gap: 16px; }
 
-  .avatar-circle {
-    width: 40px;
-    height: 40px;
-    font-size: 14px;
-  }
+  .avatar-circle { width: 40px; height: 40px; font-size: 13px; }
+  .avatar-name   { font-size: 13px; }
+  .avatar-email  { font-size: 10px; }
 
-  .avatar-name  { font-size: 13px; }
-  .avatar-email { font-size: 11px; }
+  .account-nav-item { padding: 11px 14px; font-size: 12px; }
+  .account-logout   { padding: 11px 14px; font-size: 12px; }
 
-  .account-nav-item {
-    padding: 9px 4px;
-    font-size: 10px;
-  }
+  .order-stepper      { padding: 12px 14px; }
+  .ostep-label        { font-size: 9px; }
+  .order-items-row    { padding: 10px 14px; }
+  .order-card-header  { padding: 12px 14px 10px; }
+  .order-card-footer  { padding: 8px 14px; }
+
+  .modal-total-row,
+  .modal-info-row     { padding: 9px 14px; }
+  .modal-item         { padding: 12px 14px; }
+  .modal-address-text { padding: 12px 14px; }
+  .recent-order-item  { padding: 12px 14px; }
 }
