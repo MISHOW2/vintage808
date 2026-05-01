@@ -1062,7 +1062,48 @@
     width: 16px;
     height: 16px;
   }
+/* ── Preference toggle ── */
+.pref-toggle {
+  position: relative;
+  display: inline-block;
+  width: 40px;
+  height: 22px;
+  flex-shrink: 0;
+  cursor: pointer;
+}
 
+.pref-toggle input { display: none; }
+
+.pref-toggle-track {
+  position: absolute;
+  inset: 0;
+  background: var(--acc-sand);
+  border: 1px solid #c0bbb3;
+  border-radius: 20px;
+  transition: background 0.2s;
+}
+
+.pref-toggle-track::after {
+  content: '';
+  position: absolute;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: var(--acc-white);
+  top: 2px;
+  left: 2px;
+  transition: transform 0.2s;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+}
+
+.pref-toggle input:checked + .pref-toggle-track {
+  background: var(--acc-black);
+  border-color: var(--acc-black);
+}
+
+.pref-toggle input:checked + .pref-toggle-track::after {
+  transform: translateX(18px);
+}
   /* Logout spans full width */
   .account-logout {
     width: 100%;

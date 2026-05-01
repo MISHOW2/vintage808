@@ -531,22 +531,26 @@ async function fetchOrders() {
   // ── Tab switching ─────────────────────────────────────────────
   const navItems = document.querySelectorAll('.account-nav-item');
 
-  function switchTab(name) {
-    document.querySelectorAll('.account-tab').forEach(t => t.classList.remove('active'));
-    navItems.forEach(b => b.classList.remove('active'));
-    document.getElementById(`tab-${name}`)?.classList.add('active');
-    document.querySelector(`.account-nav-item[data-tab="${name}"]`)?.classList.add('active');
-    sessionStorage.setItem('account_tab', name);
+function switchTab(name) {
+  document.querySelectorAll('.account-tab').forEach(t => t.classList.remove('active'));
+  navItems.forEach(b => b.classList.remove('active'));
+  document.getElementById(`tab-${name}`)?.classList.add('active');
+  document.querySelector(`.account-nav-item[data-tab="${name}"]`)?.classList.add('active');
+  sessionStorage.setItem('account_tab', name);
 
-    // ── Refresh orders when switching to orders tab ───────────
-    if (name === 'orders') {
-      fetchOrders().then(orders => {
-        renderOrders(orders);
-        renderDashboardOrders(orders);
-        renderStats(orders);
-      });
-    }
+  if (name === 'orders') {
+    fetchOrders().then(orders => {
+      renderOrders(orders);
+      renderDashboardOrders(orders);
+      renderStats(orders);
+    });
   }
+  if (name === 'returns') {
+    fetchOrders().then(orders => renderReturns(orders));
+  }
+  if (name === 'wishlist')     renderWishlist();
+  if (name === 'preferences')  renderPreferences();
+}
 
   navItems.forEach(btn => btn.addEventListener('click', () => switchTab(btn.dataset.tab)));
 
@@ -686,6 +690,193 @@ async function fetchOrders() {
     });
   });
 
+  // ── Render Returns ────────────────────────────────────────────
+function renderReturns(orders = []) {
+  const el = $('returns-list');
+  if (!el) return;
+
+  const returned = orders.filter(o =>
+    o.return?.status || ['returned'].includes(o.orderStatus)
+  );
+
+  if (!returned.length) {
+    el.innerHTML = `
+      <div class="account-empty">
+        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+          <path d="M3 12a9 9 0 0 0 9 9m9-9a9 9 0 0 0-9-9M3 12l4-4m-4 4l4 4"/>
+        </svg>
+        <p>No return requests yet.</p>
+      </div>`;
+    return;
+  }
+
+  el.innerHTML = returned.map(order => {
+    const ret       = order.return || {};
+    const status    = ret.status || 'requested';
+    const displayId = order.orderNumber || ('#' + (order._id || order.id || '').toString().slice(-8).toUpperCase());
+    const badgeCls  = badgeClass('return_' + status);
+    const badgeLbl  = fmtStatus('return_' + status);
+
+    return `
+      <div class="account-card" style="margin-bottom:12px;cursor:pointer;" data-order-id="${esc((order._id || order.id || '').toString())}">
+        <div class="card-header">
+          <div>
+            <div style="font-family:var(--font-mono);font-size:11px;color:var(--acc-mid);margin-bottom:3px;">${esc(displayId)}</div>
+            <div style="font-size:13px;color:var(--acc-black);">${fmtDate(order.createdAt)}</div>
+          </div>
+          <span class="order-badge ${badgeCls}">${badgeLbl}</span>
+        </div>
+        <div class="card-body">
+          <div class="profile-row">
+            <span class="profile-key">Reason</span>
+            <span class="profile-val">${esc(ret.reason || '—')}</span>
+          </div>
+          <div class="profile-row">
+            <span class="profile-key">Requested</span>
+            <span class="profile-val">${ret.requestedAt ? fmtDate(ret.requestedAt) : '—'}</span>
+          </div>
+          ${ret.adminNote ? `
+          <div class="profile-row">
+            <span class="profile-key">Admin Note</span>
+            <span class="profile-val">${esc(ret.adminNote)}</span>
+          </div>` : ''}
+          <div class="profile-row">
+            <span class="profile-key">Order Total</span>
+            <span class="profile-val">${fmtCurrency(order.total)}</span>
+          </div>
+        </div>
+        <button class="card-footer-link" data-order-id="${esc((order._id || order.id || '').toString())}">
+          View Order Details
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+        </button>
+      </div>`;
+  }).join('');
+
+  el.querySelectorAll('[data-order-id]').forEach(el => {
+    el.addEventListener('click', () => openOrderModal(el.dataset.orderId));
+  });
+}
+
+// ── Render Wishlist ───────────────────────────────────────────
+function renderWishlist() {
+  const el = $('wishlist-list');
+  if (!el) return;
+
+  const raw      = localStorage.getItem('v808_wishlist');
+  let wishlist   = [];
+  try { wishlist = JSON.parse(raw) || []; } catch { wishlist = []; }
+
+  if (!wishlist.length) {
+    el.innerHTML = `
+      <div class="account-empty">
+        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+          <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
+        </svg>
+        <p>Your wishlist is empty.</p>
+        <a class="account-btn-secondary" href="./shop.html">Browse the Shop</a>
+      </div>`;
+    return;
+  }
+
+  el.innerHTML = `
+    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:12px;">
+      ${wishlist.map(item => `
+        <div class="account-card wishlist-item" style="overflow:hidden;">
+          <div style="aspect-ratio:3/4;background:var(--acc-sand);overflow:hidden;">
+            ${item.image
+              ? `<img src="${esc(item.image)}" alt="${esc(item.name)}" style="width:100%;height:100%;object-fit:cover;" />`
+              : ''}
+          </div>
+          <div style="padding:12px;">
+            <div style="font-size:13px;color:var(--acc-black);margin-bottom:4px;font-weight:500;">${esc(item.name)}</div>
+            <div style="font-family:var(--font-display);font-size:14px;color:var(--acc-black);margin-bottom:10px;">${fmtCurrency(item.price)}</div>
+            <div style="display:flex;gap:6px;">
+              <a href="./shop.html" class="account-btn-primary" style="flex:1;font-size:11px;padding:8px 10px;text-decoration:none;text-align:center;">
+                Shop
+              </a>
+              <button class="account-btn-secondary wishlist-remove-btn" data-id="${esc(item.id)}" style="padding:8px 10px;font-size:11px;">
+                Remove
+              </button>
+            </div>
+          </div>
+        </div>`).join('')}
+    </div>`;
+
+  el.querySelectorAll('.wishlist-remove-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      wishlist = wishlist.filter(i => i.id !== btn.dataset.id);
+      localStorage.setItem('v808_wishlist', JSON.stringify(wishlist));
+      renderWishlist();
+    });
+  });
+}
+
+// ── Render Preferences ────────────────────────────────────────
+function renderPreferences() {
+  const el = $('preferences-form');
+  if (!el) return;
+
+  const raw   = localStorage.getItem('v808_prefs');
+  let prefs   = {};
+  try { prefs = JSON.parse(raw) || {}; } catch { prefs = {}; }
+
+  el.innerHTML = `
+    <div class="account-card">
+      <div class="card-header"><span class="card-title">Notifications</span></div>
+      <div class="card-body" style="display:flex;flex-direction:column;gap:0;">
+        ${[
+          { key: 'emailOrders',    label: 'Order updates',         desc: 'Shipping and delivery notifications' },
+          { key: 'emailReturns',   label: 'Return updates',        desc: 'Status changes on return requests' },
+          { key: 'emailMarketing', label: 'Promotions & new drops', desc: 'Sales, restocks and new arrivals' },
+        ].map(pref => `
+          <div class="profile-row" style="justify-content:space-between;align-items:center;">
+            <div>
+              <div style="font-size:13px;color:var(--acc-black);font-weight:500;">${pref.label}</div>
+              <div style="font-size:11px;color:var(--acc-mid);margin-top:2px;">${pref.desc}</div>
+            </div>
+            <label class="pref-toggle">
+              <input type="checkbox" data-key="${pref.key}" ${prefs[pref.key] !== false ? 'checked' : ''} />
+              <span class="pref-toggle-track"></span>
+            </label>
+          </div>`).join('')}
+      </div>
+    </div>
+
+    <div class="account-card" style="margin-top:12px;">
+      <div class="card-header"><span class="card-title">Display</span></div>
+      <div class="card-body" style="display:flex;flex-direction:column;gap:0;">
+        <div class="profile-row" style="justify-content:space-between;align-items:center;">
+          <div>
+            <div style="font-size:13px;color:var(--acc-black);font-weight:500;">Currency</div>
+            <div style="font-size:11px;color:var(--acc-mid);margin-top:2px;">Displayed currency</div>
+          </div>
+          <select class="edit-input" id="pref-currency" style="width:auto;padding:6px 10px;font-size:12px;">
+            <option value="ZAR" ${(prefs.currency || 'ZAR') === 'ZAR' ? 'selected' : ''}>ZAR (R)</option>
+            <option value="USD" ${prefs.currency === 'USD' ? 'selected' : ''}>USD ($)</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <div style="margin-top:16px;display:flex;gap:10px;">
+      <button class="account-btn-primary" id="save-prefs-btn">Save Preferences</button>
+      <div class="account-success hidden" id="prefs-success" style="margin:0;padding:10px 14px;">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+        Saved!
+      </div>
+    </div>`;
+
+  $('save-prefs-btn')?.addEventListener('click', () => {
+    const updated = {};
+    el.querySelectorAll('input[data-key]').forEach(cb => {
+      updated[cb.dataset.key] = cb.checked;
+    });
+    updated.currency = $('pref-currency')?.value || 'ZAR';
+    localStorage.setItem('v808_prefs', JSON.stringify(updated));
+    show($('prefs-success'));
+    setTimeout(() => hide($('prefs-success')), 2000);
+  });
+}
   // ── Logout ────────────────────────────────────────────────────
   $('logout-btn')?.addEventListener('click', () => {
     localStorage.removeItem('v808_token');
