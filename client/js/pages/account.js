@@ -336,6 +336,34 @@ async function requestReturn(orderId, reason) {
         </div>
       </div>
     </div>
+    ${(order.trackingNumber || order.courier) ? `
+    <div class="modal-section">
+      <div class="modal-section-title">Tracking</div>
+      <div class="modal-inner-card">
+        <div class="modal-info-rows">
+          ${order.courier ? `
+          <div class="modal-info-row">
+            <span class="modal-info-key">Courier</span>
+            <span class="modal-info-val">${esc(order.courier)}</span>
+          </div>` : ''}
+          ${order.trackingNumber ? `
+          <div class="modal-info-row">
+            <span class="modal-info-key">Tracking #</span>
+            <span class="modal-info-val mono">${esc(order.trackingNumber)}</span>
+          </div>` : ''}
+          ${order.trackingUrl ? `
+          <div class="modal-info-row">
+            <span class="modal-info-key">Track</span>
+            <span class="modal-info-val">
+              <a href="${esc(order.trackingUrl)}" target="_blank" rel="noopener"
+                style="color:var(--acc-black);font-weight:600;text-decoration:underline;text-underline-offset:2px;">
+                Track shipment →
+              </a>
+            </span>
+          </div>` : ''}
+        </div>
+      </div>
+    </div>` : ''}
     <div class="modal-two-col">
       <div class="modal-section">
         <div class="modal-section-title">Delivery Address</div>
@@ -360,8 +388,7 @@ async function requestReturn(orderId, reason) {
         </div>
       </div>
     </div>`;
-  // ↑ template literal ends here — nothing else goes inside it
-
+  
   // ── Returns section (appended separately) ─────────────────
   const ret = order.return;
   let returnHtml = '';
