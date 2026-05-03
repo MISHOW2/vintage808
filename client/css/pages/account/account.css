@@ -29,7 +29,8 @@
   display: grid;
   grid-template-columns: 260px 1fr;
   gap: 24px;
-  align-items: start;
+ align-items: start;
+  overflow: visible; 
 }
 
 

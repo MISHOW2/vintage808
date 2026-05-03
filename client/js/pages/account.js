@@ -1,5 +1,6 @@
 /* ============================================================
-   Vintage808 — js/pages/account.js  (dashboard rewrite)
+   Vintage808 — js/pages/account.js
+   Tabs: Profile · Orders · Addresses
    ============================================================ */
 
 (function () {
@@ -36,21 +37,20 @@
       .toLocaleDateString('en-ZA', { month: 'long', year: 'numeric' });
   }
 
-  const STATUS_STEPS  = ['confirmed', 'processing', 'shipped', 'delivered'];
+  const STATUS_STEPS = ['confirmed', 'processing', 'shipped', 'delivered'];
 
-
- const STATUS_LABELS = {
-  pending: 'Pending', confirmed: 'Confirmed', processing: 'Processing',
-  shipped: 'Shipped', delivered: 'Delivered', cancelled: 'Cancelled',
-  returned: 'Returned', return_requested: 'Return Requested',
-  return_approved: 'Return Approved', return_rejected: 'Return Rejected',
-  paid: 'Paid', failed: 'Failed',
-};
+  const STATUS_LABELS = {
+    pending:   'Pending',   confirmed:  'Confirmed',
+    processing:'Processing',shipped:    'Shipped',
+    delivered: 'Delivered', cancelled:  'Cancelled',
+    returned:  'Returned',  paid:       'Paid',
+    failed:    'Failed',
+  };
 
   const $ = id => document.getElementById(id);
 
-  const esc = s => String(s ?? '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
-  const fmtDate = (iso, opts = { year:'numeric', month:'short', day:'numeric' }) => {
+  const esc       = s => String(s ?? '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  const fmtDate   = (iso, opts = { year:'numeric', month:'short', day:'numeric' }) => {
     try { return new Date(iso).toLocaleDateString('en-ZA', opts); } catch { return '—'; }
   };
   const fmtCurrency = n => 'R' + Number(n).toFixed(2);
@@ -59,26 +59,23 @@
 
   function fmtStatus(s) { return STATUS_LABELS[s] ?? 'Pending'; }
 
-function badgeClass(s) {
-  return {
-    pending:          'order-badge--pending',
-    confirmed:        'order-badge--confirmed',
-    paid:             'order-badge--paid',
-    processing:       'order-badge--processing',
-    shipped:          'order-badge--shipped',
-    delivered:        'order-badge--delivered',
-    cancelled:        'order-badge--cancelled',
-    failed:           'order-badge--failed',
-    returned:         'order-badge--cancelled',
-    return_requested: 'order-badge--processing',
-    return_approved:  'order-badge--delivered',
-    return_rejected:  'order-badge--cancelled',
-  }[s] ?? 'order-badge--pending';
-}
+  function badgeClass(s) {
+    return {
+      pending:    'order-badge--pending',
+      confirmed:  'order-badge--confirmed',
+      paid:       'order-badge--paid',
+      processing: 'order-badge--processing',
+      shipped:    'order-badge--shipped',
+      delivered:  'order-badge--delivered',
+      cancelled:  'order-badge--cancelled',
+      failed:     'order-badge--failed',
+      returned:   'order-badge--cancelled',
+    }[s] ?? 'order-badge--pending';
+  }
 
   function stepState(orderStatus, step) {
     if (orderStatus === 'cancelled') return 'future';
-    if (orderStatus === 'pending') return step === 'confirmed' ? 'active' : 'future';
+    if (orderStatus === 'pending')   return step === 'confirmed' ? 'active' : 'future';
     const oi = STATUS_STEPS.indexOf(orderStatus);
     const si = STATUS_STEPS.indexOf(step);
     if (si < oi)  return 'done';
@@ -88,19 +85,20 @@ function badgeClass(s) {
 
   function buildStepperHtml(status) {
     return STATUS_STEPS.map((step, i) => {
-      const state   = stepState(status, step);
-      const isLast  = i === STATUS_STEPS.length - 1;
-      const nextSt  = !isLast ? stepState(status, STATUS_STEPS[i + 1]) : '';
+      const state  = stepState(status, step);
+      const isLast = i === STATUS_STEPS.length - 1;
+      const nextSt = !isLast ? stepState(status, STATUS_STEPS[i + 1]) : '';
       const lineCls = (nextSt === 'done' || nextSt === 'active') ? 'ostep-line done' : 'ostep-line';
-      const label   = step.charAt(0).toUpperCase() + step.slice(1);
       return `
         <div class="ostep ${state}">
           <div class="ostep-dot"></div>
-          <div class="ostep-label">${label}</div>
+          <div class="ostep-label">${step.charAt(0).toUpperCase() + step.slice(1)}</div>
         </div>
         ${!isLast ? `<div class="${lineCls}"></div>` : ''}`;
     }).join('');
   }
+
+  // ── Render helpers ────────────────────────────────────────────
 
   function renderUserInfo() {
     const full     = `${user.firstName ?? ''} ${user.lastName ?? ''}`.trim();
@@ -248,232 +246,122 @@ function badgeClass(s) {
   }
 
   // ── Order modal ───────────────────────────────────────────────
+
   let _cachedOrders = [];
-async function requestReturn(orderId, reason) {
-  const res = await fetch(`${API}/api/orders/${orderId}/return`, {
-    method:  'POST',
-    headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
-    body:    JSON.stringify({ reason }),
-  });
-  if (!res.ok) {
-    const d = await res.json().catch(() => ({}));
-    throw new Error(d.message || 'Could not submit return request.');
-  }
-  return (await res.json()).data;
-}
- async function openOrderModal(orderId) {
-  let order;
-  try {
-    const res = await fetch(`${API}/api/orders/${orderId}`, {
-      headers: { Authorization: `Bearer ${token}` },
-    });
-    if (res.ok) {
-      const d = await res.json();
-      order   = d.data ?? d;
-      const idx = _cachedOrders.findIndex(o => (o._id || o.id || '').toString() === orderId);
-      if (idx > -1) _cachedOrders[idx] = order;
+
+  async function openOrderModal(orderId) {
+    let order;
+    try {
+      const res = await fetch(`${API}/api/orders/${orderId}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      if (res.ok) {
+        const d = await res.json();
+        order   = d.data ?? d;
+        const idx = _cachedOrders.findIndex(o => (o._id || o.id || '').toString() === orderId);
+        if (idx > -1) _cachedOrders[idx] = order;
+      }
+    } catch { /* fall through to cache */ }
+
+    if (!order) {
+      order = _cachedOrders.find(o => (o._id || o.id || '').toString() === orderId);
     }
-  } catch { /* fall through to cache */ }
 
-  if (!order) {
-    order = _cachedOrders.find(o => (o._id || o.id || '').toString() === orderId);
-  }
+    if (!order) return;
 
-  if (!order) return;
+    const status    = order.orderStatus || order.status || 'pending';
+    const displayId = order.orderNumber || ('#' + (order._id || order.id || '').toString().slice(-8).toUpperCase());
+    const addr      = order.shippingAddress || {};
 
-  const status    = order.orderStatus || order.status || 'pending';
-  const displayId = order.orderNumber || ('#' + (order._id || order.id || '').toString().slice(-8).toUpperCase());
-  const addr      = order.shippingAddress || {};
+    if ($('modal-order-id'))   $('modal-order-id').textContent   = displayId;
+    if ($('modal-order-date')) $('modal-order-date').textContent = fmtDate(order.createdAt, { year:'numeric', month:'long', day:'numeric' });
 
-  if ($('modal-order-id'))   $('modal-order-id').textContent   = displayId;
-  if ($('modal-order-date')) $('modal-order-date').textContent = fmtDate(order.createdAt, { year:'numeric', month:'long', day:'numeric' });
+    const timelineHtml = STATUS_STEPS.map(step => {
+      const state = stepState(status, step);
+      const hist  = (order.statusHistory || []).find(h => h.status === step);
+      return `
+        <div class="mstep ${state}">
+          <div class="mstep-left"><div class="mstep-dot"></div><div class="mstep-line"></div></div>
+          <div class="mstep-right">
+            <div class="mstep-name">${step.charAt(0).toUpperCase() + step.slice(1)}</div>
+            ${hist?.timestamp ? `<div class="mstep-time">${esc(String(hist.timestamp))}</div>` : ''}
+            ${hist?.note      ? `<div class="mstep-note">${esc(hist.note)}</div>`              : ''}
+          </div>
+        </div>`;
+    }).join('');
 
-  const timelineHtml = STATUS_STEPS.map(step => {
-    const state = stepState(status, step);
-    const hist  = (order.statusHistory || []).find(h => h.status === step);
-    return `
-      <div class="mstep ${state}">
-        <div class="mstep-left"><div class="mstep-dot"></div><div class="mstep-line"></div></div>
-        <div class="mstep-right">
-          <div class="mstep-name">${step.charAt(0).toUpperCase() + step.slice(1)}</div>
-          ${hist?.timestamp ? `<div class="mstep-time">${esc(String(hist.timestamp))}</div>` : ''}
-          ${hist?.note      ? `<div class="mstep-note">${esc(hist.note)}</div>`              : ''}
+    const itemsHtml = (order.items || []).map(item => `
+      <div class="modal-item">
+        <div class="modal-item-img">
+          ${item.image ? `<img src="${esc(item.image)}" alt="${esc(item.name)}" style="width:100%;height:100%;object-fit:cover;">` : ''}
         </div>
-      </div>`;
-  }).join('');
-
-  const itemsHtml = (order.items || []).map(item => `
-    <div class="modal-item">
-      <div class="modal-item-img">
-        ${item.image ? `<img src="${esc(item.image)}" alt="${esc(item.name)}" style="width:100%;height:100%;object-fit:cover;">` : ''}
-      </div>
-      <div class="modal-item-info">
-        <div class="modal-item-name">${esc(item.name)}</div>
-        <div class="modal-item-meta">${item.size && item.size !== '—' ? `Size: ${esc(item.size)}<br>` : ''}Qty: ${item.quantity ?? item.qty ?? 1}</div>
-      </div>
-      <div class="modal-item-price">${fmtCurrency((item.price ?? 0) * (item.quantity ?? item.qty ?? 1))}</div>
-    </div>`).join('');
-
-  const shipping = order.shippingFee ?? order.shipping ?? 0;
-
-  // ── Set the static modal body ──────────────────────────────
-  $('modal-body').innerHTML = `
-    <div class="modal-section">
-      <div class="modal-section-title">Order Status</div>
-      <div class="modal-inner-card"><div class="modal-timeline">${timelineHtml}</div></div>
-    </div>
-    <div class="modal-section">
-      <div class="modal-section-title">Items (${(order.items || []).length})</div>
-      <div class="modal-inner-card">${itemsHtml}</div>
-    </div>
-    <div class="modal-section">
-      <div class="modal-section-title">Order Summary</div>
-      <div class="modal-inner-card">
-        <div class="modal-totals">
-          <div class="modal-total-row"><span>Subtotal</span><span>${fmtCurrency(order.subtotal ?? order.total ?? 0)}</span></div>
-          <div class="modal-total-row"><span>Shipping</span><span>${shipping === 0 ? 'Free' : fmtCurrency(shipping)}</span></div>
-          <div class="modal-total-row final"><span>Total</span><span>${fmtCurrency(order.total)}</span></div>
+        <div class="modal-item-info">
+          <div class="modal-item-name">${esc(item.name)}</div>
+          <div class="modal-item-meta">${item.size && item.size !== '—' ? `Size: ${esc(item.size)}<br>` : ''}Qty: ${item.quantity ?? item.qty ?? 1}</div>
         </div>
-      </div>
-    </div>
-    ${(order.trackingNumber || order.courier) ? `
-    <div class="modal-section">
-      <div class="modal-section-title">Tracking</div>
-      <div class="modal-inner-card">
-        <div class="modal-info-rows">
-          ${order.courier ? `
-          <div class="modal-info-row">
-            <span class="modal-info-key">Courier</span>
-            <span class="modal-info-val">${esc(order.courier)}</span>
-          </div>` : ''}
-          ${order.trackingNumber ? `
-          <div class="modal-info-row">
-            <span class="modal-info-key">Tracking #</span>
-            <span class="modal-info-val mono">${esc(order.trackingNumber)}</span>
-          </div>` : ''}
-          ${order.trackingUrl ? `
-          <div class="modal-info-row">
-            <span class="modal-info-key">Track</span>
-            <span class="modal-info-val">
-              <a href="${esc(order.trackingUrl)}" target="_blank" rel="noopener"
-                style="color:var(--acc-black);font-weight:600;text-decoration:underline;text-underline-offset:2px;">
-                Track shipment →
-              </a>
-            </span>
-          </div>` : ''}
-        </div>
-      </div>
-    </div>` : ''}
-    <div class="modal-two-col">
+        <div class="modal-item-price">${fmtCurrency((item.price ?? 0) * (item.quantity ?? item.qty ?? 1))}</div>
+      </div>`).join('');
+
+    const shipping = order.shippingFee ?? order.shipping ?? 0;
+
+    $('modal-body').innerHTML = `
       <div class="modal-section">
-        <div class="modal-section-title">Delivery Address</div>
+        <div class="modal-section-title">Order Status</div>
+        <div class="modal-inner-card"><div class="modal-timeline">${timelineHtml}</div></div>
+      </div>
+      <div class="modal-section">
+        <div class="modal-section-title">Items (${(order.items || []).length})</div>
+        <div class="modal-inner-card">${itemsHtml}</div>
+      </div>
+      <div class="modal-section">
+        <div class="modal-section-title">Order Summary</div>
         <div class="modal-inner-card">
-          <div class="modal-address-text">
-            ${esc(order.customerName || '')}<br>
-            ${addr.street  ? esc(addr.street)  + '<br>' : ''}
-            ${addr.city    ? esc(addr.city) + (addr.province ? ', ' + esc(addr.province) : '') + '<br>' : ''}
-            ${addr.postal  ? esc(addr.postal)  + '<br>' : ''}
-            <span style="color:var(--acc-mid)">${esc(addr.phone || '')}</span>
+          <div class="modal-totals">
+            <div class="modal-total-row"><span>Subtotal</span><span>${fmtCurrency(order.subtotal ?? order.total ?? 0)}</span></div>
+            <div class="modal-total-row"><span>Shipping</span><span>${shipping === 0 ? 'Free' : fmtCurrency(shipping)}</span></div>
+            <div class="modal-total-row final"><span>Total</span><span>${fmtCurrency(order.total)}</span></div>
           </div>
         </div>
       </div>
+      ${(order.trackingNumber || order.courier) ? `
       <div class="modal-section">
-        <div class="modal-section-title">Payment</div>
+        <div class="modal-section-title">Tracking</div>
         <div class="modal-inner-card">
           <div class="modal-info-rows">
-            <div class="modal-info-row"><span class="modal-info-key">Method</span><span class="modal-info-val">${esc(order.payment?.method || 'PayFast')}</span></div>
-            <div class="modal-info-row"><span class="modal-info-key">Status</span><span class="modal-info-val"><span class="order-badge ${badgeClass(order.payment?.status || status)}">${fmtStatus(order.payment?.status || status)}</span></span></div>
-            ${order.payment?.transactionId ? `<div class="modal-info-row"><span class="modal-info-key">Ref</span><span class="modal-info-val mono">${esc(order.payment.transactionId)}</span></div>` : ''}
+            ${order.courier ? `<div class="modal-info-row"><span class="modal-info-key">Courier</span><span class="modal-info-val">${esc(order.courier)}</span></div>` : ''}
+            ${order.trackingNumber ? `<div class="modal-info-row"><span class="modal-info-key">Tracking #</span><span class="modal-info-val mono">${esc(order.trackingNumber)}</span></div>` : ''}
+            ${order.trackingUrl ? `<div class="modal-info-row"><span class="modal-info-key">Track</span><span class="modal-info-val"><a href="${esc(order.trackingUrl)}" target="_blank" rel="noopener" style="color:var(--acc-black);font-weight:600;text-decoration:underline;text-underline-offset:2px;">Track shipment →</a></span></div>` : ''}
           </div>
         </div>
-      </div>
-    </div>`;
-  
-  // ── Returns section (appended separately) ─────────────────
-  const ret = order.return;
-  let returnHtml = '';
-
-  if (ret?.status) {
-    const retBadge = badgeClass('return_' + ret.status);
-    const retLabel = fmtStatus('return_' + ret.status);
-    returnHtml = `
-      <div class="modal-section">
-        <div class="modal-section-title">Return Request</div>
-        <div class="modal-inner-card">
-          <div class="modal-info-rows">
-            <div class="modal-info-row">
-              <span class="modal-info-key">Status</span>
-              <span class="modal-info-val"><span class="order-badge ${retBadge}">${retLabel}</span></span>
+      </div>` : ''}
+      <div class="modal-two-col">
+        <div class="modal-section">
+          <div class="modal-section-title">Delivery Address</div>
+          <div class="modal-inner-card">
+            <div class="modal-address-text">
+              ${esc(order.customerName || '')}<br>
+              ${addr.street  ? esc(addr.street)  + '<br>' : ''}
+              ${addr.city    ? esc(addr.city) + (addr.province ? ', ' + esc(addr.province) : '') + '<br>' : ''}
+              ${addr.postal  ? esc(addr.postal)  + '<br>' : ''}
+              <span style="color:var(--acc-mid)">${esc(addr.phone || '')}</span>
             </div>
-            <div class="modal-info-row">
-              <span class="modal-info-key">Reason</span>
-              <span class="modal-info-val">${esc(ret.reason)}</span>
+          </div>
+        </div>
+        <div class="modal-section">
+          <div class="modal-section-title">Payment</div>
+          <div class="modal-inner-card">
+            <div class="modal-info-rows">
+              <div class="modal-info-row"><span class="modal-info-key">Method</span><span class="modal-info-val">${esc(order.payment?.method || 'PayFast')}</span></div>
+              <div class="modal-info-row"><span class="modal-info-key">Status</span><span class="modal-info-val"><span class="order-badge ${badgeClass(order.payment?.status || status)}">${fmtStatus(order.payment?.status || status)}</span></span></div>
+              ${order.payment?.transactionId ? `<div class="modal-info-row"><span class="modal-info-key">Ref</span><span class="modal-info-val mono">${esc(order.payment.transactionId)}</span></div>` : ''}
             </div>
-            ${ret.requestedAt ? `
-            <div class="modal-info-row">
-              <span class="modal-info-key">Requested</span>
-              <span class="modal-info-val">${fmtDate(ret.requestedAt)}</span>
-            </div>` : ''}
-            ${ret.adminNote ? `
-            <div class="modal-info-row">
-              <span class="modal-info-key">Note</span>
-              <span class="modal-info-val">${esc(ret.adminNote)}</span>
-            </div>` : ''}
           </div>
         </div>
       </div>`;
 
-  } else if (status === 'delivered') {
-    returnHtml = `
-      <div class="modal-section" id="return-section">
-        <div class="modal-section-title">Request a Return</div>
-        <div class="modal-inner-card">
-          <p style="font-size:13px;color:var(--acc-mid);margin:0 0 12px;">Not happy with your order? Let us know why.</p>
-          <textarea id="return-reason" class="edit-input"
-            style="width:100%;resize:vertical;min-height:80px;font-family:inherit;"
-            placeholder="Describe the reason for your return…"></textarea>
-          <p id="return-error" style="font-size:12px;color:var(--acc-red);margin:6px 0 0;display:none;"></p>
-          <button id="return-submit-btn" class="account-btn-primary" style="margin-top:12px;width:100%;">
-            Submit Return Request
-          </button>
-        </div>
-      </div>`;
+    $('modal-overlay')?.classList.add('open');
+    document.body.style.overflow = 'hidden';
   }
-
-  $('modal-body').insertAdjacentHTML('beforeend', returnHtml);
-
-  const submitBtn = $('return-submit-btn');
-  if (submitBtn) {
-    submitBtn.addEventListener('click', async () => {
-      const reason  = $('return-reason')?.value.trim();
-      const errorEl = $('return-error');
-
-      if (!reason) {
-        errorEl.textContent = 'Please enter a reason.';
-        errorEl.style.display = 'block';
-        return;
-      }
-
-      submitBtn.disabled    = true;
-      submitBtn.textContent = 'Submitting…';
-      errorEl.style.display = 'none';
-
-      try {
-        await requestReturn(orderId, reason);
-        closeModal();
-        setTimeout(() => openOrderModal(orderId), 150);
-      } catch (err) {
-        errorEl.textContent   = err.message;
-        errorEl.style.display = 'block';
-        submitBtn.disabled    = false;
-        submitBtn.textContent = 'Submit Return Request';
-      }
-    });
-  }
-
-  $('modal-overlay')?.classList.add('open');
-  document.body.style.overflow = 'hidden';
-}
 
   function closeModal() {
     $('modal-overlay')?.classList.remove('open');
@@ -485,63 +373,28 @@ async function requestReturn(orderId, reason) {
   document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
 
   // ── API calls ─────────────────────────────────────────────────
-async function fetchOrders() {
-  try {
-    console.log('[Orders] Fetching orders...');
 
-    const res = await fetch(`${API}/api/orders`, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    });
-
-    console.log('[Orders] Response status:', res.status);
-
-    if (!res.ok) {
-      console.error('[Orders] API failed:', res.status);
-      return [];
-    }
-
-    const data = await res.json();
-
-    console.log('[Orders] Raw response:', data);
-
-    const rawOrders = data.data ?? data.orders ?? [];
-
-    if (!Array.isArray(rawOrders)) {
-      console.error('[Orders] Invalid format:', rawOrders);
-      return [];
-    }
-
-    const orders = rawOrders.map(order => ({
-      ...order,
-
-      // normalize IDs
-      id: order.id || order._id,
-
-      // normalize status
-      orderStatus: order.orderStatus || order.status || 'pending',
-
-      // normalize totals
-      total: Number(order.total || 0),
-
-      // normalize items
-      items: Array.isArray(order.items) ? order.items : [],
-
-      // normalize createdAt
-      createdAt: order.createdAt || new Date().toISOString(),
-    }));
-
-    console.log('[Orders] Normalized orders:', orders);
-
-    _cachedOrders = orders;
-
-    return orders;
-  } catch (err) {
-    console.error('[Orders] Fetch error:', err);
-    return [];
+  async function fetchOrders() {
+    try {
+      const res = await fetch(`${API}/api/orders`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      if (!res.ok) return [];
+      const data      = await res.json();
+      const rawOrders = data.data ?? data.orders ?? [];
+      if (!Array.isArray(rawOrders)) return [];
+      const orders = rawOrders.map(order => ({
+        ...order,
+        id:          order.id || order._id,
+        orderStatus: order.orderStatus || order.status || 'pending',
+        total:       Number(order.total || 0),
+        items:       Array.isArray(order.items) ? order.items : [],
+        createdAt:   order.createdAt || new Date().toISOString(),
+      }));
+      _cachedOrders = orders;
+      return orders;
+    } catch { return []; }
   }
-}
 
   async function fetchAddresses() {
     try {
@@ -556,30 +409,43 @@ async function fetchOrders() {
   }
 
   // ── Tab switching ─────────────────────────────────────────────
-  const navItems = document.querySelectorAll('.account-nav-item');
 
-function switchTab(name) {
-  document.querySelectorAll('.account-tab').forEach(t => t.classList.remove('active'));
-  navItems.forEach(b => b.classList.remove('active'));
-  document.getElementById(`tab-${name}`)?.classList.add('active');
-  document.querySelector(`.account-nav-item[data-tab="${name}"]`)?.classList.add('active');
-  sessionStorage.setItem('account_tab', name);
+  const TAB_LABELS = {
+    profile:   'Dashboard',
+    orders:    'Orders',
+    addresses: 'Addresses',
+  };
 
-  if (name === 'orders') {
-    fetchOrders().then(orders => {
-      renderOrders(orders);
-      renderDashboardOrders(orders);
-      renderStats(orders);
-    });
+  function switchTab(name) {
+    document.querySelectorAll('.account-tab').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.account-nav-item').forEach(b => b.classList.remove('active'));
+    document.getElementById(`tab-${name}`)?.classList.add('active');
+    document.querySelector(`.account-nav-item[data-tab="${name}"]`)?.classList.add('active');
+
+    const label = TAB_LABELS[name] || name;
+    const crumb = $('breadcrumb-current');
+    if (crumb) crumb.textContent = label;
+
+    const url = new URL(window.location.href);
+    if (name === 'profile') { url.searchParams.delete('tab'); }
+    else { url.searchParams.set('tab', name); }
+    window.history.pushState({}, '', url);
+
+    document.title = `${label} — Vintage808`;
+    sessionStorage.setItem('account_tab', name);
+
+    if (name === 'orders') {
+      fetchOrders().then(orders => {
+        renderOrders(orders);
+        renderDashboardOrders(orders);
+        renderStats(orders);
+      });
+    }
   }
-  if (name === 'returns') {
-    fetchOrders().then(orders => renderReturns(orders));
-  }
-  if (name === 'wishlist')     renderWishlist();
-  if (name === 'preferences')  renderPreferences();
-}
 
-  navItems.forEach(btn => btn.addEventListener('click', () => switchTab(btn.dataset.tab)));
+  document.querySelectorAll('.account-nav-item').forEach(btn => {
+    btn.addEventListener('click', () => switchTab(btn.dataset.tab));
+  });
 
   $('view-all-orders-btn')?.addEventListener('click', () => switchTab('orders'));
   $('dashboard-orders-footer-btn')?.addEventListener('click', () => switchTab('orders'));
@@ -589,10 +455,8 @@ function switchTab(name) {
     setTimeout(() => $('add-address-btn')?.click(), 100);
   });
 
-  const savedTab = sessionStorage.getItem('account_tab');
-  if (savedTab) switchTab(savedTab);
-
   // ── Edit profile ──────────────────────────────────────────────
+
   function openEdit() {
     if ($('edit-first-name')) $('edit-first-name').value = user.firstName ?? '';
     if ($('edit-last-name'))  $('edit-last-name').value  = user.lastName  ?? '';
@@ -612,6 +476,7 @@ function switchTab(name) {
     const newFirst  = $('edit-first-name')?.value.trim();
     const newLast   = $('edit-last-name')?.value.trim();
     const newEmail  = $('edit-email')?.value.trim();
+    const curPw     = $('edit-current-pw')?.value;
     const newPw     = $('edit-new-pw')?.value;
     const confirmPw = $('edit-confirm-pw')?.value;
 
@@ -629,7 +494,7 @@ function switchTab(name) {
 
     try {
       const body = { firstName: newFirst, lastName: newLast, email: newEmail };
-      if (newPw) body.password = newPw;
+      if (newPw) { body.currentPassword = curPw; body.newPassword = newPw; }
 
       const res = await fetch(`${API}/api/auth/profile`, {
         method: 'PUT',
@@ -660,6 +525,7 @@ function switchTab(name) {
   });
 
   // ── Add address ───────────────────────────────────────────────
+
   $('add-address-btn')?.addEventListener('click', () => {
     const existing = document.getElementById('add-address-form');
     if (existing) { existing.remove(); return; }
@@ -717,194 +583,8 @@ function switchTab(name) {
     });
   });
 
-  // ── Render Returns ────────────────────────────────────────────
-function renderReturns(orders = []) {
-  const el = $('returns-list');
-  if (!el) return;
-
-  const returned = orders.filter(o =>
-    o.return?.status || ['returned'].includes(o.orderStatus)
-  );
-
-  if (!returned.length) {
-    el.innerHTML = `
-      <div class="account-empty">
-        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-          <path d="M3 12a9 9 0 0 0 9 9m9-9a9 9 0 0 0-9-9M3 12l4-4m-4 4l4 4"/>
-        </svg>
-        <p>No return requests yet.</p>
-      </div>`;
-    return;
-  }
-
-  el.innerHTML = returned.map(order => {
-    const ret       = order.return || {};
-    const status    = ret.status || 'requested';
-    const displayId = order.orderNumber || ('#' + (order._id || order.id || '').toString().slice(-8).toUpperCase());
-    const badgeCls  = badgeClass('return_' + status);
-    const badgeLbl  = fmtStatus('return_' + status);
-
-    return `
-      <div class="account-card" style="margin-bottom:12px;cursor:pointer;" data-order-id="${esc((order._id || order.id || '').toString())}">
-        <div class="card-header">
-          <div>
-            <div style="font-family:var(--font-mono);font-size:11px;color:var(--acc-mid);margin-bottom:3px;">${esc(displayId)}</div>
-            <div style="font-size:13px;color:var(--acc-black);">${fmtDate(order.createdAt)}</div>
-          </div>
-          <span class="order-badge ${badgeCls}">${badgeLbl}</span>
-        </div>
-        <div class="card-body">
-          <div class="profile-row">
-            <span class="profile-key">Reason</span>
-            <span class="profile-val">${esc(ret.reason || '—')}</span>
-          </div>
-          <div class="profile-row">
-            <span class="profile-key">Requested</span>
-            <span class="profile-val">${ret.requestedAt ? fmtDate(ret.requestedAt) : '—'}</span>
-          </div>
-          ${ret.adminNote ? `
-          <div class="profile-row">
-            <span class="profile-key">Admin Note</span>
-            <span class="profile-val">${esc(ret.adminNote)}</span>
-          </div>` : ''}
-          <div class="profile-row">
-            <span class="profile-key">Order Total</span>
-            <span class="profile-val">${fmtCurrency(order.total)}</span>
-          </div>
-        </div>
-        <button class="card-footer-link" data-order-id="${esc((order._id || order.id || '').toString())}">
-          View Order Details
-          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
-        </button>
-      </div>`;
-  }).join('');
-
-  el.querySelectorAll('[data-order-id]').forEach(el => {
-    el.addEventListener('click', () => openOrderModal(el.dataset.orderId));
-  });
-}
-
-// ── Render Wishlist ───────────────────────────────────────────
-function renderWishlist() {
-  const el = $('wishlist-list');
-  if (!el) return;
-
-  const raw      = localStorage.getItem('v808_wishlist');
-  let wishlist   = [];
-  try { wishlist = JSON.parse(raw) || []; } catch { wishlist = []; }
-
-  if (!wishlist.length) {
-    el.innerHTML = `
-      <div class="account-empty">
-        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-          <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
-        </svg>
-        <p>Your wishlist is empty.</p>
-        <a class="account-btn-secondary" href="./shop.html">Browse the Shop</a>
-      </div>`;
-    return;
-  }
-
-  el.innerHTML = `
-    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:12px;">
-      ${wishlist.map(item => `
-        <div class="account-card wishlist-item" style="overflow:hidden;">
-          <div style="aspect-ratio:3/4;background:var(--acc-sand);overflow:hidden;">
-            ${item.image
-              ? `<img src="${esc(item.image)}" alt="${esc(item.name)}" style="width:100%;height:100%;object-fit:cover;" />`
-              : ''}
-          </div>
-          <div style="padding:12px;">
-            <div style="font-size:13px;color:var(--acc-black);margin-bottom:4px;font-weight:500;">${esc(item.name)}</div>
-            <div style="font-family:var(--font-display);font-size:14px;color:var(--acc-black);margin-bottom:10px;">${fmtCurrency(item.price)}</div>
-            <div style="display:flex;gap:6px;">
-              <a href="./shop.html" class="account-btn-primary" style="flex:1;font-size:11px;padding:8px 10px;text-decoration:none;text-align:center;">
-                Shop
-              </a>
-              <button class="account-btn-secondary wishlist-remove-btn" data-id="${esc(item.id)}" style="padding:8px 10px;font-size:11px;">
-                Remove
-              </button>
-            </div>
-          </div>
-        </div>`).join('')}
-    </div>`;
-
-  el.querySelectorAll('.wishlist-remove-btn').forEach(btn => {
-    btn.addEventListener('click', () => {
-      wishlist = wishlist.filter(i => i.id !== btn.dataset.id);
-      localStorage.setItem('v808_wishlist', JSON.stringify(wishlist));
-      renderWishlist();
-    });
-  });
-}
-
-// ── Render Preferences ────────────────────────────────────────
-function renderPreferences() {
-  const el = $('preferences-form');
-  if (!el) return;
-
-  const raw   = localStorage.getItem('v808_prefs');
-  let prefs   = {};
-  try { prefs = JSON.parse(raw) || {}; } catch { prefs = {}; }
-
-  el.innerHTML = `
-    <div class="account-card">
-      <div class="card-header"><span class="card-title">Notifications</span></div>
-      <div class="card-body" style="display:flex;flex-direction:column;gap:0;">
-        ${[
-          { key: 'emailOrders',    label: 'Order updates',         desc: 'Shipping and delivery notifications' },
-          { key: 'emailReturns',   label: 'Return updates',        desc: 'Status changes on return requests' },
-          { key: 'emailMarketing', label: 'Promotions & new drops', desc: 'Sales, restocks and new arrivals' },
-        ].map(pref => `
-          <div class="profile-row" style="justify-content:space-between;align-items:center;">
-            <div>
-              <div style="font-size:13px;color:var(--acc-black);font-weight:500;">${pref.label}</div>
-              <div style="font-size:11px;color:var(--acc-mid);margin-top:2px;">${pref.desc}</div>
-            </div>
-            <label class="pref-toggle">
-              <input type="checkbox" data-key="${pref.key}" ${prefs[pref.key] !== false ? 'checked' : ''} />
-              <span class="pref-toggle-track"></span>
-            </label>
-          </div>`).join('')}
-      </div>
-    </div>
-
-    <div class="account-card" style="margin-top:12px;">
-      <div class="card-header"><span class="card-title">Display</span></div>
-      <div class="card-body" style="display:flex;flex-direction:column;gap:0;">
-        <div class="profile-row" style="justify-content:space-between;align-items:center;">
-          <div>
-            <div style="font-size:13px;color:var(--acc-black);font-weight:500;">Currency</div>
-            <div style="font-size:11px;color:var(--acc-mid);margin-top:2px;">Displayed currency</div>
-          </div>
-          <select class="edit-input" id="pref-currency" style="width:auto;padding:6px 10px;font-size:12px;">
-            <option value="ZAR" ${(prefs.currency || 'ZAR') === 'ZAR' ? 'selected' : ''}>ZAR (R)</option>
-            <option value="USD" ${prefs.currency === 'USD' ? 'selected' : ''}>USD ($)</option>
-          </select>
-        </div>
-      </div>
-    </div>
-
-    <div style="margin-top:16px;display:flex;gap:10px;">
-      <button class="account-btn-primary" id="save-prefs-btn">Save Preferences</button>
-      <div class="account-success hidden" id="prefs-success" style="margin:0;padding:10px 14px;">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
-        Saved!
-      </div>
-    </div>`;
-
-  $('save-prefs-btn')?.addEventListener('click', () => {
-    const updated = {};
-    el.querySelectorAll('input[data-key]').forEach(cb => {
-      updated[cb.dataset.key] = cb.checked;
-    });
-    updated.currency = $('pref-currency')?.value || 'ZAR';
-    localStorage.setItem('v808_prefs', JSON.stringify(updated));
-    show($('prefs-success'));
-    setTimeout(() => hide($('prefs-success')), 2000);
-  });
-}
   // ── Logout ────────────────────────────────────────────────────
+
   $('logout-btn')?.addEventListener('click', () => {
     localStorage.removeItem('v808_token');
     localStorage.removeItem('v808_user');
@@ -913,6 +593,7 @@ function renderPreferences() {
   });
 
   // ── Boot ──────────────────────────────────────────────────────
+
   renderUserInfo();
 
   fetchOrders().then(orders => {
@@ -924,6 +605,35 @@ function renderPreferences() {
   fetchAddresses().then(addrs => {
     renderAddresses(addrs);
     renderDashboardAddress(addrs);
+  });
+
+  // ── PayFast cancel restore ────────────────────────────────────
+
+  const _urlParams = new URLSearchParams(window.location.search);
+  if (_urlParams.get('status') === 'cancelled' && _urlParams.get('restore') === '1') {
+    const pending = JSON.parse(sessionStorage.getItem('v808_pending_order') || 'null');
+    if (pending?.items) localStorage.setItem('v808_cart', JSON.stringify(pending.items));
+    const banner = document.createElement('div');
+    banner.style.cssText = 'background:#1a1a1a;color:#fff;text-align:center;padding:12px;font-size:13px;position:relative;z-index:999;';
+    banner.textContent = 'Payment was cancelled. Your cart has been restored.';
+    document.body.prepend(banner);
+    setTimeout(() => banner.remove(), 5000);
+    const cleanUrl = new URL(window.location.href);
+    cleanUrl.searchParams.delete('status');
+    cleanUrl.searchParams.delete('restore');
+    window.history.replaceState({}, '', cleanUrl);
+  }
+
+  // ── Tab routing ──────────────────────────────────────────────
+
+  const urlParams = new URLSearchParams(window.location.search);
+  const urlTab    = urlParams.get('tab');
+  const savedTab  = urlTab || sessionStorage.getItem('account_tab') || 'profile';
+  switchTab(savedTab);
+
+  window.addEventListener('popstate', () => {
+    const p   = new URLSearchParams(window.location.search);
+    switchTab(p.get('tab') || 'profile');
   });
 
 })();
