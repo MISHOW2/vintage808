@@ -305,27 +305,27 @@ body.nav-open {
 
 .product-grid {
   display: grid;
-   grid-template-columns: repeat(5, minmax(0, 1fr));
-  gap: 36px 16px;   /* was 89px 65px */
-  max-width: 1400px;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 89px 65px;
+  max-width: 1500px;
   margin: 0 auto;
 }
 
 .product-card {
   display: flex;
   flex-direction: column;
- width: auto;
+  width: 332px;
 }
 
 .product-image {
-  aspect-ratio: 3 / 4;   
-  margin-bottom: 9px;
+  aspect-ratio: 1 / 1.15;
   background: var(--sand);
   border-radius: 2px;
   display: flex;
   align-items: center;
   justify-content: center;
   overflow: hidden;
+  margin-bottom: 12px;
   position: relative;
   transition: transform 0.25s;
 }
@@ -338,7 +338,6 @@ body.nav-open {
   width: 100%;
   height: 100%;
   object-fit: cover;
-   transition: transform 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
 }
 
 .product-badge {
@@ -406,12 +405,7 @@ body.nav-open {
   background: var(--black);
   color: var(--white);
 }
-.product-card:hover .product-image img {
-  transform: scale(1.04);  /* scale the img, not the container */
-}
-.product-card:hover .product-image {
-  transform: none;   /* remove the translateY */
-}
+
 .product-card:has(.size-picker.open) .btn-cart:hover {
   background: #333;
 }
@@ -880,30 +874,21 @@ footer {
    RESPONSIVE
    ============================================================ */
 
-/* ── 1380px: drop to 4-col ── */
+/* ── 1380px: 3-col grid ── */
 @media (max-width: 1380px) {
   .product-grid {
-    grid-template-columns: repeat(4, minmax(0, 1fr));
-    gap: 32px 14px;
-    padding: 0 32px;
-  }
-}
-
-/* ── 1100px: drop to 3-col ── */
-@media (max-width: 1100px) {
-  .product-grid {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: 28px 14px;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
     padding: 0 24px;
   }
 }
 
-/* ── 960px: drop to 2-col ── */
+/* ── 960px: 2-col grid ── */
 @media (max-width: 960px) {
   .product-grid {
-    grid-template-columns: repeat(4, 1fr);
-    gap: 20px 12px;
-    padding: 0 20px;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 16px;
+    padding: 0 24px;
   }
 
   .product-card {
@@ -980,11 +965,7 @@ footer {
   .discover-section {
     padding: 56px 16px;
   }
- .product-grid {
-    grid-template-columns: repeat(2, 1fr);
-    gap: 20px 12px;
-    padding: 0 20px;
-  }
+
   .newsletter {
     padding: 40px 16px;
     gap: 24px;

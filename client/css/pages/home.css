@@ -308,13 +308,11 @@ button { cursor: pointer; font-family: inherit; }
 
 .editorial-header {
   display: flex;
-  align-items: flex-end;
-  justify-content: space-between;
+  flex-direction: column;   /* stack eyebrow above title */
+  align-items: flex-start;
+  gap: 4px;
   margin-bottom: clamp(12px, 2vw, 20px);
-  flex-wrap: wrap;
-  gap: 8px;
 }
-
 .editorial-title {
   font-family: var(--font-display);
   font-size: clamp(18px, 3vw, 28px);
@@ -324,9 +322,8 @@ button { cursor: pointer; font-family: inherit; }
 
 .editorial-grid {
   display: grid;
-  grid-template-columns: 1fr;
+  grid-template-columns: repeat(2, 1fr);  /* always 2 columns on desktop */
   gap: 8px;
-  
 }
 
 @media (min-width: 700px) {

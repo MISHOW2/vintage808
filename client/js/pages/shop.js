@@ -362,7 +362,6 @@ function buildCard(product) {
       <div class="product-image">
         ${badge}
         ${topStockBadge}
-        ${wishlistBtn}
         <div class="product-image-track">${imagesHTML}</div>
         ${arrowsHTML}
         ${dotsHTML}
