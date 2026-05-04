@@ -285,8 +285,8 @@ body.nav-open { overflow: hidden; }
 /* Default: 4 columns on large screens */
 .product-grid {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: clamp(8px, 1.5vw, 20px);
+  grid-template-columns: repeat(4, 1fr);
+  gap: clamp(4px, 1.5vw, 10px);
   padding: 0;
 }
 
@@ -297,6 +297,7 @@ body.nav-open { overflow: hidden; }
   overflow: hidden;
   -webkit-tap-highlight-color: transparent;
   transition: box-shadow 0.2s;
+  width: 332px;
 }
 
 @media (hover: hover) {
@@ -308,6 +309,7 @@ body.nav-open { overflow: hidden; }
   background: #e8e2d5;
   overflow: hidden;
   position: relative;
+  height: 300px;
 }
 
 .product-image-track {
@@ -880,7 +882,7 @@ footer {
 /* ── 1600px+: 5 columns ── */
 @media (min-width: 1600px) {
   .product-grid {
-    grid-template-columns: repeat(5, 1fr);
+    grid-template-columns: repeat(4, 1fr);
   }
 }
 
