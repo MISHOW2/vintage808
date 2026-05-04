@@ -224,6 +224,7 @@ document.getElementById('reset-btn').addEventListener('click', async () => {
 });
 
 // ── GOOGLE SIGN IN ────────────────────────────────────────────
+
 function onGoogleSuccess(data) {
   saveSession(data.token, data.user);
   window.location.href = getReturnUrl();
@@ -249,13 +250,18 @@ window.onGoogleLibraryLoad = () => {
     },
   });
 
-  google.accounts.id.renderButton(
-    document.getElementById('google-signin-btn'),
-    { theme: 'outline', size: 'large', width: 320, text: 'continue_with', shape: 'rectangular' }
-  );
+  // Render into BOTH containers
+  const loginBtn    = document.getElementById('google-signin-btn');
+  const registerBtn = document.getElementById('google-signin-btn-register');
 
-  google.accounts.id.renderButton(
-    document.getElementById('google-signin-btn-register'),
-    { theme: 'outline', size: 'large', width: 320, text: 'signup_with', shape: 'rectangular' }
-  );
+  if (loginBtn) {
+    google.accounts.id.renderButton(loginBtn,
+      { theme: 'outline', size: 'large', width: 320, text: 'continue_with', shape: 'rectangular' }
+    );
+  }
+  if (registerBtn) {
+    google.accounts.id.renderButton(registerBtn,
+      { theme: 'outline', size: 'large', width: 320, text: 'signup_with', shape: 'rectangular' }
+    );
+  }
 };

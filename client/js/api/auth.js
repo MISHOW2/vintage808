@@ -31,22 +31,3 @@ export async function googleLogin(credential) {
   if (!res.ok) throw { status: res.status, message: data.message || 'Google login failed.' };
   return data;
 }
-
-export function initGoogleSignIn(onSuccess, onError) {
-  if (!window.google) return;
-  google.accounts.id.initialize({
-    client_id: GOOGLE_CLIENT_ID,
-    callback: async (response) => {
-      try {
-        const data = await googleLogin(response.credential);
-        onSuccess(data);
-      } catch (err) {
-        onError(err.message || 'Google login failed.');
-      }
-    },
-  });
-  google.accounts.id.renderButton(
-    document.getElementById('google-signin-btn'),
-    { theme: 'outline', size: 'large', width: '100%', text: 'continue_with', shape: 'rectangular' }
-  );
-}
