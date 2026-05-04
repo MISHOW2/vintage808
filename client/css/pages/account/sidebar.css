@@ -1,4 +1,10 @@
-/* ── Desktop: sidebar shell ── */
+/* ============================================================
+   sidebar.css — Vintage808 account page
+   Desktop: sticky vertical column
+   Mobile:  avatar full-width + 2×2 nav grid + full-width logout
+   ============================================================ */
+
+/* ── Sidebar shell ── */
 .account-sidebar {
   display: flex;
   flex-direction: column;
@@ -8,18 +14,9 @@
   height: fit-content;
   width: 100%;
   box-sizing: border-box;
-  min-width: 0;
 }
 
-.account-container > .account-sidebar {
-  width: 100%;
-  box-sizing: border-box;
-  flex-shrink: 0;
-  min-width: 0;
-   overflow: visible;  
-}
-
-/* ── Avatar block ── */
+/* ── Avatar ── */
 .account-avatar {
   display: flex;
   align-items: center;
@@ -29,7 +26,6 @@
   border: 1px solid var(--acc-sand);
   border-radius: var(--acc-radius) var(--acc-radius) 0 0;
   border-bottom: none;
-  width: 100%;
   box-sizing: border-box;
   min-width: 0;
 }
@@ -50,7 +46,10 @@
   user-select: none;
 }
 
-.avatar-info { min-width: 0; flex: 1; }
+.avatar-info {
+  min-width: 0;
+  flex: 1;
+}
 
 .avatar-name {
   font-family: var(--font-display, 'Archivo Black', sans-serif);
@@ -70,15 +69,14 @@
   line-height: 1.4;
 }
 
-/* ── Nav wrapper ── */
+/* ── Nav wrapper — desktop: vertical column ── */
 .account-nav {
   display: flex;
   flex-direction: column;
   width: 100%;
-  gap: 0;
 }
 
-/* ── Nav items ── */
+/* ── Nav buttons ── */
 .account-nav-item {
   display: flex;
   align-items: center;
@@ -99,8 +97,7 @@
   white-space: nowrap;
 }
 
-/* Last nav item rounded bottom */
-.account-nav-item:last-of-type {
+.account-nav-item:last-child {
   border-radius: 0 0 var(--acc-radius) var(--acc-radius);
 }
 
@@ -130,7 +127,7 @@
   outline-offset: -2px;
 }
 
-/* ── Log out button ── */
+/* ── Logout ── */
 .account-logout {
   display: flex;
   align-items: center;
@@ -162,156 +159,77 @@
   outline-offset: 2px;
 }
 
-/* ── Preferences toggle ── */
-.pref-toggle {
-  position: relative;
-  display: inline-block;
-  width: 40px;
-  height: 22px;
-  flex-shrink: 0;
-  cursor: pointer;
-}
-
-.pref-toggle input {
-  opacity: 0;
-  width: 0;
-  height: 0;
-  position: absolute;
-}
-
-.pref-track {
-  position: absolute;
-  inset: 0;
-  background: var(--acc-sand);
-  border-radius: 22px;
-  transition: background 0.2s;
-}
-
-.pref-track::before {
-  content: '';
-  position: absolute;
-  width: 16px;
-  height: 16px;
-  left: 3px;
-  top: 3px;
-  background: #fff;
-  border-radius: 50%;
-  transition: transform 0.2s;
-}
-
-.pref-toggle input:checked + .pref-track {
-  background: var(--acc-black);
-}
-
-.pref-toggle input:checked + .pref-track::before {
-  transform: translateX(18px);
-}
-
-/* ── Mobile (≤860px) ── */
 @media (max-width: 860px) {
-  /* Sidebar becomes a flat block above content */
+  .account-container {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+
   .account-sidebar {
     position: static;
-    flex-direction: column;
-    gap: 0;
     width: 100%;
   }
 
-  /* Avatar keeps its top-rounded corners */
   .account-avatar {
     border-radius: var(--acc-radius) var(--acc-radius) 0 0;
     border-bottom: none;
   }
 
-  /* Nav switches to a 3-column grid: 3 top, 3 bottom */
+  /* 3 items in one row */
   .account-nav {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
-    gap: 0;
     border: 1px solid var(--acc-sand);
     border-top: none;
     border-radius: 0 0 var(--acc-radius) var(--acc-radius);
     overflow: hidden;
   }
 
-  /* Each cell: icon stacked above label, centred */
   .account-nav-item {
     flex-direction: column;
     justify-content: center;
     align-items: center;
     text-align: center;
-    gap: 4px;
-    padding: 12px 6px;
+    gap: 6px;
+    padding: 14px 8px;
     font-size: 11px;
     white-space: normal;
     border: none;
     border-right: 1px solid var(--acc-sand);
-    border-bottom: 1px solid var(--acc-sand);
-    border-radius: 0;
-  }
-
-  /* Remove right border on every 3rd item */
-  .account-nav-item:nth-child(3n) {
-    border-right: none;
-  }
-
-  /* Remove bottom border on last row (items 4-6) */
-  .account-nav-item:nth-child(n+4) {
     border-bottom: none;
+    border-radius: 0;
+    box-sizing: border-box;
   }
 
-  .account-nav-item:last-of-type {
+  .account-nav-item:last-child {
+    border-right: none;
     border-radius: 0;
   }
 
   .account-nav-item svg {
-    width: 16px;
-    height: 16px;
+    width: 18px;
+    height: 18px;
   }
 
-  /* Active item in grid */
-  .account-nav-item.active {
-    background: var(--acc-black);
-    color: var(--acc-white);
-  }
-
-  /* Logout spans full width */
   .account-logout {
     width: 100%;
     justify-content: center;
     margin-top: 6px;
     border-radius: var(--acc-radius);
   }
+
+  .account-content {
+    width: 100%;
+    min-width: 0;
+  }
 }
 
-/* ── Small phones (≤520px) ── */
 @media (max-width: 520px) {
-  .account-avatar {
-    padding: 14px;
-    gap: 10px;
-  }
-
-  .avatar-circle {
-    width: 40px;
-    height: 40px;
-    font-size: 13px;
-  }
-
-  .avatar-name  { font-size: 13px; }
-  .avatar-email { font-size: 10px; }
-
-  .account-nav-item {
-    padding: 10px 4px;
-    font-size: 10px;
-  }
-
-  .account-nav-item svg {
-    width: 14px;
-    height: 14px;
-  }
-
-  .account-logout {
-    padding: 11px 14px;
-    font-size: 12px;
-  }
+  .account-avatar { padding: 14px; gap: 10px; }
+  .avatar-circle  { width: 40px; height: 40px; font-size: 13px; }
+  .avatar-name    { font-size: 13px; }
+  .avatar-email   { font-size: 10px; }
+  .account-nav-item { padding: 12px 4px; font-size: 10px; }
+  .account-nav-item svg { width: 15px; height: 15px; }
+  .account-logout { padding: 11px 14px; font-size: 12px; }
 }
