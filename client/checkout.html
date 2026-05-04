@@ -48,6 +48,7 @@
 <!-- ── Mobile Drawer ── -->
 <div class="nav-drawer" aria-hidden="true">
   <ul class="nav-drawer-links">
+     <li><a href="./index.html">Home</a></li>
     <li><a href="./shop.html">Shop</a></li>
     <li><a href="./account.html">Account</a></li>
     <li><a href="./contact.html">Contact</a></li>
@@ -62,30 +63,29 @@
         </svg>
         Cart <span class="drawer-badge" style="display:none;">0</span>
       </button>
+      <button class="nav-drawer-icon-btn" aria-label="Account">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+          <circle cx="12" cy="7" r="4"/>
+        </svg>
+        Account
+      </button>
     </div>
     <div class="nav-drawer-social">
       <a href="#" class="drawer-social-link">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/></svg>
-        Facebook
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/></svg>Facebook
       </a>
       <a href="#" class="drawer-social-link">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-          <rect x="2" y="2" width="20" height="20" rx="5"/>
-          <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/>
-          <line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/>
-        </svg>
-        Instagram
-      </a>
-      <a href="#" class="drawer-social-link">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
-        X
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>Instagram
       </a>
     </div>
   </div>
 </div>
 
-<!-- Cart Overlay & Drawer -->
+<!-- Cart Overlay -->
 <div id="cart-overlay"></div>
+
+<!-- Cart Drawer -->
 <aside id="cart-drawer">
   <div class="cart-drawer-header">
     <h2 class="cart-drawer-title">Your cart</h2>
