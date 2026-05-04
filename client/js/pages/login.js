@@ -10,11 +10,11 @@ if (localStorage.getItem('v808_token')) {
 
 // ── All panels ────────────────────────────────────────────────
 const panels = {
-  login:  document.getElementById('panel-login'),
+  login:    document.getElementById('panel-login'),
   register: document.getElementById('panel-register'),
-  forgot: document.getElementById('panel-forgot'),
-  otp:    document.getElementById('panel-otp'),
-  reset:  document.getElementById('panel-reset'),
+  forgot:   document.getElementById('panel-forgot'),
+  otp:      document.getElementById('panel-otp'),
+  reset:    document.getElementById('panel-reset'),
 };
 
 function showPanel(name) {
@@ -45,10 +45,10 @@ function bindPasswordToggle(btnId, inputId) {
   });
 }
 
-bindPasswordToggle('login-toggle-pw',    'login-password');
-bindPasswordToggle('reg-toggle-pw',      'reg-password');
-bindPasswordToggle('reg-toggle-confirm', 'reg-confirm');
-bindPasswordToggle('reset-toggle-pw',    'reset-password');
+bindPasswordToggle('login-toggle-pw',      'login-password');
+bindPasswordToggle('reg-toggle-pw',        'reg-password');
+bindPasswordToggle('reg-toggle-confirm',   'reg-confirm');
+bindPasswordToggle('reset-toggle-pw',      'reset-password');
 bindPasswordToggle('reset-toggle-confirm', 'reset-confirm');
 
 // ── Session helpers ───────────────────────────────────────────
@@ -223,8 +223,24 @@ document.getElementById('reset-btn').addEventListener('click', async () => {
   }
 });
 
-// ── GOOGLE SIGN IN ────────────────────────────────────────────
+// ── PASSWORD STRENGTH BARS ────────────────────────────────────
+const pwInput = document.getElementById('reg-password');
+if (pwInput) {
+  pwInput.addEventListener('input', function () {
+    const v    = this.value;
+    const bars = ['pw-b0', 'pw-b1', 'pw-b2', 'pw-b3'].map(id => document.getElementById(id));
+    bars.forEach(b => { b.className = 'pw-bar'; });
+    let score = 0;
+    if (v.length >= 8)          score++;
+    if (/[A-Z]/.test(v))        score++;
+    if (/[0-9]/.test(v))        score++;
+    if (/[^A-Za-z0-9]/.test(v)) score++;
+    const cls = score <= 1 ? 'weak' : score <= 2 ? 'medium' : 'strong';
+    for (let i = 0; i < score; i++) bars[i].classList.add(cls);
+  });
+}
 
+// ── GOOGLE SIGN IN ────────────────────────────────────────────
 function onGoogleSuccess(data) {
   saveSession(data.token, data.user);
   window.location.href = getReturnUrl();
@@ -250,7 +266,6 @@ window.onGoogleLibraryLoad = () => {
     },
   });
 
-  // Render into BOTH containers
   const loginBtn    = document.getElementById('google-signin-btn');
   const registerBtn = document.getElementById('google-signin-btn-register');
 
