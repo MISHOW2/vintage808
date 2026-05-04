@@ -892,6 +892,7 @@ footer {
     grid-template-columns: repeat(4, 1fr);
     gap: 16px;
   }
+    .product-card { width: 100%; }
 }
 
 /* ── 1024px: 3 columns ── */
@@ -904,6 +905,11 @@ footer {
 
 /* ── 960px: newsletter stacks ── */
 @media (max-width: 960px) {
+   .product-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 14px;
+  }
+    .product-card { width: 100%; }
   .newsletter {
     grid-template-columns: 1fr;
     padding: 44px 24px;
@@ -947,6 +953,7 @@ footer {
   .nav-icons .nav-icon-btn[aria-label="Account"] { display: flex; }
   .nav-burger { display: flex; }
   .nav-drawer-icon-btn[aria-label="Account"] { display: none; }
+    .product-card { width: 100%; }
 }
 
 /* ── 768px: 2 columns, newsletter/footer tweaks ── */
@@ -956,7 +963,7 @@ footer {
     gap: 12px;
     padding: 0 16px;
   }
-
+  .product-card { width: 100%; }
   .newsletter {
     padding: 40px 16px;
     gap: 24px;
@@ -982,13 +989,14 @@ footer {
     margin: 0;
   }
 
-  .product-card { width: 100%; }
+
 
   .footer-grid { grid-template-columns: repeat(2, 1fr); }
 
   .section-heading--xl {
     font-size: clamp(48px, 14vw, 72px);
   }
+    .product-card { width: 100%; }
 }
 
 /* ── 380px: tightest mobile ── */
@@ -998,4 +1006,5 @@ footer {
     gap: 6px;
     padding: 0;
   }
+    .product-card { width: 100%; }
 }
