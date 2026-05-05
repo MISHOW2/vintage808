@@ -352,7 +352,8 @@ button { cursor: pointer; font-family: inherit; }
 }
 
 .editorial-card-bg--tees   { background: linear-gradient(135deg, #1a1a1a 0%, #2d2320 100%); }
-.editorial-card-bg--shorts { background: linear-gradient(135deg, #1e2a1e 0%, #2a2a1a 100%); }
+.editorial-card-bg--shorts { 
+  background: linear-gradient(135deg, #1e2a1e 0%, #2a2a1a 100%); }
 
 .editorial-card-bg img {
   width: 100%;

@@ -6,7 +6,7 @@ import { openOrderModal, closeModal, bindModalClose, buildStepperHtml } from '..
 (function () {
   'use strict';
 
-  const API = 'https://vintage808-api.vercel.app';
+  const API = 'https://vintage808-api.vercel.app' || 'http://localhost:5000';
 
   // ── Auth guard ────────────────────────────────────────────────
   const auth = requireAuth('./account.html');

@@ -980,31 +980,41 @@ footer {
   .newsletter-note { font-size: 10px; }
 }
 
-/* ── 520px: 2 columns tight, footer 2-col ── */
-@media (max-width: 520px) {
+@media (max-width: 699px) {
   .product-grid {
     grid-template-columns: repeat(2, 1fr);
-    gap: 8px;
-    padding: 0;
-    margin: 0;
+    max-width: none;
+  }
+.product-card {
+    max-height: 420px; /* ← adjust to taste */
   }
 
+  .product-image {
+    flex-shrink: 1; /* ← allows image to compress when card hits max-height */
+    min-height: 0;
+  }
+  .product-image-track img {
+    object-fit: cover;
+    object-position: center top;
+  }
+}
 
-
+@media (max-width: 520px) {
   .footer-grid { grid-template-columns: repeat(2, 1fr); }
 
   .section-heading--xl {
     font-size: clamp(48px, 14vw, 72px);
   }
-    .product-card { width: 100%; }
 }
 
-/* ── 380px: tightest mobile ── */
 @media (max-width: 380px) {
   .product-grid {
-    grid-template-columns: repeat(2, 1fr);
     gap: 6px;
     padding: 0;
+    /* grid-template-columns already set in 699px block */
   }
-    .product-card { width: 100%; }
+
+  .product-image {
+    aspect-ratio: 2 / 3; /* ← keep consistent on tiny screens */
+  }
 }

@@ -779,7 +779,6 @@
   .hero-stats { gap: 24px; }
   .categories-section { padding: 48px 24px 32px; }
   .category-tiles { grid-template-columns: repeat(2, 1fr); gap: 12px; }
-  .products-section { padding: 16px 24px 60px; }
  
   .brand-banner { padding: 60px 24px; }
   .brand-banner::before { display: none; }
