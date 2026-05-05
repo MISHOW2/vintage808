@@ -408,6 +408,39 @@
     } catch { return []; }
   }
 
+const accountBtn = document.querySelector('.nav-icon-btn[aria-label="Account"]');
+if (accountBtn && localStorage.getItem('v808_token')) {
+  accountBtn.addEventListener('click', (e) => {
+    e.stopPropagation();
+    let dropdown = document.getElementById('account-dropdown');
+    if (dropdown) { dropdown.remove(); return; }
+
+    dropdown = document.createElement('div');
+    dropdown.id = 'account-dropdown';
+    dropdown.style.cssText = `
+      position: absolute; top: 100%; right: 0;
+      background: #fff; border: 1px solid #e8e4de;
+      border-radius: 6px; min-width: 160px;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.08);
+      z-index: 200; overflow: hidden;
+    `;
+    dropdown.innerHTML = `
+      <a href="./account.html" style="display:block;padding:12px 16px;font-size:13px;color:#111;text-decoration:none;border-bottom:1px solid #e8e4de;">My Account</a>
+      <button id="nav-logout-btn" style="width:100%;padding:12px 16px;font-size:13px;color:#111;background:none;border:none;text-align:left;cursor:pointer;">Sign out</button>
+    `;
+    accountBtn.parentElement.style.position = 'relative';
+    accountBtn.parentElement.appendChild(dropdown);
+
+    document.getElementById('nav-logout-btn').addEventListener('click', () => {
+      localStorage.removeItem('v808_token');
+      localStorage.removeItem('v808_user');
+      sessionStorage.clear();
+      window.location.href = './index.html';
+    });
+
+    document.addEventListener('click', () => dropdown?.remove(), { once: true });
+  });
+}
 
 // ── Tab switching ─────────────────────────────────────────────
   const TAB_LABELS = { profile: 'Dashboard', orders: 'Orders', addresses: 'Addresses' };
