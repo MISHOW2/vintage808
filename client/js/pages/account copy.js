@@ -207,7 +207,8 @@ import { openOrderModal, closeModal, bindModalClose, buildStepperHtml } from '..
     } catch { return []; }
   }
 
-  // ── Tab switching ─────────────────────────────────────────────
+
+// ── Tab switching ─────────────────────────────────────────────
   const TAB_LABELS = { profile: 'Dashboard', orders: 'Orders', addresses: 'Addresses' };
 
   function switchTab(name) {
@@ -226,6 +227,9 @@ import { openOrderModal, closeModal, bindModalClose, buildStepperHtml } from '..
     document.title = `${TAB_LABELS[name] || name} — Vintage808`;
     sessionStorage.setItem('account_tab', name);
 
+    document.querySelectorAll('#mobile-tab-bar .account-mobile-tab').forEach(b => b.classList.remove('active'));
+    document.querySelector(`#mobile-tab-bar .account-mobile-tab[data-tab="${name}"]`)?.classList.add('active');
+
     if (name === 'orders') {
       fetchOrders().then(orders => {
         renderOrders(orders);
@@ -235,14 +239,31 @@ import { openOrderModal, closeModal, bindModalClose, buildStepperHtml } from '..
     }
   }
 
+  // ── Sidebar nav ───────────────────────────────────────────────
   document.querySelectorAll('.account-nav-item').forEach(btn => {
     btn.addEventListener('click', () => switchTab(btn.dataset.tab));
   });
 
-  $('view-all-orders-btn')?.addEventListener('click',       () => switchTab('orders'));
+  // ── Breadcrumb ────────────────────────────────────────────────
+  document.querySelector('.account-breadcrumb-home')?.addEventListener('click', (e) => {
+    e.preventDefault();
+    switchTab('profile');
+  });
+
+  // ── Mobile tab bar ────────────────────────────────────────────
+  document.querySelectorAll('#mobile-tab-bar .account-mobile-tab[data-tab]').forEach(btn => {
+    btn.addEventListener('click', () => switchTab(btn.dataset.tab));
+  });
+
+  document.getElementById('mobile-logout-btn')?.addEventListener('click', () => {
+    document.getElementById('logout-btn').click();
+  });
+
+  // ── Dashboard shortcuts ───────────────────────────────────────
+  $('view-all-orders-btn')?.addEventListener('click',         () => switchTab('orders'));
   $('dashboard-orders-footer-btn')?.addEventListener('click', () => switchTab('orders'));
-  $('manage-addresses-btn')?.addEventListener('click',      () => switchTab('addresses'));
-  $('add-address-shortcut-btn')?.addEventListener('click',  () => {
+  $('manage-addresses-btn')?.addEventListener('click',        () => switchTab('addresses'));
+  $('add-address-shortcut-btn')?.addEventListener('click',    () => {
     switchTab('addresses');
     setTimeout(() => $('add-address-btn')?.click(), 100);
   });

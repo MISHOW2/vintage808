@@ -408,13 +408,9 @@
     } catch { return []; }
   }
 
-  // ── Tab switching ─────────────────────────────────────────────
 
-  const TAB_LABELS = {
-    profile:   'Dashboard',
-    orders:    'Orders',
-    addresses: 'Addresses',
-  };
+// ── Tab switching ─────────────────────────────────────────────
+  const TAB_LABELS = { profile: 'Dashboard', orders: 'Orders', addresses: 'Addresses' };
 
   function switchTab(name) {
     document.querySelectorAll('.account-tab').forEach(t => t.classList.remove('active'));
@@ -422,17 +418,18 @@
     document.getElementById(`tab-${name}`)?.classList.add('active');
     document.querySelector(`.account-nav-item[data-tab="${name}"]`)?.classList.add('active');
 
-    const label = TAB_LABELS[name] || name;
     const crumb = $('breadcrumb-current');
-    if (crumb) crumb.textContent = label;
+    if (crumb) crumb.textContent = TAB_LABELS[name] || name;
 
     const url = new URL(window.location.href);
-    if (name === 'profile') { url.searchParams.delete('tab'); }
-    else { url.searchParams.set('tab', name); }
+    name === 'profile' ? url.searchParams.delete('tab') : url.searchParams.set('tab', name);
     window.history.pushState({}, '', url);
 
-    document.title = `${label} — Vintage808`;
+    document.title = `${TAB_LABELS[name] || name} — Vintage808`;
     sessionStorage.setItem('account_tab', name);
+
+    document.querySelectorAll('#mobile-tab-bar .account-mobile-tab').forEach(b => b.classList.remove('active'));
+    document.querySelector(`#mobile-tab-bar .account-mobile-tab[data-tab="${name}"]`)?.classList.add('active');
 
     if (name === 'orders') {
       fetchOrders().then(orders => {
@@ -443,14 +440,31 @@
     }
   }
 
+  // ── Sidebar nav ───────────────────────────────────────────────
   document.querySelectorAll('.account-nav-item').forEach(btn => {
     btn.addEventListener('click', () => switchTab(btn.dataset.tab));
   });
 
-  $('view-all-orders-btn')?.addEventListener('click', () => switchTab('orders'));
+  // ── Breadcrumb ────────────────────────────────────────────────
+  document.querySelector('.account-breadcrumb-home')?.addEventListener('click', (e) => {
+    e.preventDefault();
+    switchTab('profile');
+  });
+
+  // ── Mobile tab bar ────────────────────────────────────────────
+  document.querySelectorAll('#mobile-tab-bar .account-mobile-tab[data-tab]').forEach(btn => {
+    btn.addEventListener('click', () => switchTab(btn.dataset.tab));
+  });
+
+  document.getElementById('mobile-logout-btn')?.addEventListener('click', () => {
+    document.getElementById('logout-btn').click();
+  });
+
+  // ── Dashboard shortcuts ───────────────────────────────────────
+  $('view-all-orders-btn')?.addEventListener('click',         () => switchTab('orders'));
   $('dashboard-orders-footer-btn')?.addEventListener('click', () => switchTab('orders'));
-  $('manage-addresses-btn')?.addEventListener('click', () => switchTab('addresses'));
-  $('add-address-shortcut-btn')?.addEventListener('click', () => {
+  $('manage-addresses-btn')?.addEventListener('click',        () => switchTab('addresses'));
+  $('add-address-shortcut-btn')?.addEventListener('click',    () => {
     switchTab('addresses');
     setTimeout(() => $('add-address-btn')?.click(), 100);
   });
