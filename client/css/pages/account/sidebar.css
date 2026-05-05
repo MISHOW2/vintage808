@@ -233,3 +233,69 @@
   .account-nav-item svg { width: 15px; height: 15px; }
   .account-logout { padding: 11px 14px; font-size: 12px; }
 }
+
+@media (max-width: 768px) {
+
+  /* Hide desktop sidebar */
+  .account-sidebar {
+    display: none;
+  }
+
+  /* Stack layout */
+  .account-container {
+    display: block;
+    padding-bottom: 70px; /* room for tab bar */
+  }
+
+  /* Avatar at top of content instead */
+  .account-content::before {
+    content: '';
+  }
+
+  /* Bottom tab bar */
+  .account-mobile-tabs {
+    display: flex;
+    position: fixed;
+    bottom: 0; left: 0; right: 0;
+    height: 58px;
+    background: var(--white);
+    border-top: 1px solid var(--sand);
+    z-index: 100;
+  }
+
+  .account-mobile-tab {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 10px;
+    color: var(--mid);
+    letter-spacing: 0.04em;
+    transition: color 0.15s;
+  }
+
+  .account-mobile-tab.active {
+    color: var(--black);
+  }
+
+  .account-mobile-tab svg {
+    width: 18px; height: 18px;
+  }
+
+  .account-mobile-tab-dot {
+    width: 4px; height: 4px;
+    border-radius: 50%;
+    background: var(--black);
+    margin-top: 2px;
+  }
+}
+
+/* Hide tab bar on desktop */
+.account-mobile-tabs {
+  display: none;
+}

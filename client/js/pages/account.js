@@ -636,4 +636,17 @@
     switchTab(p.get('tab') || 'profile');
   });
 
+  // Mobile tab bar
+document.querySelectorAll('#mobile-tab-bar .account-mobile-tab[data-tab]').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('#mobile-tab-bar .account-mobile-tab').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    showTab(btn.dataset.tab); // uses your existing function
+  });
+});
+
+document.getElementById('mobile-logout-btn')?.addEventListener('click', () => {
+  document.getElementById('logout-btn').click(); // triggers your existing logout
+});
+
 })();
