@@ -7,7 +7,7 @@ const SHIPPING = 150;
 // ── Auth guard ────────────────────────────────────────────────
 const token = localStorage.getItem('v808_token');
 if (!token) {
-  sessionStorage.setItem('v808_return', '/checkout');
+  sessionStorage.setItem('v808_return', './checkout.html');
   window.location.href = './login.html';
 }
 
