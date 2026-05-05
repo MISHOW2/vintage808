@@ -8,7 +8,7 @@ const SHIPPING = 150;
 const token = localStorage.getItem('v808_token');
 if (!token) {
   sessionStorage.setItem('v808_return', '/checkout');
-  window.location.href = '/login.htmlfix Cannot GET /login';
+  window.location.href = '/login.html';
 }
 
 // ── Handle PayFast cancel return ─────────────────────────────
