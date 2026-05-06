@@ -1,7 +1,9 @@
 // js/pages/checkout.js
 import { getCart, getCartTotal, clearCart } from '../components/cart.js';
 
-const API      = 'https://vintage808-api.vercel.app/api';
+const API = window.location.hostname === '127.0.0.1' || window.location.hostname === 'localhost'
+  ? 'http://localhost:5000/api'
+  : 'https://vintage808-api.vercel.app/api';
 const SHIPPING = 150;
 
 // ── Auth guard ────────────────────────────────────────────────
