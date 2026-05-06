@@ -1,3 +1,5 @@
+import {openQuickAdd} from './quickAdd.js'
+
 // ─── Constants ───────────────────────────────────────────────
 const STORAGE_KEY = 'v808_cart';
 
