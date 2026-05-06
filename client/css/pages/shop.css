@@ -796,5 +796,5 @@
   .why-grid { grid-template-columns: 1fr 1fr; gap: 24px; }
   .newsletter-row { flex-direction: column; }
   .newsletter-input, .btn-subscribe { width: 100%; }
-  .filter-bar { flex-wrap: wrap; gap: 8px; }
+  .filter-bar { flex-wrap: wrap; gap: 6px; padding: 10px; }
 }
