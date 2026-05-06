@@ -32,3 +32,37 @@ export async function renderFeaturedProducts() {
     console.error('[Home] Failed to load products:', err);
   }
 }
+
+const API_BASE_URL = window.location.hostname === 'localhost'
+  ? 'http://localhost:5000/'
+  : 'https://vintage808-api.vercel.app/';
+
+const input = document.querySelector('.newsletter-input');
+const btn   = document.querySelector('.btn-subscribe');
+const note  = document.querySelector('.newsletter-note');
+
+btn?.addEventListener('click', async () => {
+  const email = input?.value.trim();
+  if (!email) return;
+
+  btn.disabled    = true;
+  btn.textContent = 'Subscribing...';
+
+  try {
+    const res  = await fetch(`${API_BASE_URL}api/subscribe`, {
+      method:  'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body:    JSON.stringify({ email }),
+    });
+    const data = await res.json();
+    note.textContent = data.message || 'Subscribed!';
+    note.style.color = res.ok ? '#166534' : '#991b1b';
+    if (res.ok) input.value = '';
+  } catch {
+    note.textContent = 'Something went wrong. Try again.';
+    note.style.color = '#991b1b';
+  } finally {
+    btn.disabled    = false;
+    btn.textContent = 'Subscribe';
+  }
+});
