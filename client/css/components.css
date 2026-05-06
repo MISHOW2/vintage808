@@ -665,7 +665,7 @@ footer {
 .product-card {
   display: flex;
   flex-direction: column;
-  background: var(--white);
+  
   overflow: hidden;
   -webkit-tap-highlight-color: transparent;
   transition: box-shadow 0.2s;
@@ -678,7 +678,7 @@ footer {
 
 .product-image {
   aspect-ratio: 3 / 4;
-  background: #e8e2d5;
+
   overflow: hidden;
   position: relative;
   height: 300px;
