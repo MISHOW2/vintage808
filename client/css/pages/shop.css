@@ -784,6 +784,9 @@
   .brand-banner::before { display: none; }
   .why-section { padding: 60px 24px; }
   .newsletter { grid-template-columns: 1fr; padding: 48px 24px; gap: 28px; }
+  .products-section {
+    padding: 50px 20px 30px;
+}
 }
 
 @media (max-width: 520px) {
