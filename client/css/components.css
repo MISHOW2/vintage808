@@ -783,16 +783,16 @@ footer {
 }
 
 .product-name {
-  font-size: clamp(11px, 1.4vw, 13px);
-  font-weight: 500;
+  font-size: clamp(12px, 1.4vw, 13px);
+  font-weight: bold;
   line-height: 1.4;
   color: var(--black);
 }
 
 .product-price {
   font-family: var(--font-mono);
-  font-size: clamp(11px, 1.4vw, 13px);
-  font-weight: 700;
+  font-size: clamp(12px, 1.4vw, 13px);
+  font-weight: bold;
   white-space: nowrap;
   color: var(--black);
 }
@@ -872,6 +872,7 @@ footer {
   min-height: 44px;
   -webkit-appearance: none;
   -webkit-tap-highlight-color: transparent;
+  border-radius: 5px;
 }
 
 .btn-cart:hover  { background: var(--accent); }
@@ -1206,7 +1207,7 @@ footer {
   width: 100%;
   background: var(--black);
   color: var(--white);
-  border: none;
+ 
   padding: 13px 16px;
   font-size: 11px;
   font-weight: 600;
@@ -1216,5 +1217,6 @@ footer {
   font-family: var(--font-body);
   transition: background 0.18s;
   margin-top: 4px;
+  border-radius: 5px;
 }
 .qa-confirm:hover { background: var(--accent); }
