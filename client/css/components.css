@@ -908,7 +908,7 @@ footer {
 /* ── 960px: newsletter stacks ── */
 @media (max-width: 960px) {
    .product-grid {
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns: repeat(3, 1fr);
     gap: 14px;
   }
     .product-card { width: 100%; }
@@ -961,7 +961,7 @@ footer {
 /* ── 768px: 2 columns, newsletter/footer tweaks ── */
 @media (max-width: 768px) {
   .product-grid {
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns: repeat(3, 1fr);
     gap: 12px;
     padding: 0 16px;
   }
@@ -988,8 +988,14 @@ footer {
     max-width: none;
   }
 
+   /* Remove fixed height — let content flow naturally */
+  .product-card {
+    height: auto;
+  }
+
+  /* Fix image height to be uniform regardless of text below */
   .product-image {
-    aspect-ratio: 4 / 3; /* ← landscape/wider = shorter card */
+    height: 200px; /* consistent across all cards */
   }
 
   .product-image-track img {
