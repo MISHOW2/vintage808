@@ -82,24 +82,49 @@ export function openQuickAdd(product) {
   sizeError.textContent = '';
   sizesEl.innerHTML = '';
 
-  if (hasSizes) {
-    sizesWrap.style.display = 'block';
-    product.sizes.forEach(s => {
-      const btn = document.createElement('button');
-      btn.className = 'size-option';
-      btn.textContent = s;
-      btn.dataset.size = s;
-      btn.addEventListener('click', () => {
-        sizesEl.querySelectorAll('.size-option').forEach(b => b.classList.remove('selected'));
-        btn.classList.add('selected');
-        selectedSize = s;
+// ── Sizes ──
+if (hasSizes) {
+  sizesWrap.style.display = 'block';
+  product.sizes.forEach(s => {
+    const sizeStock = product.sizeStock?.length
+      ? (product.sizeStock.find(e => e.size === s)?.stock ?? 0)
+      : product.stock;
+
+    const outOfStock = sizeStock === 0;
+    const btn = document.createElement('button');
+    btn.className  = `size-option${outOfStock ? ' size-option--out' : ''}`;
+    btn.textContent = s;
+    btn.dataset.size = s;
+    if (outOfStock) btn.disabled = true;
+
+    btn.addEventListener('click', () => {
+      sizesEl.querySelectorAll('.size-option').forEach(b => b.classList.remove('selected'));
+      btn.classList.add('selected');
+      selectedSize = s;
+      sizeError.textContent = '';
+
+      // ── Show stock warning under sizes ──
+      if (sizeStock <= 5 && sizeStock > 0) {
+        sizeError.textContent = `Only ${sizeStock} left in this size`;
+        sizeError.style.color = '#c84b2f';
+      } else {
         sizeError.textContent = '';
-      });
-      sizesEl.append(btn);
+      }
     });
+    sizesEl.append(btn);
+  });
+
+} else {
+  sizesWrap.style.display = 'none';
+
+  // ── No sizes: show low stock warning immediately ──
+  if (product.stock <= 5 && product.stock > 0) {
+    sizeError.style.color = '#c84b2f';
+    sizeError.textContent = `Only ${product.stock} left`;
   } else {
-    sizesWrap.style.display = 'none';
+    sizeError.textContent = '';
   }
+}
 
   // Quantity
   const countEl = modal.querySelector('#qa-count');
