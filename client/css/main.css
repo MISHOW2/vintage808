@@ -145,3 +145,11 @@ body {
   cursor: not-allowed;
 }
 
+.footer-legal-strip {
+  border-top: 1px solid rgba(255, 255, 255, 0.08); /* adjust to match your theme */
+  padding: 12px 0;
+  text-align: center;
+  font-size: 0.75rem;
+  color: #888; /* muted, doesn't distract from the design */
+  line-height: 1.6;
+}
