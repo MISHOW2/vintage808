@@ -3,7 +3,8 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Returns & Refunds — Vintage808</title>
+  <title>Shipping & Delivery — Vintage808</title>
+  <meta name="description" content="Vintage808 shipping and delivery information — timelines, costs, and tracking." />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=DM+Sans:wght@400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet" />
@@ -47,9 +48,25 @@
     .legal-contact-card h3 { font-family: var(--font-display); font-size: 22px; font-weight: 400; margin-bottom: 12px; }
     .legal-contact-card p { font-size: 14px; color: #aaa; line-height: 1.8; margin-bottom: 0; }
     .legal-contact-card a { color: var(--accent); }
+
+    /* Shipping table */
+    .shipping-table { width: 100%; border-collapse: collapse; margin: 20px 0 14px; font-size: 13px; }
+    .shipping-table thead tr { background: var(--black); color: var(--white); }
+    .shipping-table thead th { padding: 12px 16px; text-align: left; font-weight: 500; font-size: 11px; letter-spacing: .1em; text-transform: uppercase; font-family: var(--font-mono); }
+    .shipping-table tbody tr { border-bottom: 1px solid #e8e4de; }
+    .shipping-table tbody tr:last-child { border-bottom: none; }
+    .shipping-table tbody tr:nth-child(even) { background: var(--white); }
+    .shipping-table td { padding: 12px 16px; color: #444; line-height: 1.6; }
+    .shipping-table td strong { color: var(--black); font-weight: 600; }
+    .badge { display: inline-block; font-family: var(--font-mono); font-size: 10px; letter-spacing: .1em; text-transform: uppercase; padding: 3px 8px; border-radius: 3px; font-weight: 500; }
+    .badge-free { background: #e8f5e9; color: #2e7d32; }
+    .badge-standard { background: #fff8e1; color: #f57f17; }
+
     @media (max-width: 600px) {
       .legal-hero { padding: 48px 20px 40px; }
       .legal-body { padding: 40px 16px 72px; }
+      .shipping-table { font-size: 12px; }
+      .shipping-table thead th, .shipping-table td { padding: 10px 10px; }
     }
   </style>
 </head>
@@ -152,9 +169,9 @@
 
 <!-- ── Hero ── -->
 <div class="legal-hero">
-  <div class="legal-hero-eyebrow">Vintage808 · Legal</div>
-  <h1>Returns &amp; Refunds</h1>
-  <p class="legal-hero-sub">Last updated: May 2025</p>
+  <div class="legal-hero-eyebrow">Vintage808 · Help</div>
+  <h1>Shipping & Delivery</h1>
+  <p class="legal-hero-sub">Last updated: May 2025 · We deliver across South Africa</p>
 </div>
 
 <div class="legal-body">
@@ -162,119 +179,127 @@
   <div class="legal-toc">
     <div class="legal-toc-title">Contents</div>
     <ol>
-      <li><a href="#eligibility">Eligibility &amp; return window</a></li>
-      <li><a href="#non-returnable">Non-returnable items</a></li>
-      <li><a href="#how-to-return">How to initiate a return</a></li>
-      <li><a href="#condition">Condition requirements</a></li>
-      <li><a href="#refunds">Refunds</a></li>
-      <li><a href="#exchanges">Exchanges</a></li>
-      <li><a href="#shipping-cost">Shipping costs</a></li>
-      <li><a href="#cpa">Your rights under the CPA</a></li>
+      <li><a href="#processing">Order processing</a></li>
+      <li><a href="#rates">Shipping rates &amp; timelines</a></li>
+      <li><a href="#tracking">Tracking your order</a></li>
+      <li><a href="#delivery">Delivery &amp; collection</a></li>
+      <li><a href="#failed">Failed &amp; missed deliveries</a></li>
+      <li><a href="#lost">Lost or damaged parcels</a></li>
+      <li><a href="#restrictions">Shipping restrictions</a></li>
       <li><a href="#contact">Contact us</a></li>
     </ol>
   </div>
 
   <!-- 01 -->
-  <div class="legal-section" id="eligibility">
+  <div class="legal-section" id="processing">
     <div class="legal-section-num">01</div>
-    <h2>Eligibility &amp; Return Window</h2>
-    <p>We accept returns on eligible items within <strong>14 days</strong> of the confirmed delivery date. To be eligible, your item must meet the condition requirements in section 4.</p>
-    <p>Returns requested after 14 days of delivery will not be accepted unless the item is defective or damaged, in which case the Consumer Protection Act provisions in section 8 apply.</p>
+    <h2>Order Processing</h2>
+    <p>Orders are processed on business days (Monday – Friday, excluding South African public holidays). Orders placed before <strong>12:00 PM (noon)</strong> are typically dispatched the same day. Orders placed after 12:00 PM are dispatched the following business day.</p>
+    <p>You will receive an order confirmation email immediately after placing your order, followed by a dispatch notification with your tracking number once your parcel has been collected by our courier.</p>
+    <div class="legal-highlight">
+      <p><strong>Please note:</strong> During sale periods, new product launches, or public holidays, processing times may be extended by 1–2 business days. We will communicate any delays via email.</p>
+    </div>
   </div>
 
   <!-- 02 -->
-  <div class="legal-section" id="non-returnable">
+  <div class="legal-section" id="rates">
     <div class="legal-section-num">02</div>
-    <h2>Non-Returnable Items</h2>
-    <p>The following items cannot be returned:</p>
-    <ul>
-      <li>Items marked <strong>"Final Sale"</strong> or sold at clearance pricing</li>
-      <li>Items that have been worn, washed, or altered</li>
-      <li>Items without original tags and packaging</li>
-      <li>Gift cards and digital products</li>
-    </ul>
+    <h2>Shipping Rates &amp; Timelines</h2>
+    <p>We currently ship to all provinces within South Africa. Shipping costs are calculated at checkout based on your delivery address and order weight.</p>
+
+    <table class="shipping-table">
+      <thead>
+        <tr>
+          <th>Service</th>
+          <th>Estimated Delivery</th>
+          <th>Cost</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>Standard Courier</strong><br/>Door-to-door, major centres</td>
+          <td>2 – 4 business days</td>
+          <td>From <strong>R80</strong></td>
+        </tr>
+        <tr>
+          <td><strong>Standard Courier</strong><br/>Outlying / rural areas</td>
+          <td>3 – 6 business days</td>
+          <td>From <strong>R120</strong></td>
+        </tr>
+        <tr>
+          <td><strong>Pargo Click &amp; Collect</strong><br/>Collect from 3 000+ pickup points</td>
+          <td>2 – 4 business days</td>
+          <td>From <strong>R60</strong></td>
+        </tr>
+        <tr>
+          <td><strong>Free Shipping</strong><br/>All orders over R800</td>
+          <td>2 – 4 business days</td>
+          <td><span class="badge badge-free">Free</span></td>
+        </tr>
+      </tbody>
+    </table>
+
+    <p>Delivery timelines are estimates and begin from the date of dispatch, not the date of order. Delays may occur due to courier capacity, weather, or other factors outside our control.</p>
   </div>
 
   <!-- 03 -->
-  <div class="legal-section" id="how-to-return">
+  <div class="legal-section" id="tracking">
     <div class="legal-section-num">03</div>
-    <h2>How to Initiate a Return</h2>
-    <p>To start a return, email us at <a href="mailto:customersupport@vintage808info.com">customersupport@vintage808info.com</a> within 14 days of delivery with the subject line <strong>"Return Request — [Your Order Number]"</strong>.</p>
-    <p>Include the following in your email:</p>
-    <ul>
-      <li>Your order number</li>
-      <li>The item(s) you want to return</li>
-      <li>The reason for the return</li>
-      <li>Photos of the item if it is defective or damaged</li>
-    </ul>
-    <p>We will respond within 2 business days with return instructions. Do not send items back before receiving a return authorisation — unauthorised returns will not be processed.</p>
-    <div class="legal-highlight">
-      <p><strong>Important:</strong> Returns sent without prior authorisation will not be accepted and will be returned to the sender at their own cost.</p>
-    </div>
+    <h2>Tracking Your Order</h2>
+    <p>Once your order has been dispatched, you will receive an email containing your waybill (tracking) number and a link to track your parcel in real time on the courier's website.</p>
+    <p>You can also track your order from your <a href="./account.html">Vintage808 account</a> under <strong>My Orders</strong>.</p>
+    <p>If you have not received a tracking number within 2 business days of placing your order, please contact us at <a href="mailto:customersupport@vintage808info.com">customersupport@vintage808info.com</a>.</p>
   </div>
 
   <!-- 04 -->
-  <div class="legal-section" id="condition">
+  <div class="legal-section" id="delivery">
     <div class="legal-section-num">04</div>
-    <h2>Condition Requirements</h2>
-    <p>Items must be returned in the same condition in which they were received:</p>
-    <ul>
-      <li>Unworn and unwashed</li>
-      <li>Original tags still attached</li>
-      <li>In original packaging where possible</li>
-      <li>Free from odours, stains, pet hair, and damage</li>
-    </ul>
-    <p>We reserve the right to refuse a return or charge a restocking fee if the item does not meet these conditions.</p>
+    <h2>Delivery &amp; Collection</h2>
+    <p>For door-to-door deliveries, someone must be available to receive the parcel at the delivery address. Our courier will attempt delivery during standard business hours (08:00 – 17:00, Monday to Friday).</p>
+    <p>If no one is available to receive the parcel, the courier will leave a notification card and attempt re-delivery. Please ensure your delivery address and contact number are correct when placing your order.</p>
+    <p>For <strong>Pargo Click &amp; Collect</strong>, you can select your preferred pickup point at checkout. You will receive an SMS and email when your parcel is ready for collection. Parcels are held at Pargo points for <strong>7 calendar days</strong> before being returned to us.</p>
   </div>
 
   <!-- 05 -->
-  <div class="legal-section" id="refunds">
+  <div class="legal-section" id="failed">
     <div class="legal-section-num">05</div>
-    <h2>Refunds</h2>
-    <p>Once your return is received and inspected, we will email you to confirm receipt and advise whether your refund has been approved or rejected.</p>
-    <p>Approved refunds are processed to the original payment method within <strong>5–10 business days</strong>. PayFast refunds are subject to PayFast's processing timeline.</p>
-    <p>Shipping fees are non-refundable unless the item was defective or we made an error with your order.</p>
-    <div class="legal-highlight">
-      <p><strong>Please note:</strong> We do not refund the original shipping fee unless the return is due to our error or a defective product.</p>
-    </div>
+    <h2>Failed &amp; Missed Deliveries</h2>
+    <p>If a delivery attempt fails and the parcel is returned to us, we will contact you to arrange re-delivery. Please note that a re-delivery fee may apply.</p>
+    <p>If a parcel is returned due to an incorrect address provided by the customer, the customer will be responsible for the cost of re-delivery.</p>
+    <p>Parcels that cannot be delivered and are not reclaimed within 14 days of the return date will be treated in accordance with our <a href="./returns.html">Returns Policy</a>.</p>
   </div>
 
   <!-- 06 -->
-  <div class="legal-section" id="exchanges">
+  <div class="legal-section" id="lost">
     <div class="legal-section-num">06</div>
-    <h2>Exchanges</h2>
-    <p>We offer exchanges for different sizes or colours where stock is available. To request an exchange, follow the same process as a return (section 3) and specify which item and size you would like in exchange.</p>
-    <p>Exchanges are subject to stock availability. If the requested size or colour is unavailable, we will issue a refund instead.</p>
+    <h2>Lost or Damaged Parcels</h2>
+    <p>In the unlikely event that your parcel is lost or arrives damaged, please contact us within <strong>48 hours of the expected delivery date</strong> at <a href="mailto:customersupport@vintage808info.com">customersupport@vintage808info.com</a> with your order number and a description of the issue.</p>
+    <p>For damaged items, please include clear photographs of the packaging and the item(s) received. We will investigate with the courier and, where applicable, arrange a replacement or refund.</p>
+    <div class="legal-highlight">
+      <p><strong>Important:</strong> Claims for lost or damaged parcels must be submitted within 48 hours of the expected delivery date. Claims submitted after this period may not be eligible for replacement or refund.</p>
+    </div>
   </div>
 
   <!-- 07 -->
-  <div class="legal-section" id="shipping-cost">
+  <div class="legal-section" id="restrictions">
     <div class="legal-section-num">07</div>
-    <h2>Shipping Costs</h2>
-    <p>Return shipping costs are the responsibility of the customer unless the return is due to a defective product or an error on our part, in which case we will cover the cost of the return courier.</p>
-    <p>We recommend using a trackable shipping service. Vintage808 is not responsible for items lost or damaged in transit during a return.</p>
-  </div>
-
-  <!-- 08 -->
-  <div class="legal-section" id="cpa">
-    <div class="legal-section-num">08</div>
-    <h2>Your Rights Under the Consumer Protection Act</h2>
-    <p>As a South African consumer, you are protected by the Consumer Protection Act 68 of 2008 (CPA). Nothing in this returns policy limits or overrides your statutory rights under the CPA.</p>
-    <p>Under the CPA, you have the right to receive goods that are of good quality, in good working order, free of defects, and that match the description or sample provided. If a product is found to be defective, we will work with you to arrange a repair, replacement, or refund as appropriate.</p>
-    <p>If you believe your rights under the CPA have been violated and we are unable to resolve the issue, you may contact the <a href="https://www.thencc.org.za" target="_blank" rel="noopener">National Consumer Commission</a>.</p>
+    <h2>Shipping Restrictions</h2>
+    <p>We currently ship <strong>within South Africa only</strong>. We do not offer international shipping at this time. We hope to expand our delivery reach in the future.</p>
+    <p>Some remote or outlying areas may have extended delivery timelines. If you are unsure whether your area is serviced, please contact us before placing your order.</p>
   </div>
 
   <div class="legal-divider"></div>
 
   <div class="legal-contact-card" id="contact">
-    <h3>Questions about a return?</h3>
+    <h3>Questions about your delivery?</h3>
     <p>
-      Email us at <a href="mailto:customersupport@vintage808info.com">customersupport@vintage808info.com</a> with your order number and we'll get back to you within 2 business days.<br/><br/>
-      You can also visit our <a href="./faq.html">FAQ page</a> for quick answers to common questions.
+      Our support team is happy to help. Reach us at <a href="mailto:customersupport@vintage808info.com">customersupport@vintage808info.com</a> with your order number and we'll get back to you within 1 business day.<br/><br/>
+      You can also check your order status any time from your <a href="./account.html">account page</a>.
     </p>
   </div>
 
 </div>
+
 
 <!-- ── Footer ── -->
 <footer>
@@ -326,6 +351,7 @@
     <span>Made in South Africa 🇿🇦</span>
   </div>
 </footer>
+
 
 <script type="module" src="./js/main.js"></script>
 </body>
