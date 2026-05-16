@@ -40,22 +40,26 @@
   const STATUS_STEPS = ['confirmed', 'processing', 'shipped', 'delivered'];
 
   const STATUS_LABELS = {
-    pending:   'Pending',   confirmed:  'Confirmed',
-    processing:'Processing',shipped:    'Shipped',
-    delivered: 'Delivered', cancelled:  'Cancelled',
-    returned:  'Returned',  paid:       'Paid',
-    failed:    'Failed',
+    pending:    'Pending',
+    confirmed:  'Confirmed',
+    processing: 'Processing',
+    shipped:    'Shipped',
+    delivered:  'Delivered',
+    cancelled:  'Cancelled',
+    returned:   'Returned',
+    paid:       'Paid',
+    failed:     'Failed',
   };
 
   const $ = id => document.getElementById(id);
 
-  const esc       = s => String(s ?? '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
-  const fmtDate   = (iso, opts = { year:'numeric', month:'short', day:'numeric' }) => {
+  const esc         = s => String(s ?? '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  const fmtDate     = (iso, opts = { year:'numeric', month:'short', day:'numeric' }) => {
     try { return new Date(iso).toLocaleDateString('en-ZA', opts); } catch { return '—'; }
   };
   const fmtCurrency = n => 'R' + Number(n).toFixed(2);
-  const show = el => el?.classList.remove('hidden');
-  const hide = el => el?.classList.add('hidden');
+  const show        = el => el?.classList.remove('hidden');
+  const hide        = el => el?.classList.add('hidden');
 
   function fmtStatus(s) { return STATUS_LABELS[s] ?? 'Pending'; }
 
@@ -402,47 +406,51 @@
       if (!res.ok) return [];
       const data = await res.json();
       return (data.data ?? []).map((a, i) => ({
-        _id: a._id, label: a.label || `Address ${i + 1}`,
+        _id:   a._id,
+        label: a.label || `Address ${i + 1}`,
         lines: [a.street, `${a.city}, ${a.province}`, a.postal].filter(Boolean),
       }));
     } catch { return []; }
   }
 
-const accountBtn = document.querySelector('.nav-icon-btn[aria-label="Account"]');
-if (accountBtn && localStorage.getItem('v808_token')) {
-  accountBtn.addEventListener('click', (e) => {
-    e.stopPropagation();
-    let dropdown = document.getElementById('account-dropdown');
-    if (dropdown) { dropdown.remove(); return; }
+  // ── Nav account dropdown ──────────────────────────────────────
 
-    dropdown = document.createElement('div');
-    dropdown.id = 'account-dropdown';
-    dropdown.style.cssText = `
-      position: absolute; top: 100%; right: 0;
-      background: #fff; border: 1px solid #e8e4de;
-      border-radius: 6px; min-width: 160px;
-      box-shadow: 0 4px 16px rgba(0,0,0,0.08);
-      z-index: 200; overflow: hidden;
-    `;
-    dropdown.innerHTML = `
-      <a href="./account.html" style="display:block;padding:12px 16px;font-size:13px;color:#111;text-decoration:none;border-bottom:1px solid #e8e4de;">My Account</a>
-      <button id="nav-logout-btn" style="width:100%;padding:12px 16px;font-size:13px;color:#111;background:none;border:none;text-align:left;cursor:pointer;">Sign out</button>
-    `;
-    accountBtn.parentElement.style.position = 'relative';
-    accountBtn.parentElement.appendChild(dropdown);
+  const accountBtn = document.querySelector('.nav-icon-btn[aria-label="Account"]');
+  if (accountBtn && localStorage.getItem('v808_token')) {
+    accountBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      let dropdown = document.getElementById('account-dropdown');
+      if (dropdown) { dropdown.remove(); return; }
 
-    document.getElementById('nav-logout-btn').addEventListener('click', () => {
-      localStorage.removeItem('v808_token');
-      localStorage.removeItem('v808_user');
-      sessionStorage.clear();
-      window.location.href = './index.html';
+      dropdown = document.createElement('div');
+      dropdown.id = 'account-dropdown';
+      dropdown.style.cssText = `
+        position: absolute; top: 100%; right: 0;
+        background: #fff; border: 1px solid #e8e4de;
+        border-radius: 6px; min-width: 160px;
+        box-shadow: 0 4px 16px rgba(0,0,0,0.08);
+        z-index: 200; overflow: hidden;
+      `;
+      dropdown.innerHTML = `
+        <a href="./account.html" style="display:block;padding:12px 16px;font-size:13px;color:#111;text-decoration:none;border-bottom:1px solid #e8e4de;">My Account</a>
+        <button id="nav-logout-btn" style="width:100%;padding:12px 16px;font-size:13px;color:#111;background:none;border:none;text-align:left;cursor:pointer;">Sign out</button>
+      `;
+      accountBtn.parentElement.style.position = 'relative';
+      accountBtn.parentElement.appendChild(dropdown);
+
+      document.getElementById('nav-logout-btn').addEventListener('click', () => {
+        localStorage.removeItem('v808_token');
+        localStorage.removeItem('v808_user');
+        sessionStorage.clear();
+        window.location.href = './index.html';
+      });
+
+      document.addEventListener('click', () => dropdown?.remove(), { once: true });
     });
+  }
 
-    document.addEventListener('click', () => dropdown?.remove(), { once: true });
-  });
-}
+  // ── Tab switching ─────────────────────────────────────────────
 
-// ── Tab switching ─────────────────────────────────────────────
   const TAB_LABELS = { profile: 'Dashboard', orders: 'Orders', addresses: 'Addresses' };
 
   function switchTab(name) {
@@ -474,17 +482,20 @@ if (accountBtn && localStorage.getItem('v808_token')) {
   }
 
   // ── Sidebar nav ───────────────────────────────────────────────
+
   document.querySelectorAll('.account-nav-item').forEach(btn => {
     btn.addEventListener('click', () => switchTab(btn.dataset.tab));
   });
 
   // ── Breadcrumb ────────────────────────────────────────────────
+
   document.querySelector('.account-breadcrumb-home')?.addEventListener('click', (e) => {
     e.preventDefault();
     switchTab('profile');
   });
 
   // ── Mobile tab bar ────────────────────────────────────────────
+
   document.querySelectorAll('#mobile-tab-bar .account-mobile-tab[data-tab]').forEach(btn => {
     btn.addEventListener('click', () => switchTab(btn.dataset.tab));
   });
@@ -494,13 +505,11 @@ if (accountBtn && localStorage.getItem('v808_token')) {
   });
 
   // ── Dashboard shortcuts ───────────────────────────────────────
+
   $('view-all-orders-btn')?.addEventListener('click',         () => switchTab('orders'));
   $('dashboard-orders-footer-btn')?.addEventListener('click', () => switchTab('orders'));
   $('manage-addresses-btn')?.addEventListener('click',        () => switchTab('addresses'));
-  $('add-address-shortcut-btn')?.addEventListener('click',    () => {
-    switchTab('addresses');
-    setTimeout(() => $('add-address-btn')?.click(), 100);
-  });
+  $('add-address-shortcut-btn')?.addEventListener('click',    () => switchTab('addresses'));
 
   // ── Edit profile ──────────────────────────────────────────────
 
@@ -571,63 +580,65 @@ if (accountBtn && localStorage.getItem('v808_token')) {
     }
   });
 
-  // ── Add address ───────────────────────────────────────────────
+  // ── Add address (permanent form) ──────────────────────────────
 
-  $('add-address-btn')?.addEventListener('click', () => {
-    const existing = document.getElementById('add-address-form');
-    if (existing) { existing.remove(); return; }
+  $('addr-save-btn')?.addEventListener('click', async () => {
+    const street   = $('addr-street')?.value.trim();
+    const city     = $('addr-city')?.value.trim();
+    const province = $('addr-province')?.value;
+    const postal   = $('addr-postal')?.value.trim();
+    const label    = $('addr-label')?.value.trim();
+    const errEl    = $('addr-error');
+    const sucEl    = $('addr-success');
 
-    const form = document.createElement('div');
-    form.id = 'add-address-form';
-    form.style.cssText = 'margin-top:16px;display:flex;flex-direction:column;gap:12px;';
-    form.innerHTML = `
-      <input class="edit-input" id="addr-label"    placeholder="Label (e.g. Home, Work)" />
-      <input class="edit-input" id="addr-street"   placeholder="Street address" />
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
-        <input class="edit-input" id="addr-city"   placeholder="City" />
-        <input class="edit-input" id="addr-postal" placeholder="Postal code" />
-      </div>
-      <select class="edit-input" id="addr-province">
-        <option value="" disabled selected>Select province</option>
-        <option>Gauteng</option><option>Western Cape</option>
-        <option>KwaZulu-Natal</option><option>Eastern Cape</option>
-        <option>Limpopo</option><option>Mpumalanga</option>
-        <option>North West</option><option>Free State</option>
-        <option>Northern Cape</option>
-      </select>
-      <div style="display:flex;gap:10px;">
-        <button id="addr-save-btn"   class="account-btn-primary"   style="flex:1;">Save address</button>
-        <button id="addr-cancel-btn" class="account-btn-secondary" style="flex:1;">Cancel</button>
-      </div>
-      <p id="addr-error" style="font-size:12px;color:var(--acc-red);display:none;"></p>`;
+    errEl.style.display = 'none';
+    sucEl.style.display = 'none';
 
-    $('add-address-btn').after(form);
+    if (!street || !city || !province || !postal) {
+      errEl.textContent   = 'Please fill in all required fields.';
+      errEl.style.display = 'block';
+      return;
+    }
 
-    document.getElementById('addr-cancel-btn').addEventListener('click', () => form.remove());
-    document.getElementById('addr-save-btn').addEventListener('click', async () => {
-      const street   = document.getElementById('addr-street').value.trim();
-      const city     = document.getElementById('addr-city').value.trim();
-      const province = document.getElementById('addr-province').value;
-      const postal   = document.getElementById('addr-postal').value.trim();
-      const label    = document.getElementById('addr-label').value.trim();
-      const errEl    = document.getElementById('addr-error');
+    const btn       = $('addr-save-btn');
+    btn.disabled    = true;
+    btn.textContent = 'Saving…';
 
-      if (!street || !city || !province || !postal) {
-        errEl.textContent = 'Please fill in all required fields.';
-        errEl.style.display = 'block'; return;
+    try {
+      const res = await fetch(`${API}/api/auth/addresses`, {
+        method:  'POST',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+        body:    JSON.stringify({ label, street, city, province, postal }),
+      });
+
+      if (!res.ok) {
+        const d = await res.json().catch(() => ({}));
+        errEl.textContent   = d.message || 'Could not save address.';
+        errEl.style.display = 'block';
+        return;
       }
 
-      try {
-        const res = await fetch(`${API}/api/auth/addresses`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
-          body: JSON.stringify({ label, street, city, province, postal }),
-        });
-        if (!res.ok) { errEl.textContent = 'Could not save address.'; errEl.style.display = 'block'; return; }
-        form.remove();
-        fetchAddresses().then(addrs => { renderAddresses(addrs); renderDashboardAddress(addrs); });
-      } catch { errEl.textContent = 'Something went wrong.'; errEl.style.display = 'block'; }
-    });
+      // Clear form on success
+      $('addr-label').value    = '';
+      $('addr-street').value   = '';
+      $('addr-city').value     = '';
+      $('addr-postal').value   = '';
+      $('addr-province').value = '';
+
+      sucEl.style.display = 'block';
+
+      fetchAddresses().then(addrs => {
+        renderAddresses(addrs);
+        renderDashboardAddress(addrs);
+      });
+
+    } catch {
+      errEl.textContent   = 'Something went wrong.';
+      errEl.style.display = 'block';
+    } finally {
+      btn.disabled    = false;
+      btn.textContent = 'Save Address';
+    }
   });
 
   // ── Logout ────────────────────────────────────────────────────
@@ -662,7 +673,7 @@ if (accountBtn && localStorage.getItem('v808_token')) {
     if (pending?.items) localStorage.setItem('v808_cart', JSON.stringify(pending.items));
     const banner = document.createElement('div');
     banner.style.cssText = 'background:#1a1a1a;color:#fff;text-align:center;padding:12px;font-size:13px;position:relative;z-index:999;';
-    banner.textContent = 'Payment was cancelled. Your cart has been restored.';
+    banner.textContent   = 'Payment was cancelled. Your cart has been restored.';
     document.body.prepend(banner);
     setTimeout(() => banner.remove(), 5000);
     const cleanUrl = new URL(window.location.href);
@@ -671,7 +682,7 @@ if (accountBtn && localStorage.getItem('v808_token')) {
     window.history.replaceState({}, '', cleanUrl);
   }
 
-  // ── Tab routing ──────────────────────────────────────────────
+  // ── Tab routing ───────────────────────────────────────────────
 
   const urlParams = new URLSearchParams(window.location.search);
   const urlTab    = urlParams.get('tab');
@@ -679,21 +690,8 @@ if (accountBtn && localStorage.getItem('v808_token')) {
   switchTab(savedTab);
 
   window.addEventListener('popstate', () => {
-    const p   = new URLSearchParams(window.location.search);
+    const p = new URLSearchParams(window.location.search);
     switchTab(p.get('tab') || 'profile');
   });
-
-  // Mobile tab bar
-document.querySelectorAll('#mobile-tab-bar .account-mobile-tab[data-tab]').forEach(btn => {
-  btn.addEventListener('click', () => {
-    document.querySelectorAll('#mobile-tab-bar .account-mobile-tab').forEach(b => b.classList.remove('active'));
-    btn.classList.add('active');
-    showTab(btn.dataset.tab); // uses your existing function
-  });
-});
-
-document.getElementById('mobile-logout-btn')?.addEventListener('click', () => {
-  document.getElementById('logout-btn').click(); // triggers your existing logout
-});
 
 })();
