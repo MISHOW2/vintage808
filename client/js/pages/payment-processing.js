@@ -1,59 +1,53 @@
+//js/pages/payment-processing.js
+
 const API = 'https://vintage808-api.vercel.app/api';
 
-const params  = new URLSearchParams(window.location.search);
-const orderId = params.get('order');
+const params    = new URLSearchParams(window.location.search);
+// Paystack sends the reference back in the URL as ?trxref= or ?reference=
+const reference = params.get('trxref') || params.get('reference')
+               || sessionStorage.getItem('v808_paystack_ref');
+const orderId   = sessionStorage.getItem('v808_paystack_order_id');
 
-// ── Guard: if no order ID, go home ───────────────────────────
-if (!orderId) {
+if (!reference) {
   window.location.replace('./index.html');
 }
 
-// ── Guard: already redirecting — stop everything ─────────────
-let redirecting = false;
-
-function safeRedirect(url) {
-  if (redirecting) return;
-  redirecting = true;
-  clearInterval(poller);
-  window.location.replace(url);  // replace() so back-button can't loop back here
-}
-
-let attempts = 0;
-const MAX_ATTEMPTS = 40; // ~2 minutes (40 × 3s)
-
-async function pollPaymentStatus() {
-  if (redirecting) return;   // already on the way out
-  attempts++;
-
-  if (attempts > MAX_ATTEMPTS) {
-    safeRedirect(`./order-confirmation.html?order=${orderId}&timeout=1`);
-    return;
-  }
-
+async function verifyAndRedirect() {
   try {
-    const res  = await fetch(`${API}/payfast/status/${orderId}`);
+    const token = localStorage.getItem('v808_token');
+
+    const res  = await fetch(`${API}/paystack/verify`, {
+      method:  'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        ...(token && { Authorization: `Bearer ${token}` }),
+      },
+      body: JSON.stringify({ reference }),
+    });
+
     const data = await res.json();
-    console.log('Poll result:', JSON.stringify(data));
+    console.log('[OrderSuccess] Verify result:', data);
 
-    if (!data.success) return;
-
-    const payStatus = data.order?.payment?.status;
-
-    if (payStatus === 'paid') {
+    if (data.success) {
+      // Clean up
       localStorage.removeItem('v808_cart');
-      safeRedirect(`./order-confirmation.html?order=${orderId}`);
-      return;
-    }
+      sessionStorage.removeItem('v808_paystack_ref');
+      sessionStorage.removeItem('v808_paystack_order_id');
+      sessionStorage.removeItem('v808_pending_order');
 
-    if (payStatus === 'cancelled' || payStatus === 'failed') {
-      safeRedirect('./checkout.html?status=cancelled&restore=1');
-      return;
+      window.location.replace(
+        `./order-confirmation.html?order=${data.order?._id || orderId}`
+      );
+    } else {
+      // Payment failed or not found
+      window.location.replace('./checkout.html?status=cancelled&restore=1');
     }
 
   } catch (err) {
-    console.error('Poll error:', err);
+    console.error('[OrderSuccess] Error:', err);
+    // Retry once after 3s in case of network blip
+    setTimeout(verifyAndRedirect, 3000);
   }
 }
 
-const poller = setInterval(pollPaymentStatus, 3000);
-pollPaymentStatus();
+verifyAndRedirect();
