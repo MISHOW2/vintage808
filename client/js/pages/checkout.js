@@ -5,7 +5,7 @@ const API = window.location.hostname === '127.0.0.1' || window.location.hostname
   ? 'http://localhost:5000/api'
   : 'https://vintage808-api.vercel.app/api';
 
-const SHIPPING = 0; // temporarily disabled for testing
+const SHIPPING = 150;
 
 // ── Auth guard ────────────────────────────────────────────────
 const token = localStorage.getItem('v808_token');
