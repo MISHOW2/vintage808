@@ -21,7 +21,20 @@ export function nav() {
     burger.setAttribute('aria-expanded', 'false');
     drawer.setAttribute('aria-hidden', 'true');
   }
-
+// ── Drawer sign out button ────────────────────────────────
+const drawerLogout = document.getElementById('drawer-logout-btn');
+if (drawerLogout) {
+  // Show only when logged in
+  if (localStorage.getItem('v808_token')) {
+    drawerLogout.style.display = 'flex';
+  }
+  drawerLogout.addEventListener('click', () => {
+    localStorage.removeItem('v808_token');
+    localStorage.removeItem('v808_user');
+    sessionStorage.clear();
+    window.location.href = './index.html';
+  });
+}
   window.closeNavDrawer = closeMenu;
 
   burger.addEventListener('click', () => {
