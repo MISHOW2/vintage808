@@ -1,3 +1,5 @@
+// js/pages/order-confirmation.js
+
 const API = 'https://vintage808-api.vercel.app/api';
 
 const params  = new URLSearchParams(window.location.search);
@@ -10,38 +12,36 @@ if (!orderId) {
 
 async function init() {
   try {
-    const res  = await fetch(`${API}/payfast/status/${orderId}`);
+    const token = localStorage.getItem('v808_token');
+
+    const res  = await fetch(`${API}/orders/${orderId}`, {
+      headers: {
+        ...(token && { Authorization: `Bearer ${token}` }),
+      },
+    });
+
     const data = await res.json();
-
-    // ── FIX: check payment.status, not order.status ──────────
-    const payStatus = data.order?.payment?.status;
-
-    if (!data.success || payStatus !== 'paid') {
-      // Only send back to processing if it's genuinely still pending
-      // — not if the page was already confirmed (timeout param)
-      const isTimeout = params.get('timeout') === '1';
-      if (!isTimeout && (payStatus === 'pending' || payStatus === undefined)) {
-        window.location.replace(`./payment-processing.html?order=${orderId}`);
-      }
-      // If failed/cancelled or unknown, go to checkout
-      else if (payStatus === 'failed' || payStatus === 'cancelled') {
-        window.location.replace('./checkout.html?status=cancelled&restore=1');
-      }
-      return;
-    }
-
-    // ── Fetch full order from API (more reliable than sessionStorage) ─
-    let order = data.order;
+    let order  = data.data ?? data.order ?? null;
 
     // Fallback to sessionStorage if API order is missing items
-    if (!order.items?.length) {
+    if (!order?.items?.length) {
       const stored = sessionStorage.getItem('v808_pending_order');
-      if (stored) order = { ...JSON.parse(stored), ...order };
+      if (stored) {
+        const stored_order = JSON.parse(stored);
+        order = order ? { ...stored_order, ...order } : stored_order;
+      }
+    }
+
+    if (!order) {
+      console.error('[OrderConfirmation] Order not found');
+      return;
     }
 
     // ── Render order ID ───────────────────────────────────────
     const idEl = document.getElementById('confirm-order-id');
-    if (idEl) idEl.textContent = `#${orderId.slice(-6).toUpperCase()}`;
+    if (idEl) {
+      idEl.textContent = order.orderNumber || `#${orderId.slice(-6).toUpperCase()}`;
+    }
 
     // ── Render date ───────────────────────────────────────────
     const dateEl = document.getElementById('confirm-date');
@@ -67,7 +67,8 @@ async function init() {
     if (itemsEl && order.items?.length) {
       itemsEl.innerHTML = order.items.map(item => `
         <div class="confirm-item">
-          <img class="confirm-item-img" src="${item.image ?? ''}" alt="${item.name}" />
+          <img class="confirm-item-img" src="${item.image ?? ''}" alt="${item.name}"
+               onerror="this.style.display='none'" />
           <div class="confirm-item-info">
             <p class="confirm-item-name">${item.name}</p>
             <p class="confirm-item-meta">
@@ -87,7 +88,7 @@ async function init() {
 
   } catch (err) {
     console.error('[OrderConfirmation] Error:', err);
-    // Network error — don't loop, just show a fallback message
+    // Network error — show fallback order ID so page isn't blank
     const el = document.getElementById('confirm-order-id');
     if (el) el.textContent = `#${orderId.slice(-6).toUpperCase()}`;
   }
